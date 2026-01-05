@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'pro'
+export type SubscriptionTier = 'free' | 'pro' | 'premium'
 
 export interface UsageLimits {
   requests: number
@@ -11,15 +11,19 @@ export const TIER_LIMITS: Record<SubscriptionTier, UsageLimits> = {
   pro: {
     requests: 1000,
   },
+  premium: {
+    requests: 1000,
+  },
 }
 
 export function getTierLimits(tier: SubscriptionTier): UsageLimits {
-  return TIER_LIMITS[tier]
+  return TIER_LIMITS[tier] || TIER_LIMITS.free
 }
 
 export function checkUsageLimit(
   tier: SubscriptionTier,
-  currentUsage: number
+  _feature?: string,
+  currentUsage: number = 0
 ): { allowed: boolean; remaining: number; limit: number } {
   const limits = getTierLimits(tier)
   const limit = limits.requests

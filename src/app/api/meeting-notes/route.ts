@@ -41,15 +41,17 @@ export async function POST(request: Request) {
 
     const tier = (userData?.subscription_tier || 'free') as 'free' | 'pro' | 'premium'
 
-    const currentMonth = new Date().toISOString().slice(0, 7)
+    const startOfMonth = new Date()
+    startOfMonth.setDate(1)
+    startOfMonth.setHours(0, 0, 0, 0)
+    
     const { data: usageData } = await supabase
       .from('usage_stats')
       .select('meeting_notes_count')
       .eq('user_id', user.id)
-      .like('date', `${currentMonth}%`)
-      .single()
+      .gte('date', startOfMonth.toISOString().split('T')[0])
 
-    const currentUsage = usageData?.meeting_notes_count || 0
+    const currentUsage = usageData?.reduce((sum, row) => sum + (row.meeting_notes_count || 0), 0) || 0
     const limits = { free: 20, pro: 200, premium: Infinity }
     const limit = limits[tier]
 

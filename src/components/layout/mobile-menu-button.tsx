@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/contexts/SidebarContext";
 
@@ -12,9 +12,9 @@ export function MobileMenuButton() {
       variant="ghost"
       size="icon"
       onClick={() => setMobileOpen(true)}
-      className="md:hidden fixed top-4 right-4 z-30 h-10 w-10 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] hover:from-[#6B8EFF] hover:to-[#4169E1] backdrop-blur-sm border border-white/20 text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 rounded-xl"
+      className="md:hidden fixed top-1/2 -translate-y-1/2 left-0 z-30 h-12 w-6 bg-gradient-to-r from-[#4169E1]/90 to-[#6B8EFF]/90 hover:from-[#6B8EFF] hover:to-[#4169E1] backdrop-blur-md border-r border-t border-b border-white/20 text-white shadow-lg transition-all duration-200 rounded-r-lg rounded-l-none"
     >
-      <Menu className="h-5 w-5" />
+      <ChevronRight className="h-4 w-4" />
     </Button>
   );
 }

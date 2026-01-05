@@ -6,7 +6,14 @@ const ALLOWED_TAGS = ['h1', 'h2', 'h3', 'h4', 'p', 'ul', 'ol', 'li', 'blockquote
 const ALLOWED_ATTRS = ['class'];
 
 export function sanitizeHtml(html: string): string {
-  if (typeof window === 'undefined') return html;
+  if (typeof window === 'undefined') {
+    // Server-side: simple text-based sanitization
+    return html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+      .replace(/javascript:/gi, '')
+  }
   
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');

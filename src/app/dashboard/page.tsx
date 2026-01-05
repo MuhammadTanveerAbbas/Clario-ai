@@ -67,6 +67,16 @@ export default function DashboardPage() {
     if (user) {
       loadDashboardData()
     }
+
+    // Reload data when page becomes visible
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        loadDashboardData()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [user, authLoading])
 
   const loadDashboardData = async () => {
@@ -111,17 +121,12 @@ export default function DashboardPage() {
         .eq('user_id', user?.id)
 
       const currentMonth = new Date().toISOString().slice(0, 7)
-      const currentMonthUsage = usageData?.find((u) => u.date.startsWith(currentMonth)) || {
-        summaries_count: 0,
-        chats_count: 0,
-        meeting_notes_count: 0,
-        writing_sessions: 0,
-      }
+      const currentMonthUsage = usageData?.find((u) => u?.date?.startsWith(currentMonth))
 
-      const totalRequests = (currentMonthUsage.summaries_count || 0) +
-        (currentMonthUsage.chats_count || 0) +
-        (currentMonthUsage.meeting_notes_count || 0) +
-        (currentMonthUsage.writing_sessions || 0)
+      const totalRequests = (currentMonthUsage?.summaries_count || 0) +
+        (currentMonthUsage?.chats_count || 0) +
+        (currentMonthUsage?.meeting_notes_count || 0) +
+        (currentMonthUsage?.writing_sessions || 0)
 
       setStats({
         totalSummaries: summariesCount || 0,
@@ -134,9 +139,9 @@ export default function DashboardPage() {
       })
 
       const chartData = usageData?.slice(0, 7).reverse().map((u) => ({
-        date: new Date(u.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        summaries: u.summaries_count,
-        chats: u.chats_count,
+        date: new Date(u?.date || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        summaries: u?.summaries_count || 0,
+        chats: u?.chats_count || 0,
       })) || []
 
       setChartData(chartData)

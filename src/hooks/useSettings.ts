@@ -40,31 +40,26 @@ export function useSettings({
             setLoading(true)
             const { data, error } = await supabase
                 .from('users')
-                .select('name, email, subscription_tier, subscription_status')
+                .select('name, email, subscription_tier')
                 .eq('id', userId)
                 .single()
 
-            if (error) throw error
+            if (error && error.code !== 'PGRST116') throw error
 
             if (data) {
                 setProfile({
                     name: data.name || userName || '',
                     email: data.email || userEmail || '',
                     subscription_tier: data.subscription_tier || 'free',
-                    subscription_status: data.subscription_status || 'active',
+                    subscription_status: 'active',
                 })
             }
         } catch (error: any) {
             console.error('Error loading profile:', error)
-            toast({
-                variant: 'destructive',
-                title: 'Error',
-                description: 'Failed to load profile settings.',
-            })
         } finally {
             setLoading(false)
         }
-    }, [userId, userEmail, userName, supabase, toast])
+    }, [userId, userEmail, userName, supabase])
 
     // Load profile on mount
     useEffect(() => {

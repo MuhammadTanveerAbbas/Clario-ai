@@ -1,115 +1,118 @@
-'use client'
+"use client";
 
-import { useState, useRef, useEffect } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
-import { useSidebar } from '@/contexts/SidebarContext'
-import { AppSidebar } from '@/components/layout/app-sidebar'
-import { MobileMenuButton } from '@/components/layout/mobile-menu-button'
-import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
-import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Loader2, Send, Copy, RefreshCw, User, Bot } from 'lucide-react'
-import { useToast } from '@/hooks/use-toast'
-import { motion, AnimatePresence } from 'framer-motion'
-import { checkUsageLimit } from '@/lib/usage-limits'
-import { MarkdownRenderer } from '@/components/markdown-renderer'
+import { useState, useRef, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useSidebar } from "@/contexts/SidebarContext";
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { MobileMenuButton } from "@/components/layout/mobile-menu-button";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Loader2, Send, Copy, RefreshCw, User, Bot } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
+import { checkUsageLimit } from "@/lib/usage-limits";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
 
 interface Message {
-  id: string
-  role: 'user' | 'assistant'
-  content: string
-  timestamp: Date
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
 }
 
 export default function ChatPage() {
-  const { user, loading: authLoading } = useAuth()
-  const { collapsed } = useSidebar()
-  const router = useRouter()
-  const { toast } = useToast()
-  const supabase = createClient()
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [userTier, setUserTier] = useState<'free' | 'pro' | 'premium'>('free')
-  const [chatUsage, setChatUsage] = useState(0)
+  const { user, loading: authLoading } = useAuth();
+  const { collapsed } = useSidebar();
+  const router = useRouter();
+  const { toast } = useToast();
+  const supabase = createClient();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [userTier, setUserTier] = useState<"free" | "pro" | "premium">("free");
+  const [chatUsage, setChatUsage] = useState(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/sign-in?redirect=/chat')
-      return
+      router.push("/sign-in?redirect=/chat");
+      return;
     }
 
     if (user) {
-      loadUserData()
+      loadUserData();
     }
-  }, [user, authLoading])
+  }, [user, authLoading]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const loadUserData = async () => {
     try {
       const { data: userData } = await supabase
-        .from('users')
-        .select('subscription_tier')
-        .eq('id', user?.id)
-        .single()
+        .from("users")
+        .select("subscription_tier")
+        .eq("id", user?.id)
+        .single();
 
-      const tier = (userData?.subscription_tier || 'free') as 'free' | 'pro' | 'premium'
-      setUserTier(tier)
+      const tier = (userData?.subscription_tier || "free") as
+        | "free"
+        | "pro"
+        | "premium";
+      setUserTier(tier);
 
       // Get current month usage
-      const currentMonth = new Date().toISOString().slice(0, 7)
+      const currentMonth = new Date().toISOString().slice(0, 7);
       const { data: usageData } = await supabase
-        .from('usage_stats')
-        .select('chats_count')
-        .eq('user_id', user?.id)
-        .like('date', `${currentMonth}%`)
-        .single()
+        .from("usage_stats")
+        .select("chats_count")
+        .eq("user_id", user?.id)
+        .like("date", `${currentMonth}%`)
+        .single();
 
-      setChatUsage(usageData?.chats_count || 0)
+      setChatUsage(usageData?.chats_count || 0);
     } catch (error) {
-      console.error('Error loading user data:', error)
+      console.error("Error loading user data:", error);
     }
-  }
+  };
 
   const handleSend = async () => {
-    if (!input.trim() || loading) return
+    if (!input.trim() || loading) return;
 
     // Check usage limits
-    const usageCheck = checkUsageLimit(userTier, 'chats', chatUsage)
+    const usageCheck = checkUsageLimit(userTier, "chats", chatUsage);
     if (!usageCheck.allowed) {
       toast({
-        variant: 'destructive',
-        title: 'Usage limit reached',
+        variant: "destructive",
+        title: "Usage limit reached",
         description: `You've reached your ${userTier} tier limit. Please upgrade to continue.`,
-      })
-      router.push('/pricing')
-      return
+      });
+      router.push("/pricing");
+      return;
     }
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      role: 'user',
+      role: "user",
       content: input,
       timestamp: new Date(),
-    }
+    };
 
-    setMessages((prev) => [...prev, userMessage])
-    setInput('')
-    setLoading(true)
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
 
     try {
       // Call API route
-      const response = await fetch('/api/chat', {
-        method: 'POST',
+      const response = await fetch("/api/chat", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           message: input,
@@ -118,64 +121,73 @@ export default function ChatPage() {
             content: m.content,
           })),
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-        throw new Error(errorData.error || `HTTP ${response.status}`)
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.response || 'Sorry, I could not generate a response.',
+        role: "assistant",
+        content: data.response || "Sorry, I could not generate a response.",
         timestamp: new Date(),
-      }
+      };
 
-      setMessages((prev) => [...prev, assistantMessage])
-      setChatUsage((prev) => prev + 1)
+      setMessages((prev) => [...prev, assistantMessage]);
+      setChatUsage((prev) => prev + 1);
     } catch (error: any) {
-      console.error('Error sending message:', error)
+      console.error("Error sending message:", error);
       toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: error.message || 'Failed to send message. Please try again.',
-      })
+        variant: "destructive",
+        title: "Error",
+        description:
+          error.message || "Failed to send message. Please try again.",
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content)
+    navigator.clipboard.writeText(content);
     toast({
-      title: 'Copied!',
-      description: 'Message copied to clipboard.',
-    })
-  }
+      title: "Copied!",
+      description: "Message copied to clipboard.",
+    });
+  };
 
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black">
         <Loader2 className="h-8 w-8 animate-spin text-[#4169E1]" />
       </div>
-    )
+    );
   }
 
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <AppSidebar />
       <MobileMenuButton />
-      <main className={`flex-1 transition-all duration-300 ${collapsed ? 'ml-0 md:ml-[80px]' : 'ml-0 md:ml-[256px]'} flex flex-col h-screen`}>
+      <main
+        className={`flex-1 transition-all duration-300 ${
+          collapsed ? "ml-0 md:ml-[80px]" : "ml-0 md:ml-[256px]"
+        } flex flex-col h-screen`}
+      >
         {/* Header */}
         <div className="bg-gradient-to-r from-[#4169E1]/10 via-purple-500/5 to-pink-500/5 border-b border-[#4169E1]/20 p-4 md:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">AI Chat</h1>
+              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                AI Chat
+              </h1>
               <p className="text-xs md:text-sm text-gray-400 mt-1">
-                Powered by Groq's lightning-fast language models
+                Powered by Clario Engine
               </p>
             </div>
             <div className="flex items-center gap-2 md:gap-3">
@@ -183,7 +195,11 @@ export default function ChatPage() {
                 ⚡ Online
               </div>
               <div className="text-[10px] md:text-xs text-gray-400">
-                {chatUsage} / {checkUsageLimit(userTier, 'chats', chatUsage).limit === Infinity ? '∞' : checkUsageLimit(userTier, 'chats', chatUsage).limit}
+                {chatUsage} /{" "}
+                {checkUsageLimit(userTier, "chats", chatUsage).limit ===
+                Infinity
+                  ? "∞"
+                  : checkUsageLimit(userTier, "chats", chatUsage).limit}
               </div>
             </div>
           </div>
@@ -205,10 +221,19 @@ export default function ChatPage() {
                     </div>
                     <div className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-green-400 rounded-full border-2 border-black animate-pulse" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Ready to Chat!</h3>
-                  <p className="text-sm md:text-base text-gray-400 mb-4">Ask me anything - I'm here to help with your questions.</p>
+                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">
+                    Ready to Chat!
+                  </h3>
+                  <p className="text-sm md:text-base text-gray-400 mb-4">
+                    Ask me anything - I'm here to help with your questions.
+                  </p>
                   <div className="flex flex-wrap gap-2 justify-center">
-                    {['Explain a concept', 'Write code', 'Brainstorm ideas', 'Solve problems'].map((suggestion) => (
+                    {[
+                      "Explain a concept",
+                      "Write code",
+                      "Brainstorm ideas",
+                      "Solve problems",
+                    ].map((suggestion) => (
                       <button
                         key={suggestion}
                         onClick={() => setInput(suggestion)}
@@ -227,9 +252,11 @@ export default function ChatPage() {
                 key={message.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`flex gap-3 md:gap-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-3 md:gap-4 ${
+                  message.role === "user" ? "justify-end" : "justify-start"
+                }`}
               >
-                {message.role === 'assistant' && (
+                {message.role === "assistant" && (
                   <div className="relative">
                     <Avatar className="h-8 w-8 md:h-10 md:w-10 ring-2 ring-[#4169E1]/30">
                       <AvatarFallback className="bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] text-white">
@@ -241,20 +268,25 @@ export default function ChatPage() {
                 )}
                 <Card
                   className={`max-w-[85%] md:max-w-[75%] transition-all duration-200 hover:shadow-lg ${
-                    message.role === 'user'
-                      ? 'bg-gradient-to-br from-[#4169E1]/20 to-[#6B8EFF]/10 border-[#4169E1]/30'
-                      : 'bg-gradient-to-br from-white/5 to-white/10 border-white/10'
+                    message.role === "user"
+                      ? "bg-gradient-to-br from-[#4169E1]/20 to-[#6B8EFF]/10 border-[#4169E1]/30"
+                      : "bg-gradient-to-br from-white/5 to-white/10 border-white/10"
                   }`}
                 >
                   <CardContent className="p-3 md:p-4">
-                    {message.role === 'assistant' ? (
+                    {message.role === "assistant" ? (
                       <MarkdownRenderer content={message.content} />
                     ) : (
-                      <p className="text-white whitespace-pre-wrap leading-relaxed text-sm md:text-base">{message.content}</p>
+                      <p className="text-white whitespace-pre-wrap leading-relaxed text-sm md:text-base">
+                        {message.content}
+                      </p>
                     )}
                     <div className="flex items-center justify-between mt-2 md:mt-3 pt-2 border-t border-white/10">
                       <span className="text-[10px] md:text-xs text-gray-400">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {message.timestamp.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
                       </span>
                       <Button
                         variant="ghost"
@@ -267,7 +299,7 @@ export default function ChatPage() {
                     </div>
                   </CardContent>
                 </Card>
-                {message.role === 'user' && (
+                {message.role === "user" && (
                   <Avatar className="h-8 w-8 md:h-10 md:w-10 ring-2 ring-gray-600/30">
                     <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-700 text-white">
                       <User className="h-4 w-4 md:h-5 md:w-5" />
@@ -308,13 +340,13 @@ export default function ChatPage() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault()
-                      handleSend()
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
                     }
                   }}
                   placeholder="Type your message..."
-                  className="bg-white/5 border-white/20 text-white resize-none rounded-xl focus:ring-2 focus:ring-[#4169E1]/50 focus:border-[#4169E1]/50 transition-all text-sm py-2.5"
+                  className="bg-white/5 border-white/20 text-white resize-none rounded-xl focus:ring-2 focus:ring-[#4169E1]/50 focus:border-[#4169E1]/50 transition-all text-sm min-h-[42px] max-h-[42px] py-2.5"
                   rows={1}
                   disabled={loading}
                 />
@@ -335,19 +367,30 @@ export default function ChatPage() {
               </Button>
             </div>
             <div className="flex items-center justify-between mt-2 md:mt-3 text-[10px] md:text-xs text-gray-400">
-              <span className="hidden sm:inline">Press Shift + Enter for new line</span>
-              <span className={`px-2 py-1 rounded-full ${
-                chatUsage >= checkUsageLimit(userTier, 'chats', chatUsage).limit && checkUsageLimit(userTier, 'chats', chatUsage).limit !== Infinity
-                  ? 'bg-red-500/20 text-red-400'
-                  : 'bg-green-500/20 text-green-400'
-              }`}>
-                {chatUsage} / {checkUsageLimit(userTier, 'chats', chatUsage).limit === Infinity ? '∞' : checkUsageLimit(userTier, 'chats', chatUsage).limit} messages
+              <span className="hidden sm:inline">
+                Press Shift + Enter for new line
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full ${
+                  chatUsage >=
+                    checkUsageLimit(userTier, "chats", chatUsage).limit &&
+                  checkUsageLimit(userTier, "chats", chatUsage).limit !==
+                    Infinity
+                    ? "bg-red-500/20 text-red-400"
+                    : "bg-green-500/20 text-green-400"
+                }`}
+              >
+                {chatUsage} /{" "}
+                {checkUsageLimit(userTier, "chats", chatUsage).limit ===
+                Infinity
+                  ? "∞"
+                  : checkUsageLimit(userTier, "chats", chatUsage).limit}{" "}
+                messages
               </span>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
-

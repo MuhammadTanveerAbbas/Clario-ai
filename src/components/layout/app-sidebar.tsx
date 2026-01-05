@@ -126,8 +126,8 @@ export function AppSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 md:p-4 space-y-0.5 md:overflow-hidden overflow-y-auto">
-          {navigation.map((item) => {
+        <nav className="flex-1 p-3 md:p-4 md:overflow-hidden overflow-y-auto">
+          {navigation.map((item, index) => {
             const isActive =
               pathname === item.href || pathname?.startsWith(item.href + "/");
             const Icon = item.icon;
@@ -137,6 +137,7 @@ export function AppSidebar() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
+                className={index > 0 ? "block mt-4" : "block"}
               >
                 <motion.div
                   whileHover={{ scale: 1.02, x: 4 }}
