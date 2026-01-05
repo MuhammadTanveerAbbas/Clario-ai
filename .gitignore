@@ -44,3 +44,7 @@ next-env.d.ts
 
 # OS
 Thumbs.db
+
+# database credentials only (keep migration files)
+database/.env
+database/credentials.json

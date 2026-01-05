@@ -2,24 +2,43 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Github, Menu, StickyNote, X } from 'lucide-react';
-
+import { Menu, StickyNote, X, User } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { VisuallyHidden } from '@/components/ui/visually-hidden';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 const navLinks: { href: string; label: string }[] = [];
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useAuth();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/10" style={{ backgroundColor: '#000000' }}>
-      <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
+      <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         <div className="flex flex-1 items-center justify-start ml-[3%]">
           <Link href="/" className="flex items-center space-x-2">
-              <StickyNote className="h-5 w-5 text-[#4169E1]" />
-              <span className="font-bold text-white sm:inline-block">Clario</span>
+              <StickyNote className="h-6 w-6 text-[#4169E1]" />
+              <span className="font-bold text-white sm:inline-block text-lg">Clario</span>
           </Link>
         </div>
 
@@ -35,13 +54,44 @@ export function Navbar() {
           ))}
         </nav>
 
-        <div className="flex flex-1 items-center justify-end">
-            <a href="https://github.com/muhammadtanveerabbas/clario-ai-summarizer" target="_blank" rel="noopener noreferrer">
-                <Button variant="ghost" className="text-white hover:bg-white/10">
-                    <Github className="mr-1.5 h-4 w-4 text-[#4169E1]" />
-                    GitHub
+        <div className="flex flex-1 items-center justify-end gap-2 mr-2 sm:mr-0">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                  <Avatar className="h-9 w-9">
+                    <AvatarFallback className="bg-[#4169E1] text-white flex items-center justify-center">
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
-            </a>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-black border-white/10">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium text-white">{user.email}</p>
+                  </div>
+                </div>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={() => router.push('/dashboard')} className="text-gray-400 hover:text-white cursor-pointer">
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/settings')} className="text-gray-400 hover:text-white cursor-pointer">
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/10" />
+                <DropdownMenuItem onClick={handleSignOut} className="text-gray-400 hover:text-white cursor-pointer">
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/sign-up">
+              <Button className="bg-gradient-to-r from-[#4169E1] to-[#5179F1] text-white hover:from-[#3159D1] hover:to-[#4169E1] font-semibold shadow-lg shadow-[#4169E1]/20 transition-all px-4 sm:px-6 text-sm h-10">
+                Create Account
+              </Button>
+            </Link>
+          )}
         </div>
 
 

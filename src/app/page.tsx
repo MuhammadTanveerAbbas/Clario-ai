@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { UniqueLoader } from "@/components/ui/unique-loader";
 import { Navbar } from "@/components/layout/navbar";
+import { useAuth } from "@/contexts/AuthContext";
+import { Footer } from "@/components/layout/footer";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -12,299 +15,136 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
-  Briefcase,
   CheckCircle,
-  Flame,
-  Gavel,
-  Github,
-  LayoutList,
-  Linkedin,
-  ListTodo,
   Sparkles,
-  Target,
   Zap,
-  Chrome,
-  Code,
   FileText,
-  Users,
-  Check,
+  MessageSquare,
+  PenTool,
+  ClipboardList,
+  Shield,
+  BarChart3,
+  ArrowRight,
+  Rocket,
+  BookOpen,
+  Briefcase,
+  Edit3,
+  Microscope,
   X,
+  DollarSign,
+  Users,
+  Lock,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 
-const features: {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-}[] = [
+const coreFeatures = [
   {
-    title: "Action Items Only",
-    description: "Extract a clean list of tasks and to dos.",
-    icon: ListTodo,
-  },
-  {
-    title: "Decisions Made",
-    description: "Get a summary of all key decisions.",
-    icon: Gavel,
-  },
-  {
-    title: "Brutal Roast",
-    description: "A humorous, overly critical take on your text.",
-    icon: Flame,
-  },
-  {
-    title: "Executive Brief",
-    description: "A high level summary for busy leaders.",
-    icon: Briefcase,
-  },
-  {
-    title: "Full Breakdown",
-    description: "A detailed, section by section analysis.",
-    icon: LayoutList,
-  },
-  {
-    title: "Key Quotes",
-    description: "Extract the most impactful quotes.",
-    icon: Sparkles,
-  },
-  {
-    title: "Sentiment Analysis",
-    description: "Analyze tone and emotion of the text.",
-    icon: Target,
-  },
-  {
-    title: "ELI5",
-    description: "Explain complex topics in simple terms.",
-    icon: CheckCircle,
-  },
-  {
-    title: "SWOT Analysis",
-    description: "Identify strengths, weaknesses, opportunities, threats.",
-    icon: Target,
-  },
-  {
-    title: "Meeting Minutes",
-    description: "Create formal, structured meeting records.",
-    icon: CheckCircle,
-  },
-];
-
-const useCases = [
-  {
-    icon: Users,
-    title: "Team Meetings",
+    title: "Text Summarizer",
     description:
-      "Convert hour long meetings into actionable summaries in seconds.",
-  },
-  {
+      "Transform long content into concise summaries with 6 AI-powered modes. Perfect for quickly understanding documents, articles, and reports.",
     icon: FileText,
-    title: "Research & Articles",
-    description:
-      "Extract key insights from lengthy research papers and articles.",
+    color: "from-blue-500 to-cyan-500",
   },
   {
-    icon: Briefcase,
-    title: "Business Reports",
-    description: "Create executive briefs and SWOT analyses for stakeholders.",
+    title: "AI Chat",
+    description:
+      "Conversational AI powered by Groq's Llama models. Get instant, intelligent responses to your questions and ideas.",
+    icon: MessageSquare,
+    color: "from-purple-500 to-pink-500",
+  },
+  {
+    title: "Writing Assistant",
+    description:
+      "Enhance your writing with AI suggestions, tone adjustment, and style improvements. Write better, faster.",
+    icon: PenTool,
+    color: "from-orange-500 to-red-500",
+  },
+  {
+    title: "Meeting Notes",
+    description:
+      "Convert meeting transcripts into structured notes with summaries, action items, and key discussion points.",
+    icon: ClipboardList,
+    color: "from-cyan-500 to-blue-500",
   },
 ];
 
 const stats = [
-  { value: "10", label: "Summary Modes" },
-  { value: "50K", label: "Character Limit" },
-  { value: "100%", label: "Free Forever" },
-  { value: "<2s", label: "Average Speed" },
-];
-
-const pricingTiers = [
   {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    description: "Perfect for individuals",
-    features: [
-      "10 Summary Modes",
-      "50K Character Limit",
-      "PDF & Markdown Export",
-      "Browser Extension",
-      "History (50 summaries)",
-      "Community Support",
-    ],
-    cta: "Get Started",
-    popular: false,
+    value: "5",
+    label: "AI Features",
+    description: "All-in-one productivity platform",
   },
   {
-    name: "Pro",
-    price: "$9",
-    period: "/month",
-    description: "For power users",
-    features: [
-      "Everything in Free",
-      "200K Character Limit",
-      "Unlimited History",
-      "Priority Processing",
-      "API Access (1000 req/day)",
-      "Email Support",
-      "Custom Templates",
-    ],
-    cta: "Start Free Trial",
-    popular: true,
+    value: "100",
+    label: "Free Requests",
+    description: "Per month on free plan",
   },
   {
-    name: "Enterprise",
-    price: "$49",
-    period: "/month",
-    description: "For teams & businesses",
-    features: [
-      "Everything in Pro",
-      "Unlimited Characters",
-      "Team Workspaces",
-      "Unlimited API Access",
-      "SSO & Advanced Security",
-      "Dedicated Support",
-      "Custom AI Models",
-      "White-label Option",
-    ],
-    cta: "Contact Sales",
-    popular: false,
-  },
-];
-
-const comparisonFeatures = [
-  {
-    feature: "Summary Modes",
-    clario: "10",
-    competitor1: "3",
-    competitor2: "5",
+    value: "$20",
+    label: "Pro Plan",
+    description: "1000 requests per month",
   },
   {
-    feature: "Character Limit",
-    clario: "50K",
-    competitor1: "5K",
-    competitor2: "10K",
-  },
-  {
-    feature: "Export Formats",
-    clario: "3 (PDF, MD, Copy)",
-    competitor1: "1 (Copy)",
-    competitor2: "2 (PDF, Copy)",
-  },
-  {
-    feature: "Browser Extension",
-    clario: true,
-    competitor1: false,
-    competitor2: false,
-  },
-  {
-    feature: "API Access",
-    clario: true,
-    competitor1: false,
-    competitor2: true,
-  },
-  {
-    feature: "History Management",
-    clario: "50 summaries",
-    competitor1: "None",
-    competitor2: "10 summaries",
-  },
-  {
-    feature: "No Login Required",
-    clario: true,
-    competitor1: false,
-    competitor2: false,
-  },
-  {
-    feature: "Free Tier",
-    clario: "Full Features",
-    competitor1: "Limited",
-    competitor2: "Trial Only",
-  },
-  {
-    feature: "Processing Speed",
-    clario: "<2s",
-    competitor1: "5-10s",
-    competitor2: "3-5s",
-  },
-  {
-    feature: "Privacy",
-    clario: "Local Storage",
-    competitor1: "Cloud Stored",
-    competitor2: "Cloud Stored",
+    value: "24/7",
+    label: "Available",
+    description: "Access anytime, anywhere",
   },
 ];
 
 const faqItems = [
   {
-    question: "How accurate is it?",
+    question: "What is Clario?",
     answer:
-      "The accuracy depends heavily on the quality of your input. Vague transcripts will result in blunt, and sometimes unhelpful, output. Clear, well structured text yields the best results.",
+      "Clario is an AI-powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and an intelligent knowledge graph. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
   },
-  {
-    question: "What exactly is Brutal Roast mode?",
-    answer:
-      "It'''s a sarcastic, humorous critique of your text. It points out everything that could be wrong, from grammar to clarity, and suggests improvements in a very direct way.",
-  },
-  {
-    question: "Do I need an account to use this?",
-    answer:
-      "Nope. There are no sign ups or logins. Everything runs locally in your browser, and your data is only stored in cookies for your convenience.",
-  },
-  {
-    question: "Can I export the summaries?",
-    answer:
-      "Yes. You can instantly copy the generated summary text with a single click and paste it wherever you need it.",
-  },
-  {
-    question: "Is my data saved anywhere?",
-    answer:
-      "No. Your data is not stored on any servers. All processing happens in your browser, and the text you paste is only kept in local storage for your convenience. It is never sent to or stored by us.",
-  },
-];
 
-const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg
-    viewBox="0 0 1200 1227"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <path
-      d="M714.163 519.284L1160.89 0H1055.03L667.137 450.887L357.328 0H0L468.492 681.821L0 1226.37H105.866L515.491 750.218L842.672 1226.37H1200L714.137 519.284H714.163ZM569.165 687.828L521.697 619.934L112.633 43.4836H312.3L604.212 514.974L651.68 582.869L1099.03 1184.04H899.362L569.165 687.854V687.828Z"
-      fill="currentColor"
-    />
-  </svg>
-);
-
-const socialLinks = [
   {
-    href: "https://linkedin.com/in/muhammadtanveerabbas",
-    icon: Linkedin,
-    label: "LinkedIn",
+    question: "What counts as a request?",
+    answer:
+      "Each AI operation counts as one request: summarization, chat message, writing assistance, or meeting notes generation. Your monthly limit resets on the same date each month.",
   },
   {
-    href: "https://github.com/muhammadtanveerabbas",
-    icon: Github,
-    label: "GitHub",
+    question: "Can I cancel anytime?",
+    answer:
+      "Yes! Cancel your Pro subscription anytime with no penalties. You'll keep access until the end of your billing period, then automatically move to the free plan. All your data remains intact.",
   },
   {
-    href: "https://x.com/m_tanveerabbas",
-    icon: XIcon,
-    label: "X",
+    question: "Is my data secure?",
+    answer:
+      "Yes. We use Row Level Security (RLS), PKCE authentication, encrypted data storage, and rate limiting. Your data is private and only accessible to you. We follow industry-standard security practices.",
+  },
+  {
+    question: "What AI models power Clario?",
+    answer:
+      "We use Groq SDK with Llama 3.3 70B for fast chat and analysis. Google Gemini API powers text summarization. This combination provides both speed and accuracy.",
+  },
+  {
+    question: "Is there a money-back guarantee?",
+    answer:
+      "Yes! We offer a 30-day money-back guarantee on Pro plan purchases. If you're not satisfied, contact support for a full refund.",
   },
 ];
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+    };
+  }, []);
 
   const handleCTAClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      router.push("/tool");
-    }, 100);
+    const targetRoute = user ? "/dashboard" : "/sign-up";
+    router.push(targetRoute);
   };
 
   return (
@@ -313,356 +153,380 @@ export default function Home() {
       <div className="flex min-h-dvh flex-col">
         <Navbar />
         <main className="flex-1">
+          {/* Hero Section */}
           <section
             id="home"
-            className="relative flex h-dvh min-h-[700px] w-full flex-col items-center justify-center overflow-hidden text-center -mt-14 sm:mt-0"
+            className="relative flex min-h-[600px] sm:min-h-[700px] h-dvh w-full flex-col items-center justify-center overflow-hidden text-center px-4 -mt-14 sm:mt-0"
             style={{ backgroundColor: "#000000" }}
           >
             <div className="absolute inset-0 -z-10 h-full w-full">
-              <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black/50 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px]"></div>
-              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px]">
+                <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black"></div>
+              </div>
+              <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
               <div
-                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse"
+                className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse"
                 style={{ animationDelay: "1s" }}
+              ></div>
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl animate-pulse"
+                style={{ animationDelay: "2s" }}
               ></div>
             </div>
             <div className="container z-10">
               <div className="inline-block mb-4 px-4 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm animate-fade-in">
                 <span className="text-xs sm:text-sm text-gray-300 flex items-center gap-2 flex-wrap justify-center">
                   <span className="inline-flex items-center gap-1">
-                    <svg
-                      className="h-3 w-3 sm:h-4 sm:w-4 text-[#4169E1]"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
-                    <span className="whitespace-nowrap">Instant Summaries</span>
+                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-[#4169E1]" />
+                    <span className="whitespace-nowrap">5 AI Features</span>
                   </span>
                   <span className="text-white/40">•</span>
-                  <span className="whitespace-nowrap">100% Free</span>
+                  <span className="whitespace-nowrap">Start Free</span>
                   <span className="text-white/40">•</span>
-                  <span className="whitespace-nowrap">No Sign Up</span>
+                  <span className="whitespace-nowrap">$20/mo Pro</span>
                 </span>
               </div>
-              <h1 className="font-headline text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl animate-fade-in-up px-4">
-                <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
-                  Transform Text Into Ruthless Summaries.
+              <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white animate-fade-in-up px-4">
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                  AI-Powered Productivity
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-gray-400 via-gray-500 to-gray-400 bg-clip-text text-transparent animate-gradient">
-                  Zero Fluff.
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+                  Made Simple
                 </span>
-                <br />
-                <span className="text-[#4169E1]">Maximum Clarity.</span>
               </h1>
               <p
-                className="mx-auto mt-6 max-w-2xl text-base sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4"
+                className="mx-auto mt-6 max-w-3xl text-sm sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4"
                 style={{ animationDelay: "0.2s" }}
               >
-                Transform meeting transcripts, articles, and documents into
-                clear, actionable summaries. Our AI provides ruthless,
-                structured insights in seconds. Free forever.
+                5 powerful AI features in one platform. Summarize documents, chat with AI, improve writing, and generate meeting notes. Start free with 100 requests per month.
               </p>
               <div
-                className="mt-10 flex items-center justify-center gap-x-4 animate-fade-in-up"
+                className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up px-4"
                 style={{ animationDelay: "0.4s" }}
               >
                 <Button
                   size="lg"
                   onClick={handleCTAClick}
-                  className="group relative overflow-hidden rounded-full bg-white px-8 py-6 text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/20"
+                  className="group relative overflow-hidden rounded-full bg-white px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/20 w-full sm:w-auto"
                   aria-label="Try the Tool Now"
                 >
                   <span className="relative z-10 flex items-center">
                     <Zap className="mr-2 h-5 w-5 text-[#4169E1]" />
-                    Try the Tool Now
+                    {user ? "Go to Dashboard" : "Start Free"}
                   </span>
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-gray-100 to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </Button>
               </div>
               <div
-                className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-gray-500 animate-fade-in px-4"
+                className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 text-xs text-gray-500 animate-fade-in px-4"
                 style={{ animationDelay: "0.6s" }}
               >
                 <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> No Credit
-                  Card
+                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> Free Plan
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> Instant
-                  Access
+                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> $20/mo Pro
                 </span>
                 <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> Privacy
-                  First
+                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> 30-day Guarantee
                 </span>
               </div>
             </div>
           </section>
 
+          {/* How It Works Section */}
           <section
-            id="stats"
-            className="py-16 sm:py-20"
+            id="how-it-works"
+            className="py-24 sm:py-32 relative overflow-hidden"
             style={{ backgroundColor: "#000000" }}
           >
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-                {stats.map((stat, index) => (
-                  <div
-                    key={stat.label}
-                    className="group relative text-center p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 hover:scale-105 animate-fade-in-up"
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-                    <p className="relative text-4xl font-bold text-white sm:text-5xl">
-                      {stat.value}
-                    </p>
-                    <p className="relative mt-2 text-sm text-gray-400">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section
-            id="features"
-            className="py-24 sm:py-32"
-            style={{ backgroundColor: "#000000" }}
-          >
-            <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                  Core Features
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-purple-500/5"></div>
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
+              <div className="mx-auto max-w-2xl text-center mb-20">
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Simple Process
                 </h2>
-                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                  Summarize Your Way
-                </p>
-                <p className="mt-6 text-lg leading-8 text-foreground/80">
-                  Choose from ten powerful summarization modes to get the exact
-                  output you need.
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Get Started in 3 Steps
                 </p>
               </div>
-              <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                  {features.map((feature) => (
-                    <Card
-                      key={feature.title}
-                      className="transform-gpu bg-accent/10 backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:border-accent/50"
-                    >
-                      <CardContent className="pt-6">
-                        <div className="flex flex-col items-center text-center">
-                          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
-                            <feature.icon
-                              className="h-6 w-6 text-[#4169E1]"
-                              aria-hidden="true"
-                            />
-                          </div>
-                          <h3 className="text-lg font-semibold leading-6 text-primary-foreground">
-                            {feature.title}
-                          </h3>
-                          <p className="mt-2 text-sm text-foreground/70">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+              <div className="relative">
+                {/* Connection Line */}
+                <div className="hidden lg:block absolute top-24 left-0 right-0 h-1">
+                  <div className="max-w-4xl mx-auto px-32">
+                    <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-full opacity-30"></div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 max-w-6xl mx-auto">
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0, duration: 0.5 }}
+                    className="relative"
+                  >
+                    <div className="relative z-10">
+                      <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-6 shadow-2xl shadow-blue-500/50">
+                        <span className="text-3xl font-bold text-white">1</span>
+                      </div>
+                      <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 hover:scale-105">
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Sign Up Free</h3>
+                        <p className="text-gray-400 text-center leading-relaxed">Create your account in seconds. No credit card required.</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="relative"
+                  >
+                    <div className="relative z-10">
+                      <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-6 shadow-2xl shadow-purple-500/50">
+                        <span className="text-3xl font-bold text-white">2</span>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Choose Feature</h3>
+                        <p className="text-gray-400 text-center leading-relaxed">Select from 5 AI-powered tools based on your needs.</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                    className="relative"
+                  >
+                    <div className="relative z-10">
+                      <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-6 shadow-2xl shadow-green-500/50">
+                        <span className="text-3xl font-bold text-white">3</span>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-green-500/40 transition-all duration-300 hover:scale-105">
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Get Results</h3>
+                        <p className="text-gray-400 text-center leading-relaxed">Receive instant AI-powered insights and outputs.</p>
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Use Cases Section */}
           <section
             id="use-cases"
             className="py-24 sm:py-32"
             style={{ backgroundColor: "#000000" }}
           >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
+              <div className="mx-auto max-w-2xl text-center mb-16">
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
                   Use Cases
                 </h2>
-                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                  Built for Real-World Scenarios
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Perfect For Every Professional
                 </p>
               </div>
-              <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-8 sm:mt-20 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-                {useCases.map((useCase) => (
-                  <Card
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { title: "Students", desc: "Summarize research papers and study materials", icon: BookOpen, color: "from-blue-500 to-cyan-500" },
+                  { title: "Executives", desc: "Quick meeting notes and decision summaries", icon: Briefcase, color: "from-purple-500 to-pink-500" },
+                  { title: "Writers", desc: "Improve content quality and writing style", icon: Edit3, color: "from-orange-500 to-red-500" },
+                  { title: "Researchers", desc: "Analyze documents and extract insights", icon: Microscope, color: "from-green-500 to-emerald-500" },
+                ].map((useCase, i) => (
+                  <motion.div
                     key={useCase.title}
-                    className="bg-white/5 border-white/10"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
                   >
-                    <CardContent className="pt-6">
-                      <div className="flex flex-col items-center text-center">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10">
-                          <useCase.icon
-                            className="h-6 w-6 text-[#4169E1]"
-                            aria-hidden="true"
-                          />
+                    <Card className="bg-white/5 border-white/10 hover:border-white/30 transition-all h-full group">
+                      <CardContent className="p-6 text-center">
+                        <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${useCase.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                          <useCase.icon className="h-8 w-8 text-white" />
                         </div>
-                        <h3 className="text-lg font-semibold text-white">
-                          {useCase.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-400">
-                          {useCase.description}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <h3 className="text-lg font-semibold text-white mb-2">{useCase.title}</h3>
+                        <p className="text-sm text-gray-400">{useCase.desc}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
               </div>
             </div>
           </section>
 
+          {/* Stats Section */}
           <section
-            id="extensions"
+            id="stats"
+            className="py-16 sm:py-20"
+            style={{ backgroundColor: "#000000" }}
+          >
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                {stats.map((stat, index) => (
+                  <motion.div
+                    key={stat.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group relative text-center p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 hover:scale-105"
+                  >
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                    <p className="relative text-4xl font-bold text-white sm:text-5xl">
+                      {stat.value}
+                    </p>
+                    <p className="relative mt-2 text-sm font-semibold text-gray-300">
+                      {stat.label}
+                    </p>
+                    <p className="relative mt-1 text-xs text-gray-500">
+                      {stat.description}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section
+            id="features"
             className="py-24 sm:py-32"
             style={{ backgroundColor: "#000000" }}
           >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto grid max-w-2xl grid-cols-1 gap-16 lg:mx-0 lg:max-w-none lg:grid-cols-2">
-                <div className="flex flex-col justify-center">
-                  <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                    Browser Extension
-                  </h2>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                    Summarize Any Webpage
-                  </p>
-                  <p className="mt-6 text-lg leading-8 text-foreground/80">
-                    Install our Chrome/Firefox extension and summarize any text
-                    on any website with a right-click.
-                  </p>
-                  <div className="mt-8 flex gap-4">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10"
+              <div className="mx-auto max-w-2xl text-center mb-16">
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Core Features
+                </h2>
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Everything You Need
+                </p>
+                <p className="mt-6 text-lg leading-8 text-gray-400">
+                  Four AI-driven features designed to boost your productivity and streamline your workflow.
+                </p>
+              </div>
+              <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                  {coreFeatures.map((feature, index) => (
+                    <motion.div
+                      key={feature.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
                     >
-                      <Chrome className="mr-2 h-5 w-5 text-[#4169E1]" />
-                      Chrome
-                    </Button>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <Chrome className="mr-2 h-5 w-5 text-[#4169E1]" />
-                      Firefox
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex flex-col justify-center">
-                  <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                    Developer API
-                  </h2>
-                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                    Integrate with Your Apps
-                  </p>
-                  <p className="mt-6 text-lg leading-8 text-foreground/80">
-                    Use our REST API to add summarization to your applications,
-                    bots, and workflows.
-                  </p>
-                  <div className="mt-8">
-                    <Link href="/tool">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="border-white/20 text-white hover:bg-white/10"
-                      >
-                        <Code className="mr-2 h-5 w-5 text-[#4169E1]" />
-                        View API Docs
-                      </Button>
-                    </Link>
-                  </div>
+                      <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
+                        ></div>
+                        <CardContent className="relative p-8">
+                          <div className="flex items-start space-x-4">
+                            <div
+                              className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color}`}
+                            >
+                              <feature.icon className="h-6 w-6 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-xl font-semibold text-white mb-2">
+                                {feature.title}
+                              </h3>
+                              <p className="text-gray-400 leading-relaxed">
+                                {feature.description}
+                              </p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Pricing Preview Section */}
           <section
-            id="pricing"
-            className="py-24 sm:py-32"
+            id="pricing-preview"
+            className="py-16 sm:py-20 md:py-24"
             style={{ backgroundColor: "#000000" }}
           >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
-              <div className="mx-auto max-w-2xl text-center">
-                <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                  Pricing
+              <div className="mx-auto max-w-2xl text-center mb-10 sm:mb-12">
+                <h2 className="text-sm sm:text-base font-semibold leading-7 text-blue-400">
+                  Simple Pricing
                 </h2>
-                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
+                <p className="mt-2 font-headline text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
                   Choose Your Plan
                 </p>
-                <p className="mt-6 text-lg leading-8 text-foreground/80">
-                  Start free, upgrade when you need more power.
+                <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base leading-6 sm:leading-7 text-gray-400 px-4">
+                  Start free or upgrade to Pro. Cancel anytime with our 30-day money-back guarantee.
                 </p>
               </div>
-              <div className="mx-auto mt-16 grid max-w-lg grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
-                {pricingTiers.map((tier) => (
-                  <Card
-                    key={tier.name}
-                    className={`relative flex flex-col bg-white/5 border-white/10 ${
-                      tier.popular ? "ring-2 ring-white/20" : ""
-                    }`}
-                  >
-                    {tier.popular && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <span className="inline-flex rounded-full bg-white px-4 py-1 text-sm font-semibold text-black">
-                          Most Popular
-                        </span>
-                      </div>
-                    )}
-                    <CardContent className="flex flex-col flex-1 p-8">
-                      <h3 className="text-2xl font-bold text-white">
-                        {tier.name}
-                      </h3>
-                      <p className="mt-2 text-sm text-gray-400">
-                        {tier.description}
-                      </p>
-                      <div className="mt-6 flex items-baseline gap-x-1">
-                        <span className="text-5xl font-bold text-white">
-                          {tier.price}
-                        </span>
-                        <span className="text-sm text-gray-400">
-                          {tier.period}
-                        </span>
-                      </div>
-                      <ul className="mt-8 space-y-3 flex-1">
-                        {tier.features.map((feature) => (
-                          <li key={feature} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-[#4169E1] flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-gray-300">
-                              {feature}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                      <Link href="/tool" className="mt-8">
-                        <Button
-                          className={`w-full ${
-                            tier.popular
-                              ? "bg-white text-black hover:bg-gray-200"
-                              : "bg-white/10 text-white hover:bg-white/20"
-                          }`}
-                        >
-                          {tier.cta}
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto">
+                <Card className="bg-white/5 border-white/10 relative overflow-hidden">
+                  <CardHeader className="pb-3 sm:pb-4 pt-4 sm:pt-6 px-4 sm:px-5">
+                    <CardTitle className="text-lg sm:text-xl text-white">Free</CardTitle>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">Perfect for getting started</p>
+                  </CardHeader>
+                  <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-5 pb-4 sm:pb-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-white">$0<span className="text-sm sm:text-base text-gray-400">/month</span></div>
+                    <ul className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-300">
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> 100 requests/month</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> All 5 AI features</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Email support</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> No credit card required</li>
+                    </ul>
+                    <Link href="/sign-up" className="block">
+                      <Button className="w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm py-4 sm:py-5">
+                        Start Free
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border-blue-500/30 relative overflow-hidden">
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4">
+                    <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 text-[10px] sm:text-xs px-2.5 sm:px-3 py-0.5 sm:py-1">
+                      Most Popular
+                    </Badge>
+                  </div>
+                  <CardHeader className="pb-3 sm:pb-4 pt-4 sm:pt-6 px-4 sm:px-5">
+                    <CardTitle className="text-lg sm:text-xl text-white">Pro</CardTitle>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">For power users</p>
+                  </CardHeader>
+                  <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-5 pb-4 sm:pb-6">
+                    <div className="text-2xl sm:text-3xl font-bold text-white">$20<span className="text-sm sm:text-base text-gray-400">/month</span></div>
+                    <ul className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-300">
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> 1000 requests/month</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> All 5 AI features</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Priority support</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Early access</li>
+                    </ul>
+                    <Link href="/sign-up" className="block">
+                      <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 text-xs sm:text-sm py-4 sm:py-5">
+                        Upgrade to Pro
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+              <div className="text-center mt-5 sm:mt-6">
+                <Link href="/pricing">
+                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 text-xs sm:text-sm py-4 sm:py-5">
+                    View Full Pricing <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </section>
 
+          {/* Comparison Section */}
           <section
             id="comparison"
             className="py-24 sm:py-32"
@@ -670,102 +534,172 @@ export default function Home() {
           >
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center mb-16">
-                <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                  Comparison
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Why Clario?
                 </h2>
-                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                  Why Clario Wins
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  All-in-One vs Multiple Tools
                 </p>
               </div>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-white/10">
-                      <th className="py-4 px-4 text-left text-sm font-semibold text-white">
-                        Feature
-                      </th>
-                      <th className="py-4 px-4 text-center text-sm font-semibold text-white">
-                        <div className="flex flex-col items-center gap-1">
-                          <span>Clario</span>
-                          <span className="text-xs font-normal text-green-500">
-                            (You are here)
-                          </span>
-                        </div>
-                      </th>
-                      <th className="py-4 px-4 text-center text-sm font-semibold text-gray-400">
-                        <div className="flex flex-col items-center gap-1">
-                          <span>QuillBot</span>
-                          <span className="text-xs font-normal text-gray-500">
-                            Summarizer
-                          </span>
-                        </div>
-                      </th>
-                      <th className="py-4 px-4 text-center text-sm font-semibold text-gray-400">
-                        <div className="flex flex-col items-center gap-1">
-                          <span>TLDR This</span>
-                          <span className="text-xs font-normal text-gray-500">
-                            AI Summarizer
-                          </span>
-                        </div>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {comparisonFeatures.map((row, idx) => (
-                      <tr
-                        key={row.feature}
-                        className={idx % 2 === 0 ? "bg-white/5" : ""}
-                      >
-                        <td className="py-4 px-4 text-sm text-gray-300">
-                          {row.feature}
-                        </td>
-                        <td className="py-4 px-4 text-center">
-                          {typeof row.clario === "boolean" ? (
-                            row.clario ? (
-                              <Check className="h-5 w-5 text-[#4169E1] mx-auto" />
-                            ) : (
-                              <X className="h-5 w-5 text-red-500 mx-auto" />
-                            )
-                          ) : (
-                            <span className="text-sm font-semibold text-white">
-                              {row.clario}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-4 text-center">
-                          {typeof row.competitor1 === "boolean" ? (
-                            row.competitor1 ? (
-                              <Check className="h-5 w-5 text-[#4169E1] mx-auto" />
-                            ) : (
-                              <X className="h-5 w-5 text-red-500 mx-auto" />
-                            )
-                          ) : (
-                            <span className="text-sm text-gray-400">
-                              {row.competitor1}
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-4 px-4 text-center">
-                          {typeof row.competitor2 === "boolean" ? (
-                            row.competitor2 ? (
-                              <Check className="h-5 w-5 text-[#4169E1] mx-auto" />
-                            ) : (
-                              <X className="h-5 w-5 text-red-500 mx-auto" />
-                            )
-                          ) : (
-                            <span className="text-sm text-gray-400">
-                              {row.competitor2}
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                <Card className="bg-white/5 border-white/10">
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <X className="h-5 w-5 text-red-400" /> Multiple Tools
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-gray-400">
+                    <p className="flex items-start gap-3">
+                      <DollarSign className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Pay for 5+ separate subscriptions</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Layers className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Switch between different platforms</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Users className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Manage multiple accounts and logins</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <BarChart3 className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Inconsistent user experience</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Lock className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <span>Data scattered across platforms</span>
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30 relative overflow-hidden">
+                  <div className="absolute top-4 right-4">
+                    <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0">
+                      Better Value
+                    </Badge>
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-xl text-white flex items-center gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-400" /> Clario
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-gray-300">
+                    <p className="flex items-start gap-3">
+                      <DollarSign className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>One affordable subscription ($20/mo)</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Layers className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>All features in one dashboard</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Users className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>Single login, seamless experience</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <BarChart3 className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>Consistent, beautiful interface</span>
+                    </p>
+                    <p className="flex items-start gap-3">
+                      <Lock className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span>All your data in one secure place</span>
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </section>
 
+          {/* Why Choose Clario Section */}
+          <section
+            id="why-clario"
+            className="py-24 sm:py-32"
+            style={{ backgroundColor: "#000000" }}
+          >
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="mx-auto max-w-2xl text-center mb-16">
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Why Choose Clario
+                </h2>
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Built for Real Productivity
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-8">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
+                      <Rocket className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Fast & Reliable</h3>
+                    <p className="text-gray-400">Powered by Groq and Google Gemini for instant, accurate results.</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-8">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4">
+                      <Shield className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Enterprise Security</h3>
+                    <p className="text-gray-400">Row Level Security, encryption, and GDPR/CCPA compliance.</p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-8">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
+                      <BarChart3 className="h-6 w-6 text-white" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Smart Analytics</h3>
+                    <p className="text-gray-400">Track usage, streaks, and trends with comprehensive insights.</p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </section>
+
+          {/* Social Proof Section */}
+          <section
+            id="social-proof"
+            className="py-24 sm:py-32"
+            style={{ backgroundColor: "#000000" }}
+          >
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+              <div className="mx-auto max-w-2xl text-center mb-16">
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Trusted Platform
+                </h2>
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Built with Modern Technology
+                </p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                {[
+                  { name: "Next.js 15", desc: "React Framework" },
+                  { name: "Groq AI", desc: "Llama 3.3 70B" },
+                  { name: "Google Gemini", desc: "AI Summarization" },
+                  { name: "Supabase", desc: "PostgreSQL Database" },
+                ].map((tech, i) => (
+                  <motion.div
+                    key={tech.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="text-center"
+                  >
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all">
+                      <p className="text-white font-semibold text-lg mb-1">{tech.name}</p>
+                      <p className="text-gray-400 text-sm">{tech.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
           <section
             id="faq"
             className="py-24 sm:py-32"
@@ -773,30 +707,26 @@ export default function Home() {
           >
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
               <div className="mx-auto mb-16 max-w-2xl text-center">
-                <h2 className="text-base font-semibold leading-7 text-accent-foreground/60">
-                  Frequently Asked Questions
+                <h2 className="text-base font-semibold leading-7 text-blue-400">
+                  Questions?
                 </h2>
-                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                  Have Questions? We Have Answers.
-                </p>
-                <p className="mt-6 text-lg leading-8 text-foreground/80">
-                  Find answers to common questions about Clario, its features,
-                  and how it works.
+                <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  Frequently Asked Questions
                 </p>
               </div>
-              <Card className="bg-background/80 backdrop-blur-sm">
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
                 <CardContent className="p-6 md:p-8">
                   <Accordion type="single" collapsible className="w-full">
                     {faqItems.map((item, index) => (
                       <AccordionItem
                         value={`item-${index}`}
                         key={index}
-                        className="border-border/50"
+                        className="border-white/10"
                       >
-                        <AccordionTrigger className="py-6 text-left text-lg font-semibold hover:no-underline">
+                        <AccordionTrigger className="py-6 text-left text-lg font-semibold text-white hover:no-underline hover:text-blue-400 transition-colors">
                           {item.question}
                         </AccordionTrigger>
-                        <AccordionContent className="pb-6 text-base text-foreground/80">
+                        <AccordionContent className="pb-6 text-base text-gray-400 leading-relaxed">
                           {item.answer}
                         </AccordionContent>
                       </AccordionItem>
@@ -806,38 +736,41 @@ export default function Home() {
               </Card>
             </div>
           </section>
+
+          {/* Final CTA */}
+          <section
+            id="final-cta"
+            className="py-24 sm:py-32"
+            style={{ backgroundColor: "#000000" }}
+          >
+            <div className="mx-auto max-w-4xl px-6 lg:px-8">
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 backdrop-blur-sm p-12 text-center">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
+                <div className="relative">
+                  <h2 className="text-3xl font-bold text-white mb-4">
+                    Ready to Boost Your Productivity?
+                  </h2>
+                  <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
+                    Start free with 100 requests per month. No credit card required. 30-day money-back guarantee on Pro.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/sign-up">
+                      <Button className="bg-white text-black hover:bg-white/90 px-8">
+                        Get Started Free
+                      </Button>
+                    </Link>
+                    <Link href="/pricing">
+                      <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8">
+                        View Pricing
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </main>
-        <footer
-          id="contact"
-          className="text-primary-foreground border-t border-white/10"
-          style={{ backgroundColor: "#000000" }}
-        >
-          <div className="mx-auto max-w-7xl px-4 py-8 lg:px-6">
-            <div className="flex justify-center space-x-4">
-              {socialLinks.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 transition-colors duration-300 hover:text-white"
-                >
-                  <span className="sr-only">{item.label}</span>
-                  <item.icon
-                    className="h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]"
-                    aria-hidden="true"
-                  />
-                </a>
-              ))}
-            </div>
-            <div className="mt-4 text-center text-xs text-gray-500">
-              <p>
-                &copy; {new Date().getFullYear()} Clario. Built by Muhammad
-                Tanveer Abbas.
-              </p>
-            </div>
-          </div>
-        </footer>
+        <Footer />
       </div>
     </>
   );
