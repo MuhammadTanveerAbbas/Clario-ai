@@ -1,14 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { OpenAI } from 'openai'
+import Groq from 'groq-sdk'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: 'https://openrouter.ai/api/v1',
-  defaultHeaders: {
-    'HTTP-Referer': process.env.NEXTAUTH_URL || 'http://localhost:3000',
-    'X-Title': 'Clario',
-  },
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 })
 
 export async function GET(request: Request) {
@@ -48,7 +43,7 @@ export async function GET(request: Request) {
       ?.map((e) => `${e.entity_text} (${e.entity_type})`)
       .join(', ')
 
-    const completion = await openai.chat.completions.create({
+    const completion = await groq.chat.completions.create({
       messages: [
         {
           role: 'system',
@@ -59,7 +54,7 @@ export async function GET(request: Request) {
           content: `Documents:\n${documentSummary}\n\nKey Entities:\n${entitySummary}`,
         },
       ],
-      model: 'openai/gpt-3.5-turbo',
+      model: 'llama-3.1-8b-instant',
       temperature: 0.7,
       max_tokens: 1024,
     })
