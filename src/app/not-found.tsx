@@ -49,7 +49,7 @@ export default function NotFound() {
           transition={{ duration: 0.5 }}
           className="relative mb-8"
         >
-          <h1 className="text-[10rem] sm:text-[14rem] md:text-[18rem] font-black leading-none">
+          <h1 className="text-[8rem] sm:text-[12rem] md:text-[16rem] lg:text-[20rem] font-black leading-none">
             <span className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               404
             </span>
@@ -71,10 +71,10 @@ export default function NotFound() {
           transition={{ delay: 0.2 }}
           className="space-y-4 mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white px-4">
             Oops! Lost in the <span className="bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">AI Universe</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-lg sm:text-xl text-gray-400 leading-relaxed">
+          <p className="mx-auto max-w-2xl text-base sm:text-lg md:text-xl text-gray-400 leading-relaxed px-4">
             The page you're looking for doesn't exist. It might have been moved, deleted, or perhaps it never existed at all.
           </p>
         </motion.div>
@@ -84,19 +84,19 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-12 sm:mb-16 px-4"
         >
-          <Link href="/">
-            <Button size="lg" className="group relative overflow-hidden rounded-xl bg-white px-8 py-6 text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 w-full sm:w-auto">
-              <span className="relative z-10 flex items-center">
-                <Home className="mr-2 h-5 w-5" />
+          <Link href="/" className="w-full sm:w-auto">
+            <Button size="lg" className="group relative overflow-hidden rounded-xl bg-white px-6 sm:px-8 py-4 sm:py-6 text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 w-full">
+              <span className="relative z-10 flex items-center justify-center">
+                <Home className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                 Back to Home
               </span>
             </Button>
           </Link>
-          <Link href="/dashboard">
-            <Button size="lg" variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40 rounded-xl px-8 py-6 w-full sm:w-auto backdrop-blur-sm transition-all duration-300">
-              <Sparkles className="mr-2 h-5 w-5 text-blue-400" />
+          <Link href="/dashboard" className="w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/40 rounded-xl px-6 sm:px-8 py-4 sm:py-6 w-full backdrop-blur-sm transition-all duration-300">
+              <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
               Go to Dashboard
             </Button>
           </Link>
@@ -107,10 +107,10 @@ export default function NotFound() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="max-w-3xl mx-auto"
+          className="max-w-3xl mx-auto px-4"
         >
-          <p className="text-sm text-gray-500 mb-6">Or explore our features:</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">Or explore our features:</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             {[
               { label: 'AI Chat', icon: MessageSquare, href: '/chat', color: 'from-blue-500 to-purple-600' },
               { label: 'Summarizer', icon: FileText, href: '/summarizer', color: 'from-green-500 to-blue-600' },
@@ -120,10 +120,10 @@ export default function NotFound() {
               <Link key={item.label} href={item.href}>
                 <motion.div
                   whileHover={{ scale: 1.05, y: -5 }}
-                  className={`p-4 rounded-xl bg-gradient-to-r ${item.color} bg-opacity-10 border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer group`}
+                  className={`p-3 sm:p-4 rounded-xl bg-gradient-to-r ${item.color} bg-opacity-10 border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer group`}
                 >
-                  <item.icon className="w-6 h-6 text-white mx-auto mb-2 group-hover:scale-110 transition-transform" />
-                  <p className="text-sm text-white font-medium">{item.label}</p>
+                  <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white mx-auto mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-xs sm:text-sm text-white font-medium">{item.label}</p>
                 </motion.div>
               </Link>
             ))}

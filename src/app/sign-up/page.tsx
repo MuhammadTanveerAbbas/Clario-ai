@@ -211,7 +211,7 @@ export default function SignUpPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="pl-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:border-[#4169E1] focus:ring-1 focus:ring-[#4169E1]/20 transition-all"
+                    className="pl-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-white/10 transition-all"
                     disabled={loading}
                   />
                 </div>
@@ -232,7 +232,7 @@ export default function SignUpPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="pl-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:border-[#4169E1] focus:ring-1 focus:ring-[#4169E1]/20 transition-all"
+                    className="pl-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-white/10 transition-all"
                     disabled={loading}
                   />
                 </div>
@@ -253,7 +253,7 @@ export default function SignUpPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="pl-9 pr-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:border-[#4169E1] focus:ring-1 focus:ring-[#4169E1]/20 transition-all"
+                    className="pl-9 pr-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-white/10 transition-all"
                     disabled={loading}
                   />
                   <button
@@ -284,7 +284,7 @@ export default function SignUpPage() {
                         confirmPassword: e.target.value,
                       })
                     }
-                    className="pl-9 pr-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:border-[#4169E1] focus:ring-1 focus:ring-[#4169E1]/20 transition-all"
+                    className="pl-9 pr-9 h-9 text-sm bg-black/40 border-white/10 text-white placeholder:text-gray-500 focus:outline-none focus:ring-0 focus:border-white/10 transition-all"
                     disabled={loading}
                   />
                   <button

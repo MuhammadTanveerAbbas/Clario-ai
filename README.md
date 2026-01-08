@@ -1,16 +1,16 @@
 # Clario - AI Powered Productivity Platform
 
-An AI-powered SaaS platform built with Next.js, featuring text summarization, AI chat, document analysis, writing assistance, and meeting notes.
+An AI-powered SaaS platform built with Next.js, featuring text summarization, AI chat, writing assistance, and meeting notes.
 
 ## 🚀 Features
 
 ### Core AI Features
 
-- **Text Summarizer**: 6 different summary modes (Action Items, Executive Brief, SWOT Analysis, Meeting Minutes, Key Quotes, Sentiment Analysis)
-- **AI Chat**: Conversational AI powered by Groq's Llama 3.1 8B model
-- **Document Analyzer**: Upload and analyze PDFs, DOCX, and TXT files
-- **Writing Assistant**: AI-powered writing improvement with tone adjustment
-- **Meeting Notes**: Convert meeting transcripts into structured notes with action items
+- **Text Summarizer**: 10 different summary modes (Action Items, Decisions Made, Brutal Roast, Executive Brief, Full Breakdown, Key Quotes, Sentiment Analysis, ELI5, SWOT Analysis, Meeting Minutes) powered by Groq Llama 3.3 70B with export to Markdown
+- **AI Chat**: Conversational AI powered by Groq's Llama 3.1 8B with persistent chat history and clear explanations of AI capabilities
+- **Writing Assistant**: AI-powered writing improvement with 5 action types (improve, rewrite, expand, summarize, grammar) and 5 tone options using Groq Llama 3.3 70B
+- **Meeting Notes**: Convert meeting transcripts into structured notes with summary, action items, and key points using Groq Llama 3.3 70B
+- **Quick Notes**: Organize and categorize quick notes with AI-powered summaries and tagging
 
 ### Platform Features
 
@@ -37,8 +37,7 @@ An AI-powered SaaS platform built with Next.js, featuring text summarization, AI
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **AI Services**:
-  - Groq SDK (Llama 3.1 8B for chat and document analysis)
-  - Google Gemini API (for text summarization)
+  - Groq SDK (Llama 3.1 8B for chat, Llama 3.3 70B for writing, meeting notes, and text summarization)
 - **Monitoring**: Sentry
 - **Analytics**: PostHog
 
@@ -54,7 +53,7 @@ An AI-powered SaaS platform built with Next.js, featuring text summarization, AI
 
 - Node.js 18+
 - npm or yarn
-- Accounts for: Supabase, Groq, Gemini, Sentry, PostHog
+- Accounts for: Supabase, Groq, Sentry, PostHog
 
 ### Quick Start
 
@@ -109,9 +108,9 @@ Clario/
 │   │   ├── dashboard/          # Dashboard page
 │   │   ├── chat/               # AI Chat feature
 │   │   ├── summarizer/         # Text Summarizer feature
-│   │   ├── documents/          # Document Analyzer feature
 │   │   ├── writing/            # Writing Assistant feature
 │   │   ├── meeting-notes/      # Meeting Notes feature
+│   │   ├── quick-notes/        # Quick Notes feature
 │   │   ├── settings/           # Settings page
 │   │   ├── pricing/            # Pricing page
 │   │   ├── privacy/            # Privacy policy
@@ -149,7 +148,7 @@ Clario/
 - Priority email support
 - Early access to new features
 
-**What counts as a request?** Each AI operation: summarization, chat message, document analysis, writing assistance, or meeting notes.
+**What counts as a request?** Each AI operation: summarization, chat message, writing assistance, meeting notes generation, or quick note creation.
 
 ## 🔐 Environment Variables
 
@@ -158,8 +157,7 @@ See `.env.example` for all required environment variables. Key variables include
 - `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
-- `GROQ_API_KEY` - Groq API key for chat and document analysis
-- `GEMINI_API_KEY` - Google Gemini API key for summarization
+- `GROQ_API_KEY` - Groq API key for all AI features (chat, writing, meeting notes, and summarization)
 - `SENTRY_DSN` - Sentry DSN for error tracking
 - `NEXT_PUBLIC_SENTRY_DSN` - Public Sentry DSN
 - `NEXT_PUBLIC_POSTHOG_KEY` - PostHog API key
@@ -228,7 +226,7 @@ MIT License - see LICENSE file for details.
 
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [ShadCN UI](https://ui.shadcn.com/)
-- AI powered by [Groq](https://groq.com/) and [Google Gemini](https://ai.google.dev/)
+- AI powered by [Groq](https://groq.com/)
 - Database by [Supabase](https://supabase.com/)
 - Payments by [Paddle](https://paddle.com/)
 

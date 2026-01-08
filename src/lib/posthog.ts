@@ -9,14 +9,20 @@ export function initPostHog() {
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com'
 
     if (posthogKey) {
-      posthog.init(posthogKey, {
-        api_host: posthogHost,
-        loaded: (posthog) => {
-          if (process.env.NODE_ENV === 'development') {
-            posthog.debug()
-          }
-        },
-      })
+      try {
+        posthog.init(posthogKey, {
+          api_host: posthogHost,
+          loaded: (posthog) => {
+            if (process.env.NODE_ENV === 'development') {
+              posthog.debug()
+            }
+          },
+          disable_session_recording: true,
+          autocapture: false,
+        })
+      } catch (error) {
+        console.warn('PostHog initialization failed:', error)
+      }
     }
   }
 }

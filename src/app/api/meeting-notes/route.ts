@@ -52,10 +52,10 @@ export async function POST(request: Request) {
       .gte('date', startOfMonth.toISOString().split('T')[0])
 
     const currentUsage = usageData?.reduce((sum, row) => sum + (row.meeting_notes_count || 0), 0) || 0
-    const limits = { free: 20, pro: 200, premium: Infinity }
+    const limits = { free: 100, pro: 1000, premium: 1000 }
     const limit = limits[tier]
 
-    if (limit !== Infinity && currentUsage >= limit) {
+    if (currentUsage >= limit) {
       return NextResponse.json(
         { error: 'Usage limit reached', message: `You've reached your ${tier} tier limit of ${limit} meeting notes per month.` },
         { status: 403 }

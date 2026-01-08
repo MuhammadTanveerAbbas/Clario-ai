@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
+import posthog from 'posthog-js'
 
 interface AuthContextType {
   user: User | null
@@ -25,6 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+      
+      // Identify user in PostHog
+      if (session?.user) {
+        posthog.identify(session.user.id, {
+          email: session.user.email,
+        })
+      }
     })
 
     // Listen for auth changes
@@ -34,6 +42,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
+
+      // Track auth events in PostHog
+      if (event === 'SIGNED_IN' && session?.user) {
+        posthog.identify(session.user.id, {
+          email: session.user.email,
+        })
+        posthog.capture('user_signed_in')
+      } else if (event === 'SIGNED_OUT') {
+        posthog.capture('user_signed_out')
+        posthog.reset()
+      }
 
       // Auto-refresh session
       if (session) {
@@ -54,9 +73,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase])
 
   const signOut = async () => {
+    posthog.capture('user_signed_out')
     await supabase.auth.signOut()
     setUser(null)
     setSession(null)
+    posthog.reset()
   }
 
   return (

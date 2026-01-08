@@ -36,6 +36,7 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [userTier, setUserTier] = useState<"free" | "pro" | "premium">("free");
   const [chatUsage, setChatUsage] = useState(0);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -45,12 +46,52 @@ export default function ChatPage() {
 
     if (user) {
       loadUserData();
+      loadChatHistory();
     }
   }, [user, authLoading]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const loadChatHistory = async () => {
+    try {
+      const response = await fetch('/api/chat/history');
+      if (response.ok) {
+        const data = await response.json();
+        const historyMessages = data.messages.map((msg: any, index: number) => ({
+          id: msg.id || `history-${index}-${Date.now()}`,
+          role: msg.message ? 'user' : 'assistant',
+          content: msg.message || msg.response,
+          timestamp: new Date(msg.created_at),
+        }));
+        setMessages(historyMessages);
+      }
+    } catch (error) {
+      console.error('Error loading chat history:', error);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const handleClearHistory = async () => {
+    try {
+      const response = await fetch('/api/chat/history', { method: 'DELETE' });
+      if (response.ok) {
+        setMessages([]);
+        toast({
+          title: "History Cleared",
+          description: "All chat messages have been deleted.",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to clear history.",
+      });
+    }
+  };
 
   const loadUserData = async () => {
     try {
@@ -97,7 +138,7 @@ export default function ChatPage() {
     }
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: `user-${Date.now()}-${Math.random()}`,
       role: "user",
       content: input,
       timestamp: new Date(),
@@ -133,7 +174,7 @@ export default function ChatPage() {
       const data = await response.json();
 
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `assistant-${Date.now()}-${Math.random()}`,
         role: "assistant",
         content: data.response || "Sorry, I could not generate a response.",
         timestamp: new Date(),
@@ -191,15 +232,20 @@ export default function ChatPage() {
               </p>
             </div>
             <div className="flex items-center gap-2 md:gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleClearHistory}
+                disabled={messages.length === 0}
+                className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs"
+              >
+                Clear History
+              </Button>
               <div className="px-2 md:px-3 py-1 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-medium rounded-full border border-green-500/30">
                 ⚡ Online
               </div>
               <div className="text-[10px] md:text-xs text-gray-400">
-                {chatUsage} /{" "}
-                {checkUsageLimit(userTier, "chats", chatUsage).limit ===
-                Infinity
-                  ? "∞"
-                  : checkUsageLimit(userTier, "chats", chatUsage).limit}
+                {chatUsage} / {userTier === 'free' ? 100 : 1000}
               </div>
             </div>
           </div>
@@ -207,46 +253,42 @@ export default function ChatPage() {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 bg-gradient-to-b from-transparent to-gray-900/20">
-          <AnimatePresence>
-            {messages.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex items-center justify-center h-full"
-              >
-                <div className="text-center p-6 md:p-8 rounded-2xl bg-gradient-to-br from-[#4169E1]/10 to-purple-500/10 border border-[#4169E1]/20">
-                  <div className="relative mb-4 md:mb-6">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] rounded-full flex items-center justify-center mx-auto">
-                      <Bot className="h-6 w-6 md:h-8 md:w-8 text-white" />
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-green-400 rounded-full border-2 border-black animate-pulse" />
+          {messages.length === 0 && !loading && (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center p-6 md:p-8 rounded-2xl bg-gradient-to-br from-[#4169E1]/10 to-purple-500/10 border border-[#4169E1]/20">
+                <div className="relative mb-4 md:mb-6">
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] rounded-full flex items-center justify-center mx-auto">
+                    <Bot className="h-6 w-6 md:h-8 md:w-8 text-white" />
                   </div>
-                  <h3 className="text-lg md:text-xl font-semibold text-white mb-2">
-                    Ready to Chat!
-                  </h3>
-                  <p className="text-sm md:text-base text-gray-400 mb-4">
-                    Ask me anything - I'm here to help with your questions.
-                  </p>
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {[
-                      "Explain a concept",
-                      "Write code",
-                      "Brainstorm ideas",
-                      "Solve problems",
-                    ].map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => setInput(suggestion)}
-                        className="px-2 md:px-3 py-1 text-[10px] md:text-xs bg-white/10 text-gray-300 rounded-full hover:bg-white/20 transition-colors"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-green-400 rounded-full border-2 border-black animate-pulse" />
                 </div>
-              </motion.div>
-            )}
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">
+                  Ready to Chat!
+                </h3>
+                <p className="text-sm md:text-base text-gray-400 mb-4">
+                  Ask me anything - I'm here to help with your questions.
+                </p>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {[
+                    "Explain a concept",
+                    "Write code",
+                    "Brainstorm ideas",
+                    "Solve problems",
+                  ].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      onClick={() => setInput(suggestion)}
+                      className="px-2 md:px-3 py-1 text-[10px] md:text-xs bg-white/10 text-gray-300 rounded-full hover:bg-white/20 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
+          <AnimatePresence mode="popLayout">
             {messages.map((message) => (
               <motion.div
                 key={message.id}
@@ -308,13 +350,10 @@ export default function ChatPage() {
                 )}
               </motion.div>
             ))}
+          </AnimatePresence>
 
-            {loading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex gap-4 justify-start"
-              >
+          {loading && (
+            <div className="flex gap-4 justify-start">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-[#4169E1] text-white">
                     <Bot className="h-4 w-4" />
@@ -325,9 +364,8 @@ export default function ChatPage() {
                     <Loader2 className="h-4 w-4 animate-spin text-[#4169E1]" />
                   </CardContent>
                 </Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
@@ -372,20 +410,12 @@ export default function ChatPage() {
               </span>
               <span
                 className={`px-2 py-1 rounded-full ${
-                  chatUsage >=
-                    checkUsageLimit(userTier, "chats", chatUsage).limit &&
-                  checkUsageLimit(userTier, "chats", chatUsage).limit !==
-                    Infinity
+                  chatUsage >= (userTier === 'free' ? 100 : 1000)
                     ? "bg-red-500/20 text-red-400"
                     : "bg-green-500/20 text-green-400"
                 }`}
               >
-                {chatUsage} /{" "}
-                {checkUsageLimit(userTier, "chats", chatUsage).limit ===
-                Infinity
-                  ? "∞"
-                  : checkUsageLimit(userTier, "chats", chatUsage).limit}{" "}
-                messages
+                {chatUsage} / {userTier === 'free' ? 100 : 1000} messages
               </span>
             </div>
           </div>

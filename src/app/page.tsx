@@ -74,7 +74,7 @@ const coreFeatures = [
 
 const stats = [
   {
-    value: "5",
+    value: "4",
     label: "AI Features",
     description: "All-in-one productivity platform",
   },
@@ -99,7 +99,7 @@ const faqItems = [
   {
     question: "What is Clario?",
     answer:
-      "Clario is an AI-powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and an intelligent knowledge graph. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
+      "Clario is an AI-powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and quick notes. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
   },
 
   {
@@ -120,7 +120,7 @@ const faqItems = [
   {
     question: "What AI models power Clario?",
     answer:
-      "We use Groq SDK with Llama 3.3 70B for fast chat and analysis. Google Gemini API powers text summarization. This combination provides both speed and accuracy.",
+      "We use Groq SDK with Llama models (Llama 3.1 8B for chat, Llama 3.3 70B for writing, meeting notes, and text summarization) for fast, accurate processing. All AI features are powered by Groq's lightning-fast inference engine.",
   },
   {
     question: "Is there a money-back guarantee?",
@@ -187,49 +187,49 @@ export default function Home() {
                 </span>
               </div>
               <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white animate-fade-in-up px-4">
-                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl">
+                <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
                   AI-Powered Productivity
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient leading-tight">
                   Made Simple
                 </span>
               </h1>
               <p
-                className="mx-auto mt-6 max-w-3xl text-sm sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4"
+                className="mx-auto mt-4 sm:mt-6 max-w-3xl text-sm sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4 leading-relaxed"
                 style={{ animationDelay: "0.2s" }}
               >
-                5 powerful AI features in one platform. Summarize documents, chat with AI, improve writing, and generate meeting notes. Start free with 100 requests per month.
+                5 powerful AI features in one platform. Summarize documents, chat with AI, improve writing, generate meeting notes, and organize quick notes. Start free with 100 requests per month.
               </p>
-              <div
-                className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up px-4"
+              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up px-4"
                 style={{ animationDelay: "0.4s" }}
               >
                 <Button
+                  type="button"
                   size="lg"
                   onClick={handleCTAClick}
-                  className="group relative overflow-hidden rounded-full bg-white px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/20 w-full sm:w-auto"
+                  className="group relative overflow-hidden rounded-full bg-white px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base text-black font-semibold transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-white/20 w-full sm:w-auto max-w-xs sm:max-w-none"
                   aria-label="Try the Tool Now"
                 >
-                  <span className="relative z-10 flex items-center">
-                    <Zap className="mr-2 h-5 w-5 text-[#4169E1]" />
+                  <span className="relative z-10 flex items-center justify-center">
+                    <Zap className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
                     {user ? "Go to Dashboard" : "Start Free"}
                   </span>
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-gray-100 to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </Button>
               </div>
               <div
-                className="mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 text-xs text-gray-500 animate-fade-in px-4"
+                className="mt-8 sm:mt-12 flex flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-6 text-[10px] sm:text-xs text-gray-500 animate-fade-in px-4"
                 style={{ animationDelay: "0.6s" }}
               >
-                <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> Free Plan
+                <span className="flex items-center gap-1 sm:gap-1.5">
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> Free Plan
                 </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> $20/mo Pro
+                <span className="flex items-center gap-1 sm:gap-1.5">
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> $20/mo Pro
                 </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle className="h-3 w-3 text-[#4169E1]" /> 30-day Guarantee
+                <span className="flex items-center gap-1 sm:gap-1.5">
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> 30-day Guarantee
                 </span>
               </div>
             </div>
@@ -291,7 +291,7 @@ export default function Home() {
                       </div>
                       <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
                         <h3 className="text-2xl font-bold text-white mb-3 text-center">Choose Feature</h3>
-                        <p className="text-gray-400 text-center leading-relaxed">Select from 5 AI-powered tools based on your needs.</p>
+                        <p className="text-gray-400 text-center leading-relaxed">Select from 5 AI-powered features based on your needs.</p>
                       </div>
                     </div>
                   </motion.div>
@@ -409,7 +409,7 @@ export default function Home() {
                   Everything You Need
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-400">
-                  Four AI-driven features designed to boost your productivity and streamline your workflow.
+                  Five AI-driven features designed to boost your productivity and streamline your workflow.
                 </p>
               </div>
               <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -482,11 +482,9 @@ export default function Home() {
                       <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Email support</li>
                       <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> No credit card required</li>
                     </ul>
-                    <Link href="/sign-up" className="block">
-                      <Button className="w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm py-4 sm:py-5">
-                        Start Free
-                      </Button>
-                    </Link>
+                    <Button type="button" onClick={handleCTAClick} className="w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm py-4 sm:py-5">
+                      {user ? "Go to Dashboard" : "Start Free"}
+                    </Button>
                   </CardContent>
                 </Card>
 
@@ -508,11 +506,9 @@ export default function Home() {
                       <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Priority support</li>
                       <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Early access</li>
                     </ul>
-                    <Link href="/sign-up" className="block">
-                      <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 text-xs sm:text-sm py-4 sm:py-5">
-                        Upgrade to Pro
-                      </Button>
-                    </Link>
+                    <Button type="button" onClick={handleCTAClick} className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 text-xs sm:text-sm py-4 sm:py-5">
+                      {user ? "Go to Dashboard" : "Upgrade to Pro"}
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -678,8 +674,8 @@ export default function Home() {
                 {[
                   { name: "Next.js 15", desc: "React Framework" },
                   { name: "Groq AI", desc: "Llama 3.3 70B" },
-                  { name: "Google Gemini", desc: "AI Summarization" },
                   { name: "Supabase", desc: "PostgreSQL Database" },
+                  { name: "Paddle", desc: "Payment Processing" },
                 ].map((tech, i) => (
                   <motion.div
                     key={tech.name}
@@ -737,12 +733,164 @@ export default function Home() {
             </div>
           </section>
 
+          {/* Transform Your Workflow Section */}
+          <section
+            id="transform-workflow"
+            className="py-24 sm:py-32 relative overflow-hidden"
+            style={{ backgroundColor: "#000000" }}
+          >
+            <div className="absolute inset-0">
+              <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+            </div>
+            <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
+              <div className="mx-auto max-w-2xl text-center mb-16">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <Badge className="mb-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 border-blue-500/30">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Work Smarter, Not Harder
+                  </Badge>
+                  <h2 className="text-base font-semibold leading-7 text-blue-400">
+                    Transform Your Workflow
+                  </h2>
+                  <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                    Save Hours Every Day
+                  </p>
+                  <p className="mt-6 text-lg leading-8 text-gray-400">
+                    Join thousands who've revolutionized their productivity with AI
+                  </p>
+                </motion.div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                {/* Left Card - Time Savings */}
+                <motion.div
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Card className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent border-blue-500/30 h-full group hover:border-blue-500/50 transition-all duration-500">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <CardContent className="p-8 relative">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl shadow-blue-500/50 group-hover:scale-110 transition-transform">
+                          <Zap className="h-8 w-8 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-white mb-2">Lightning Fast</h3>
+                          <p className="text-sm text-blue-400 font-semibold">Instant Results</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        Get AI-powered summaries, chat responses, and writing improvements in seconds. No more spending hours reading lengthy documents or crafting perfect emails.
+                      </p>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></div>
+                          <span>Summarize 10-page docs in 30 seconds</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" style={{ animationDelay: "0.3s" }}></div>
+                          <span>Instant chat responses</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: "0.6s" }}></div>
+                          <span>Real-time writing improvements</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+
+                {/* Right Card - Quality */}
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <Card className="relative overflow-hidden bg-gradient-to-br from-purple-500/10 via-pink-500/5 to-transparent border-purple-500/30 h-full group hover:border-purple-500/50 transition-all duration-500">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
+                    <CardContent className="p-8 relative">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-2xl shadow-purple-500/50 group-hover:scale-110 transition-transform">
+                          <Sparkles className="h-8 w-8 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-white mb-2">Premium Quality</h3>
+                          <p className="text-sm text-purple-400 font-semibold">Professional Results</p>
+                        </div>
+                      </div>
+                      <p className="text-gray-300 leading-relaxed mb-6">
+                        Enterprise-grade AI delivers accurate summaries, intelligent responses, and polished writing. Perfect for professionals who demand excellence.
+                      </p>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
+                          <span>10 specialized summary modes</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" style={{ animationDelay: "0.3s" }}></div>
+                          <span>Context-aware intelligence</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-sm text-gray-400">
+                          <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: "0.6s" }}></div>
+                          <span>Professional-grade outputs</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </div>
+
+              {/* Bottom Stats Bar */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="mt-16 max-w-4xl mx-auto"
+              >
+                <Card className="bg-gradient-to-r from-white/5 via-white/10 to-white/5 border-white/20 backdrop-blur-xl">
+                  <CardContent className="p-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                      <div className="space-y-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                          5 Hours
+                        </div>
+                        <p className="text-sm text-gray-400">Saved Per Week</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                          10x
+                        </div>
+                        <p className="text-sm text-gray-400">Faster Workflows</p>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
+                          100%
+                        </div>
+                        <p className="text-sm text-gray-400">Satisfaction Rate</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </section>
+
           {/* Final CTA */}
           <section
             id="final-cta"
             className="py-24 sm:py-32"
             style={{ backgroundColor: "#000000" }}
           >
+
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
               <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 backdrop-blur-sm p-12 text-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
@@ -754,11 +902,9 @@ export default function Home() {
                     Start free with 100 requests per month. No credit card required. 30-day money-back guarantee on Pro.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Link href="/sign-up">
-                      <Button className="bg-white text-black hover:bg-white/90 px-8">
-                        Get Started Free
-                      </Button>
-                    </Link>
+                    <Button type="button" onClick={handleCTAClick} className="bg-white text-black hover:bg-white/90 px-8">
+                      {user ? "Go to Dashboard" : "Get Started Free"}
+                    </Button>
                     <Link href="/pricing">
                       <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8">
                         View Pricing

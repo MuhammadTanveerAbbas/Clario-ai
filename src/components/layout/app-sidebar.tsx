@@ -26,14 +26,14 @@ import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
-  { name: "AI Chat", href: "/chat", icon: MessageSquare, badge: "Hot" },
-  { name: "Summarizer", href: "/summarizer", icon: FileText, badge: null },
-  { name: "Writing", href: "/writing", icon: PenTool, badge: "New" },
+  { name: "AI Chat", href: "/chat", icon: MessageSquare, badge: "Popular" },
+  { name: "Summarizer", href: "/summarizer", icon: FileText, badge: "New" },
+  { name: "Writing", href: "/writing", icon: PenTool, badge: "Pro" },
   {
     name: "Meeting Notes",
     href: "/meeting-notes",
     icon: ClipboardList,
-    badge: "New",
+    badge: "Beta",
   },
 ];
 
@@ -126,7 +126,7 @@ export function AppSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 md:p-4 md:overflow-hidden overflow-y-auto">
+        <nav className="flex-1 p-3 md:p-4 md:overflow-hidden overflow-y-auto space-y-3 md:space-y-2.5">
           {navigation.map((item, index) => {
             const isActive =
               pathname === item.href || pathname?.startsWith(item.href + "/");
@@ -137,7 +137,7 @@ export function AppSidebar() {
                 key={item.name}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className={index > 0 ? "block mt-4" : "block"}
+                className="block"
               >
                 <motion.div
                   whileHover={{ scale: 1.02, x: 4 }}
@@ -184,16 +184,20 @@ export function AppSidebar() {
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
-                            className="ml-2"
+                            className="ml-2 flex-shrink-0"
                           >
                             <Badge
                               className={cn(
-                                "text-[10px] md:text-xs px-1.5 md:px-2 py-0.5 font-semibold shadow-sm",
-                                item.badge === "Hot"
-                                  ? "bg-gradient-to-r from-red-500 to-red-600 text-white border-0"
+                                "text-[9px] md:text-[10px] px-1.5 py-0.5 font-semibold shadow-sm whitespace-nowrap",
+                                item.badge === "Popular"
+                                  ? "bg-gradient-to-r from-orange-500 to-red-500 text-white border-0"
                                   : item.badge === "New"
-                                  ? "bg-gradient-to-r from-green-500 to-green-600 text-white border-0"
-                                  : "bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0"
+                                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0"
+                                  : item.badge === "Pro"
+                                  ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0"
+                                  : item.badge === "Beta"
+                                  ? "bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0"
+                                  : "bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0"
                               )}
                             >
                               {item.badge}

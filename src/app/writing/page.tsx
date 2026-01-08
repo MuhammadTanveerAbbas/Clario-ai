@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2, Sparkles, Save, PenTool } from "lucide-react";
+import { Loader2, Sparkles, Save, PenTool, Download, RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -36,6 +36,30 @@ export default function WritingPage() {
   const [tone, setTone] = useState("professional");
   const [action, setAction] = useState("improve");
   const [improving, setImproving] = useState(false);
+  const [history, setHistory] = useState<Array<{original: string, improved: string, timestamp: number}>>([]);
+
+  const handleExport = async (format: 'txt' | 'md') => {
+    if (!improvedContent) return;
+    
+    const content = format === 'md' 
+      ? `# Improved Writing\n\n**Tone:** ${tone}\n**Action:** ${action}\n**Date:** ${new Date().toLocaleDateString()}\n\n## Result\n\n${improvedContent}`
+      : improvedContent;
+    
+    const blob = new Blob([content], { type: format === 'md' ? 'text/markdown' : 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `writing-${Date.now()}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Exported!",
+      description: `File saved as ${format.toUpperCase()}.`,
+    });
+  };
 
   if (authLoading) {
     return (
@@ -83,6 +107,7 @@ export default function WritingPage() {
 
       const data = await response.json();
       setImprovedContent(data.improvedText);
+      setHistory(prev => [{original: content, improved: data.improvedText, timestamp: Date.now()}, ...prev.slice(0, 9)]);
 
       toast({
         title: "Text Improved",
@@ -230,13 +255,23 @@ export default function WritingPage() {
                 </Button>
                 <Button
                   variant="outline"
+                  onClick={() => handleExport('md')}
+                  disabled={!improvedContent}
+                  className="border-white/20 text-white hover:bg-white/10 text-sm md:text-base"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Export
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => {
                     setContent("");
                     setImprovedContent("");
                   }}
                   className="border-white/20 text-white hover:bg-white/10 text-sm md:text-base"
                 >
-                  Clear All
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Clear
                 </Button>
               </div>
             </CardContent>

@@ -48,3 +48,6 @@ Thumbs.db
 # database credentials only (keep migration files)
 database/.env
 database/credentials.json
+
+# Sentry Config File
+.env.sentry-build-plugin

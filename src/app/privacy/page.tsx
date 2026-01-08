@@ -10,7 +10,7 @@ export default function PrivacyPage() {
       <Navbar />
       <div className="max-w-4xl mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold text-white mb-8">Privacy Policy</h1>
-        <p className="text-gray-400 mb-8">Last Updated: January 2024</p>
+        <p className="text-gray-400 mb-8">Last Updated: October 8, 2025</p>
 
         <div className="space-y-6">
           <Card className="bg-white/5 border-white/10">
@@ -18,10 +18,10 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">1. Information We Collect</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">1.1 Account Information:</strong> Email address, password (encrypted), subscription tier, and payment information (processed by Paddle).</p>
-              <p><strong className="text-white">1.2 Usage Data:</strong> AI summaries count, chat messages, document analyses, writing sessions, feature usage patterns, and timestamps.</p>
-              <p><strong className="text-white">1.3 Content Data:</strong> Text submitted for summarization, chat conversations, uploaded documents, and writing assistant inputs.</p>
-              <p><strong className="text-white">1.4 Technical Data:</strong> IP address, browser type, device information, and session data.</p>
+              <p><strong className="text-white">1.1 Account Information:</strong> Email address, password (encrypted), subscription tier (Free or Pro), and payment information (processed securely by Paddle).</p>
+              <p><strong className="text-white">1.2 Usage Data:</strong> AI request counts (summaries, chat messages, writing sessions, meeting notes, quick notes), feature usage patterns, and timestamps.</p>
+              <p><strong className="text-white">1.3 Content Data:</strong> Text submitted for summarization, chat conversations, writing drafts, meeting transcripts, and quick notes you create.</p>
+              <p><strong className="text-white">1.4 Technical Data:</strong> IP address, browser type, device information, and session data for security and analytics.</p>
             </CardContent>
           </Card>
 
@@ -30,10 +30,10 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">2. How We Use Your Information</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">2.1 Service Delivery:</strong> Process AI requests, provide chat responses, analyze documents, and deliver writing assistance.</p>
-              <p><strong className="text-white">2.2 Usage Tracking:</strong> Monitor monthly limits, track feature usage, and provide analytics dashboard.</p>
-              <p><strong className="text-white">2.3 Billing:</strong> Process payments, manage subscriptions, and handle refunds via Paddle.</p>
-              <p><strong className="text-white">2.4 Improvements:</strong> Analyze usage patterns, improve AI models, and enhance features.</p>
+              <p><strong className="text-white">2.1 Service Delivery:</strong> Process AI requests, provide chat responses, analyze text, deliver writing assistance, and generate meeting notes.</p>
+              <p><strong className="text-white">2.2 Usage Tracking:</strong> Monitor monthly request limits (100 for Free, 1000 for Pro), track feature usage, and provide analytics dashboard.</p>
+              <p><strong className="text-white">2.3 Billing:</strong> Process payments for Pro subscriptions ($20/month), manage subscriptions, and handle refunds via Paddle.</p>
+              <p><strong className="text-white">2.4 Improvements:</strong> Analyze usage patterns to improve AI models and enhance features.</p>
               <p><strong className="text-white">2.5 Communications:</strong> Send service updates, billing notifications, and security alerts.</p>
             </CardContent>
           </Card>
@@ -43,9 +43,8 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">3. Data Processing and AI Services</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">3.1 Groq SDK:</strong> Chat messages and document content are processed by Groq's language models. Data is not stored by Groq beyond processing.</p>
-              <p><strong className="text-white">3.2 Google Gemini:</strong> Text submitted for summarization is processed by Google Gemini API. Google's privacy policy applies to this processing.</p>
-              <p><strong className="text-white">3.3 Data Retention:</strong> Content is temporarily stored for processing and deleted after 30 days unless saved by user.</p>
+              <p><strong className="text-white">3.1 Groq SDK:</strong> All AI features (chat messages, writing content, meeting notes, and text summarization) are processed by Groq's Llama models (Llama 3.1 8B for chat, Llama 3.3 70B for writing, meeting notes, and summarization). Data is not stored by Groq beyond processing.</p>
+              <p><strong className="text-white">3.2 Data Retention:</strong> Your content is stored in your account. You can delete it anytime. Deleted content is removed within 30 days including backups.</p>
             </CardContent>
           </Card>
 
@@ -54,10 +53,12 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">4. Data Security</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">4.1 Encryption:</strong> All data transmitted using TLS/SSL encryption. Passwords hashed using industry-standard algorithms.</p>
-              <p><strong className="text-white">4.2 Row Level Security:</strong> Database implements RLS to ensure users only access their own data.</p>
-              <p><strong className="text-white">4.3 Rate Limiting:</strong> API rate limiting prevents abuse and protects against attacks.</p>
-              <p><strong className="text-white">4.4 Monitoring:</strong> Sentry tracks errors and security incidents. PostHog provides privacy-focused analytics.</p>
+              <p><strong className="text-white">4.1 Encryption:</strong> All data transmitted using TLS 1.3 encryption. Passwords hashed using bcrypt with salt rounds. Session tokens encrypted at rest.</p>
+              <p><strong className="text-white">4.2 Row Level Security:</strong> Database implements RLS policies ensuring users only access their own data. All queries are scoped to authenticated user ID.</p>
+              <p><strong className="text-white">4.3 Rate Limiting:</strong> API rate limiting (60 req/min default, 5 req/min auth, 20 req/min AI) prevents abuse. Failed login attempts trigger temporary IP blocks (15 minutes after 5 failures).</p>
+              <p><strong className="text-white">4.4 Security Headers:</strong> HSTS, CSP, X-Frame-Options (DENY), X-Content-Type-Options (nosniff), and strict Permissions-Policy implemented.</p>
+              <p><strong className="text-white">4.5 Cookie Security:</strong> HttpOnly, Secure, SameSite=Strict cookies with __Host- or __Secure- prefixes. CSRF tokens on all state-changing operations.</p>
+              <p><strong className="text-white">4.6 Monitoring:</strong> Sentry tracks errors and security incidents. Real-time alerts for suspicious activity.</p>
             </CardContent>
           </Card>
 
@@ -66,7 +67,7 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">5. Data Sharing and Third Parties</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">5.1 Payment Processing:</strong> Paddle processes all payments. Their privacy policy governs payment data.</p>
+              <p><strong className="text-white">5.1 Payment Processing:</strong> Paddle acts as Merchant of Record and processes all payments. For sales to US-based customers: Paddle.com Inc. For sales to UK-based customers (VAT purposes): Paddle Payments Limited. For all other customers: Paddle.com Market Limited. Paddle's privacy policy at https://paddle.com/privacy governs payment data.</p>
               <p><strong className="text-white">5.2 Infrastructure:</strong> Supabase hosts our database. Vercel hosts our application.</p>
               <p><strong className="text-white">5.3 Analytics:</strong> PostHog provides privacy-focused analytics. No personal data sold to third parties.</p>
               <p><strong className="text-white">5.4 Legal Requirements:</strong> We may disclose data to comply with legal obligations or protect rights.</p>
@@ -92,9 +93,10 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">7. Cookies and Tracking</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">7.1 Essential Cookies:</strong> Authentication, session management, and security.</p>
-              <p><strong className="text-white">7.2 Analytics:</strong> PostHog tracks usage patterns (privacy-focused, no personal data).</p>
-              <p><strong className="text-white">7.3 Control:</strong> Manage cookies through browser settings.</p>
+              <p><strong className="text-white">7.1 Essential Cookies:</strong> Authentication tokens, session management, security tokens, and CSRF protection. These cookies use __Host- or __Secure- prefixes for enhanced security.</p>
+              <p><strong className="text-white">7.2 Analytics:</strong> PostHog tracks usage patterns with privacy-focused, anonymized data. No personal information is collected.</p>
+              <p><strong className="text-white">7.3 Security Features:</strong> All cookies are HttpOnly, Secure (in production), SameSite=Strict, and have a maximum age of 7 days.</p>
+              <p><strong className="text-white">7.4 Control:</strong> Manage cookies through browser settings. Disabling essential cookies may affect functionality.</p>
             </CardContent>
           </Card>
 
@@ -142,8 +144,13 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">12. Contact Us</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
+              <p><strong className="text-white">12.1 Service Provider:</strong> Muhammad Tanveer Abbas</p>
+              <p><strong className="text-white">12.2 Payment Processor:</strong> Paddle (Merchant of Record)</p>
+              <p><strong className="text-white">12.3 Contact Methods:</strong></p>
               <p>For privacy questions or to exercise your rights:</p>
-              <p>Email: privacy@clario.ai<br />Data Protection Officer: dpo@clario.ai</p>
+              <p>Email: privacy@clario.ai<br />Data Protection Officer: dpo@clario.ai<br />Website: https://clario.ai</p>
+              <p><strong className="text-white">12.4 Paddle Contact:</strong></p>
+              <p>For payment-related privacy inquiries:<br />Paddle Privacy Policy: https://paddle.com/privacy<br />Paddle Legal: legal@paddle.com</p>
             </CardContent>
           </Card>
         </div>

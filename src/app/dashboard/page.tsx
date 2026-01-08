@@ -116,7 +116,7 @@ export default function DashboardPage() {
         .eq('user_id', user?.id)
 
       const { count: writingCount } = await supabase
-        .from('writing_drafts')
+        .from('writing_sessions')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user?.id)
 
@@ -126,7 +126,7 @@ export default function DashboardPage() {
       const totalRequests = (currentMonthUsage?.summaries_count || 0) +
         (currentMonthUsage?.chats_count || 0) +
         (currentMonthUsage?.meeting_notes_count || 0) +
-        (currentMonthUsage?.writing_sessions || 0)
+        (currentMonthUsage?.writing_count || 0)
 
       setStats({
         totalSummaries: summariesCount || 0,
@@ -176,73 +176,73 @@ export default function DashboardPage() {
       <main className={`flex-1 transition-all duration-300 ${collapsed ? 'ml-0 md:ml-[80px]' : 'ml-0 md:ml-[256px]'} p-3 sm:p-6 md:p-8`}>
         <div className="max-w-7xl mx-auto space-y-3 sm:space-y-6">
           {/* Header */}
-          <div className="mb-4 sm:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-xl sm:text-3xl font-bold text-white mb-1">Dashboard</h1>
-              <p className="text-xs sm:text-base text-gray-400">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'}!</p>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">Dashboard</h1>
+              <p className="text-sm sm:text-base text-gray-400">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'User'}!</p>
             </div>
             
-            <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-xl bg-gradient-to-r from-white/5 via-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 shadow-lg w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-white/5 via-white/10 to-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 shadow-lg w-full sm:w-auto">
               <div className="relative">
-                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-[#4169E1] via-[#6B8EFF] to-[#8FA5FF] flex items-center justify-center text-white text-xs sm:text-sm font-bold ring-2 ring-[#4169E1]/40 shadow-lg">
+                <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-[#4169E1] via-[#6B8EFF] to-[#8FA5FF] flex items-center justify-center text-white text-sm font-bold ring-2 ring-[#4169E1]/40 shadow-lg">
                   {user?.user_metadata?.name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'}
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-black shadow-sm" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-400 rounded-full border-2 border-black shadow-sm" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs sm:text-sm font-semibold text-white truncate">{user?.user_metadata?.name || 'User'}</p>
-                <p className="text-[10px] sm:text-xs text-gray-400 truncate">{user?.email}</p>
+                <p className="text-sm font-semibold text-white truncate">{user?.user_metadata?.name || 'User'}</p>
+                <p className="text-xs text-gray-400 truncate">{user?.email}</p>
               </div>
             </div>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <Card className="bg-gradient-to-br from-blue-500/10 via-blue-400/5 to-blue-300/5 border-blue-500/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500/20 to-transparent rounded-bl-full" />
-              <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Summaries</CardTitle>
-                <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-500/20 to-transparent rounded-bl-full" />
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4 sm:p-6">
+                <CardTitle className="text-sm font-medium text-gray-300">Summaries</CardTitle>
+                <FileText className="h-4 w-4 text-blue-400" />
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalSummaries}</div>
-                <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Total created</p>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.totalSummaries}</div>
+                <p className="text-xs text-gray-400 mt-1">Total created</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-purple-500/10 via-purple-400/5 to-purple-300/5 border-purple-500/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500/20 to-transparent rounded-bl-full" />
-              <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Chats</CardTitle>
-                <MessageSquare className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-purple-500/20 to-transparent rounded-bl-full" />
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4 sm:p-6">
+                <CardTitle className="text-sm font-medium text-gray-300">Chats</CardTitle>
+                <MessageSquare className="h-4 w-4 text-purple-400" />
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalChats}</div>
-                <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Total messages</p>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.totalChats}</div>
+                <p className="text-xs text-gray-400 mt-1">Total messages</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-emerald-500/10 via-emerald-400/5 to-emerald-300/5 border-emerald-500/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-bl-full" />
-              <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Meetings</CardTitle>
-                <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-400" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-bl-full" />
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4 sm:p-6">
+                <CardTitle className="text-sm font-medium text-gray-300">Meetings</CardTitle>
+                <Activity className="h-4 w-4 text-emerald-400" />
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
-                <div className="text-xl sm:text-2xl font-bold text-white">{stats.totalMeetingNotes || 0}</div>
-                <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Total notes</p>
+              <CardContent className="p-4 sm:p-6 pt-0">
+                <div className="text-2xl sm:text-3xl font-bold text-white">{stats.totalMeetingNotes || 0}</div>
+                <p className="text-xs text-gray-400 mt-1">Total notes</p>
               </CardContent>
             </Card>
 
             <Card className="bg-gradient-to-br from-green-500/10 via-green-400/5 to-green-300/5 border-green-500/20 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-full" />
-              <CardHeader className="flex flex-row items-center justify-between pb-1 sm:pb-2 p-3 sm:p-6">
-                <CardTitle className="text-xs sm:text-sm font-medium text-gray-300">Quick Action</CardTitle>
-                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-green-500/20 to-transparent rounded-bl-full" />
+              <CardHeader className="flex flex-row items-center justify-between pb-2 p-4 sm:p-6">
+                <CardTitle className="text-sm font-medium text-gray-300">Quick Action</CardTitle>
+                <Sparkles className="h-4 w-4 text-green-400" />
               </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0">
+              <CardContent className="p-4 sm:p-6 pt-0">
                 <Button
-                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 font-medium transition-all duration-200 hover:scale-105 text-xs sm:text-sm h-8 sm:h-9"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 font-medium transition-all duration-200 hover:scale-105 text-sm h-9"
                   onClick={() => router.push('/summarizer')}
                 >
                   Create Summary
@@ -294,64 +294,64 @@ export default function DashboardPage() {
 
           {/* Analytics Insights */}
           {insights && (
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <Card className="bg-gradient-to-br from-orange-500/10 via-orange-400/5 to-orange-300/5 border-orange-500/20">
-                <CardHeader className="pb-2 p-3 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Flame className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400" />
+                <CardHeader className="pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Flame className="h-4 w-4 text-orange-400" />
                     Streak
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-6 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-white">{insights.currentStreak}</div>
-                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Days active</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">{insights.currentStreak}</div>
+                  <p className="text-xs text-gray-400 mt-1">Days active</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-green-500/10 via-green-400/5 to-green-300/5 border-green-500/20">
-                <CardHeader className="pb-2 p-3 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+                <CardHeader className="pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-green-400" />
                     Avg/Day
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-6 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-white">{insights.avgRequestsPerDay}</div>
-                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Requests</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl font-bold text-white">{insights.avgRequestsPerDay}</div>
+                  <p className="text-xs text-gray-400 mt-1">Requests</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-purple-500/10 via-purple-400/5 to-purple-300/5 border-purple-500/20">
-                <CardHeader className="pb-2 p-3 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
-                    <Activity className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+                <CardHeader className="pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-purple-400" />
                     Top Feature
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-6 pt-0">
-                  <div className="text-xl sm:text-2xl font-bold text-white capitalize">{insights.mostUsedFeature}</div>
-                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">Most used</p>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="text-2xl sm:text-3xl font-bold text-white capitalize">{insights.mostUsedFeature}</div>
+                  <p className="text-xs text-gray-400 mt-1">Most used</p>
                 </CardContent>
               </Card>
 
               <Card className={`bg-gradient-to-br ${insights.trendDirection === 'up' ? 'from-green-500/10 via-green-400/5 to-green-300/5 border-green-500/20' : insights.trendDirection === 'down' ? 'from-red-500/10 via-red-400/5 to-red-300/5 border-red-500/20' : 'from-gray-500/10 via-gray-400/5 to-gray-300/5 border-gray-500/20'}`}>
-                <CardHeader className="pb-2 p-3 sm:p-6">
-                  <CardTitle className="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
+                <CardHeader className="pb-2 p-4 sm:p-6">
+                  <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
                     {insights.trendDirection === 'up' ? (
-                      <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
+                      <TrendingUp className="h-4 w-4 text-green-400" />
                     ) : insights.trendDirection === 'down' ? (
-                      <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-400" />
+                      <TrendingDown className="h-4 w-4 text-red-400" />
                     ) : (
-                      <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400" />
+                      <BarChart3 className="h-4 w-4 text-gray-400" />
                     )}
                     Trend
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-3 sm:p-6 pt-0">
-                  <div className={`text-xl sm:text-2xl font-bold ${insights.trendDirection === 'up' ? 'text-green-400' : insights.trendDirection === 'down' ? 'text-red-400' : 'text-gray-400'}`}>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className={`text-2xl sm:text-3xl font-bold ${insights.trendDirection === 'up' ? 'text-green-400' : insights.trendDirection === 'down' ? 'text-red-400' : 'text-gray-400'}`}>
                     {insights.trendDirection === 'up' ? '+' : insights.trendDirection === 'down' ? '-' : ''}{insights.trendPercentage}%
                   </div>
-                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">vs last month</p>
+                  <p className="text-xs text-gray-400 mt-1">vs last month</p>
                 </CardContent>
               </Card>
             </div>

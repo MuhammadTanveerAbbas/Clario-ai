@@ -4,6 +4,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
+import { PostHogProvider } from "@/components/providers/posthog-provider";
+import { PostHogPageView } from "./posthog-pageview";
+import { Suspense } from "react";
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://clario-hub.vercel.app"),
@@ -101,32 +105,21 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Sansation:wght@400;700&display=swap"
           rel="stylesheet"
         />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]);var n=t;if("undefined"!=typeof e)n=t[e]=function(){n.push([e].concat(Array.prototype.slice.call(arguments,0)))};else for(var p=0;p<e.length;p++)n[e[p]]=function(t){return function(){n.push([t].concat(Array.prototype.slice.call(arguments,0)))}}(e[p]);return t}(p=e,"capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys".split(" ")),p._i.push([i,s,a]),p.__SV=1}(document,window.posthog||[]);
-              if (typeof window !== 'undefined' && '${
-                process.env.NEXT_PUBLIC_POSTHOG_KEY
-              }') {
-                posthog.init('${process.env.NEXT_PUBLIC_POSTHOG_KEY}', {
-                  api_host: '${
-                    process.env.NEXT_PUBLIC_POSTHOG_HOST ||
-                    "https://app.posthog.com"
-                  }'
-                });
-              }
-            `,
-          }}
-        />
+
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          <SidebarProvider>
-            {children}
-            <Toaster />
-            <ScrollToTop />
-          </SidebarProvider>
-        </AuthProvider>
+        <PostHogProvider>
+          <Suspense fallback={null}>
+            <PostHogPageView />
+          </Suspense>
+          <AuthProvider>
+            <SidebarProvider>
+              {children}
+              <Toaster />
+              <ScrollToTop />
+            </SidebarProvider>
+          </AuthProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

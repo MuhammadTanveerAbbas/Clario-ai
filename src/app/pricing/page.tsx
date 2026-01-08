@@ -19,11 +19,12 @@ const plans = [
     description: 'Perfect for getting started with AI-powered productivity',
     features: [
       '100 AI requests per month',
-      'Text Summarizer (6 modes)',
-      'AI Chat powered by Groq',
-      'Document Analysis',
-      'Writing Assistant',
+      'Text Summarizer (10 modes)',
+      'AI Chat with history',
+      'Writing Assistant (5 actions)',
       'Meeting Notes Generator',
+      'Quick Notes with categories',
+      'Export to Markdown/TXT',
       'Basic analytics dashboard',
       'Email support',
       'Secure data storage',
@@ -41,11 +42,12 @@ const plans = [
     description: 'For power users who need unlimited productivity',
     features: [
       '1000 AI requests per month',
-      'Text Summarizer (6 modes)',
-      'AI Chat powered by Groq',
-      'Document Analysis',
-      'Writing Assistant',
+      'Text Summarizer (10 modes)',
+      'AI Chat with history',
+      'Writing Assistant (5 actions)',
       'Meeting Notes Generator',
+      'Quick Notes with categories',
+      'Export to Markdown/TXT',
       'Advanced analytics & insights',
       'Priority email support',
       'Priority processing speed',
@@ -91,10 +93,10 @@ export default function PricingPage() {
               <Sparkles className="h-3 w-3 mr-1" />
               Simple Pricing
             </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-4 leading-tight">
               Choose Your Plan
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4">
+            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4 leading-relaxed">
               Start free with 100 requests per month or upgrade to Pro for 1000 requests.
             </p>
           </motion.div>
@@ -125,15 +127,15 @@ export default function PricingPage() {
                     </div>
                   )}
                   <CardHeader className="pb-3 sm:pb-4 pt-6 sm:pt-8 px-4 sm:px-6">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-3 sm:mb-4 shadow-xl`}>
-                      <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-3 sm:mb-4 shadow-xl`}>
+                      <Zap className="h-6 w-6 text-white" />
                     </div>
-                    <CardTitle className="text-xl sm:text-2xl font-bold text-white mb-2">{plan.name}</CardTitle>
-                    <div className="mt-2 sm:mt-3 mb-3 sm:mb-4">
-                      <span className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{plan.price}</span>
-                      <span className="text-gray-400 text-sm sm:text-base ml-2">/{plan.period}</span>
+                    <CardTitle className="text-2xl font-bold text-white mb-2">{plan.name}</CardTitle>
+                    <div className="mt-3 mb-4">
+                      <span className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{plan.price}</span>
+                      <span className="text-gray-400 text-base ml-2">/{plan.period}</span>
                     </div>
-                    <CardDescription className="text-gray-400 text-xs sm:text-sm leading-relaxed">
+                    <CardDescription className="text-gray-400 text-sm leading-relaxed">
                       {plan.description}
                     </CardDescription>
                   </CardHeader>
@@ -147,26 +149,26 @@ export default function PricingPage() {
                           transition={{ delay: index * 0.15 + i * 0.05 }}
                           className="flex items-start gap-2 sm:gap-2.5"
                         >
-                          <div className={`mt-0.5 rounded-full p-0.5 sm:p-1 bg-gradient-to-br ${plan.gradient} flex-shrink-0 shadow-md`}>
-                            <Check className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-white stroke-[3]" />
+                          <div className={`mt-0.5 rounded-full p-1 bg-gradient-to-br ${plan.gradient} flex-shrink-0 shadow-md`}>
+                            <Check className="h-3 w-3 text-white stroke-[3]" />
                           </div>
-                          <span className="text-gray-200 text-xs sm:text-sm leading-relaxed">{feature}</span>
+                          <span className="text-gray-200 text-sm leading-relaxed">{feature}</span>
                         </motion.li>
                       ))}
                     </ul>
                     <div className="space-y-2">
                       <Button
                         size="lg"
-                        className={`w-full text-sm sm:text-base font-bold py-4 sm:py-5 rounded-xl transition-all duration-300 shadow-xl ${
+                        className={`w-full text-base font-bold py-5 rounded-xl transition-all duration-300 shadow-xl ${
                           plan.popular
-                            ? 'bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 text-white'
-                            : 'bg-white text-black hover:bg-gray-100'
+                            ? 'bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 text-white hover:scale-105'
+                            : 'bg-white text-black hover:bg-gray-100 hover:scale-105'
                         }`}
                         onClick={() => handleSubscribe(plan.tier)}
                       >
                         {plan.cta}
                       </Button>
-                      <p className="text-center text-[10px] sm:text-xs text-gray-500">
+                      <p className="text-center text-xs text-gray-500">
                         {plan.tier === 'free' ? 'No credit card required' : '30-day money-back guarantee'}
                       </p>
                     </div>
@@ -189,29 +191,29 @@ export default function PricingPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4">
-                    <Check className="h-6 w-6 text-white" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4">
+                    <Check className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Enterprise Security</h3>
-                  <p className="text-sm text-gray-400">Row Level Security, rate limiting, and encryption</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">Enterprise Security</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">Row Level Security, rate limiting, and encryption</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-4">
-                    <Zap className="h-6 w-6 text-white" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-4">
+                    <Zap className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Lightning Fast</h3>
-                  <p className="text-sm text-gray-400">Powered by Groq and Google Gemini AI</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">Lightning Fast</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">Powered by Groq and Google Gemini AI</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="h-6 w-6 text-white" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
+                    <Sparkles className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-2">Real-time Analytics</h3>
-                  <p className="text-sm text-gray-400">Track usage and performance insights</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">Real-time Analytics</h3>
+                  <p className="text-sm text-gray-400 leading-relaxed">Track usage and performance insights</p>
                 </CardContent>
               </Card>
             </div>
@@ -252,11 +254,11 @@ export default function PricingPage() {
 
               <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-colors">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg">What counts as a request?</CardTitle>
+                  <CardTitle className="text-white text-xl">What counts as a request?</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-400">
-                    Each AI operation counts as one request: summarization, chat message, document analysis, writing assistance, or meeting notes generation.
+                  <p className="text-gray-400 text-base leading-relaxed">
+                    Each AI operation counts as one request: summarization, chat message, writing assistance, or meeting notes generation.
                   </p>
                 </CardContent>
               </Card>

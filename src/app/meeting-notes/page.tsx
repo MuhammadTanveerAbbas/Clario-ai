@@ -22,6 +22,8 @@ import {
   CheckCircle2,
   Users,
   Calendar,
+  Download,
+  Copy,
 } from "lucide-react";
 
 export default function MeetingNotesPage() {
@@ -30,6 +32,27 @@ export default function MeetingNotesPage() {
   const [rawNotes, setRawNotes] = useState("");
   const [structuredNotes, setStructuredNotes] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  const handleExport = (format: 'txt' | 'md') => {
+    if (!structuredNotes) return;
+    
+    let content = '';
+    if (format === 'md') {
+      content = `# ${title || 'Meeting Notes'}\n\n**Date:** ${new Date().toLocaleDateString()}\n\n## Summary\n\n${structuredNotes.summary}\n\n## Action Items\n\n${structuredNotes.actionItems?.map((item: string) => `- ${item}`).join('\n')}\n\n## Key Points\n\n${structuredNotes.keyPoints?.map((point: string) => `- ${point}`).join('\n')}`;
+    } else {
+      content = `${title || 'Meeting Notes'}\n\nDate: ${new Date().toLocaleDateString()}\n\nSummary:\n${structuredNotes.summary}\n\nAction Items:\n${structuredNotes.actionItems?.map((item: string) => `- ${item}`).join('\n')}\n\nKey Points:\n${structuredNotes.keyPoints?.map((point: string) => `- ${point}`).join('\n')}`;
+    }
+    
+    const blob = new Blob([content], { type: format === 'md' ? 'text/markdown' : 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `meeting-notes-${Date.now()}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   const handleGenerate = async () => {
     if (!rawNotes.trim()) return;
@@ -131,13 +154,40 @@ export default function MeetingNotesPage() {
 
             <Card className="bg-gradient-to-br from-purple-500/10 via-purple-400/5 to-purple-300/5 border-purple-500/20">
               <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2 text-base md:text-lg">
-                  <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
-                  Structured Output
-                </CardTitle>
-                <CardDescription className="text-gray-400 text-xs md:text-sm">
-                  AI organized meeting summary
-                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white flex items-center gap-2 text-base md:text-lg">
+                      <CheckCircle2 className="h-4 w-4 md:h-5 md:w-5 text-purple-400" />
+                      Structured Output
+                    </CardTitle>
+                    <CardDescription className="text-gray-400 text-xs md:text-sm">
+                      AI organized meeting summary
+                    </CardDescription>
+                  </div>
+                  {structuredNotes && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleExport('md')}
+                        className="border-white/20 text-white hover:bg-white/10"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const text = `${structuredNotes.summary}\n\nAction Items:\n${structuredNotes.actionItems?.join('\n')}\n\nKey Points:\n${structuredNotes.keyPoints?.join('\n')}`;
+                          navigator.clipboard.writeText(text);
+                        }}
+                        className="border-white/20 text-white hover:bg-white/10"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {structuredNotes ? (
