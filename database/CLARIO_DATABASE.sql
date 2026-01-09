@@ -99,6 +99,15 @@ CREATE TABLE IF NOT EXISTS public.quick_notes (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Feedback
+CREATE TABLE IF NOT EXISTS public.feedback (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+  email TEXT,
+  feedback TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Enable RLS
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_summaries ENABLE ROW LEVEL SECURITY;
@@ -108,47 +117,79 @@ ALTER TABLE public.meeting_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.usage_stats ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.insights ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.quick_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.feedback ENABLE ROW LEVEL SECURITY;
 
 -- Users Policies
+DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
 CREATE POLICY "Users can view own profile" ON public.users FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON public.users;
 CREATE POLICY "Users can update own profile" ON public.users FOR UPDATE USING (auth.uid() = id);
 
 -- AI Summaries Policies
+DROP POLICY IF EXISTS "Users can view own summaries" ON public.ai_summaries;
 CREATE POLICY "Users can view own summaries" ON public.ai_summaries FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own summaries" ON public.ai_summaries;
 CREATE POLICY "Users can insert own summaries" ON public.ai_summaries FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own summaries" ON public.ai_summaries;
 CREATE POLICY "Users can delete own summaries" ON public.ai_summaries FOR DELETE USING (auth.uid() = user_id);
 
 -- Chat Messages Policies
+DROP POLICY IF EXISTS "Users can view own messages" ON public.chat_messages;
 CREATE POLICY "Users can view own messages" ON public.chat_messages FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own messages" ON public.chat_messages;
 CREATE POLICY "Users can insert own messages" ON public.chat_messages FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own messages" ON public.chat_messages;
 CREATE POLICY "Users can delete own messages" ON public.chat_messages FOR DELETE USING (auth.uid() = user_id);
 
 -- Writing Drafts Policies
+DROP POLICY IF EXISTS "Users can view own drafts" ON public.writing_drafts;
 CREATE POLICY "Users can view own drafts" ON public.writing_drafts FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own drafts" ON public.writing_drafts;
 CREATE POLICY "Users can insert own drafts" ON public.writing_drafts FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own drafts" ON public.writing_drafts;
 CREATE POLICY "Users can update own drafts" ON public.writing_drafts FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own drafts" ON public.writing_drafts;
 CREATE POLICY "Users can delete own drafts" ON public.writing_drafts FOR DELETE USING (auth.uid() = user_id);
 
 -- Meeting Notes Policies
+DROP POLICY IF EXISTS "Users can view own meeting notes" ON public.meeting_notes;
 CREATE POLICY "Users can view own meeting notes" ON public.meeting_notes FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own meeting notes" ON public.meeting_notes;
 CREATE POLICY "Users can insert own meeting notes" ON public.meeting_notes FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own meeting notes" ON public.meeting_notes;
 CREATE POLICY "Users can update own meeting notes" ON public.meeting_notes FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own meeting notes" ON public.meeting_notes;
 CREATE POLICY "Users can delete own meeting notes" ON public.meeting_notes FOR DELETE USING (auth.uid() = user_id);
 
 -- Usage Stats Policies
+DROP POLICY IF EXISTS "Users can view own usage stats" ON public.usage_stats;
 CREATE POLICY "Users can view own usage stats" ON public.usage_stats FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own usage stats" ON public.usage_stats;
 CREATE POLICY "Users can insert own usage stats" ON public.usage_stats FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own usage stats" ON public.usage_stats;
 CREATE POLICY "Users can update own usage stats" ON public.usage_stats FOR UPDATE USING (auth.uid() = user_id);
 
 -- Insights Policies
+DROP POLICY IF EXISTS "Users can view own insights" ON public.insights;
 CREATE POLICY "Users can view own insights" ON public.insights FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own insights" ON public.insights;
 CREATE POLICY "Users can insert own insights" ON public.insights FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Quick Notes Policies
+DROP POLICY IF EXISTS "Users can view own notes" ON public.quick_notes;
 CREATE POLICY "Users can view own notes" ON public.quick_notes FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can insert own notes" ON public.quick_notes;
 CREATE POLICY "Users can insert own notes" ON public.quick_notes FOR INSERT WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own notes" ON public.quick_notes;
 CREATE POLICY "Users can update own notes" ON public.quick_notes FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can delete own notes" ON public.quick_notes;
 CREATE POLICY "Users can delete own notes" ON public.quick_notes FOR DELETE USING (auth.uid() = user_id);
+
+-- Feedback Policies
+DROP POLICY IF EXISTS "Anyone can insert feedback" ON public.feedback;
+CREATE POLICY "Anyone can insert feedback" ON public.feedback FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Users can view own feedback" ON public.feedback;
+CREATE POLICY "Users can view own feedback" ON public.feedback FOR SELECT USING (auth.uid() = user_id);
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_ai_summaries_user_id ON public.ai_summaries(user_id);
@@ -163,6 +204,8 @@ CREATE INDEX IF NOT EXISTS idx_insights_user_id ON public.insights(user_id);
 CREATE INDEX IF NOT EXISTS idx_quick_notes_user_id ON public.quick_notes(user_id);
 CREATE INDEX IF NOT EXISTS idx_quick_notes_category ON public.quick_notes(category);
 CREATE INDEX IF NOT EXISTS idx_quick_notes_created_at ON public.quick_notes(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_feedback_user_id ON public.feedback(user_id);
+CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON public.feedback(created_at DESC);
 
 -- Functions
 CREATE OR REPLACE FUNCTION update_updated_at_column()

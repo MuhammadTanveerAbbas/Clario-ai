@@ -147,10 +147,14 @@ export default function SignUpPage() {
   const handleSocialLogin = async (provider: "github" | "google") => {
     setLoading(true);
     try {
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`
+        : `https://clario-hub.vercel.app/auth/callback?redirect=${encodeURIComponent(redirect)}`;
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `https://clario-hub.vercel.app/auth/callback?redirect=${encodeURIComponent(redirect)}`,
+          redirectTo: redirectUrl,
         },
       });
 
