@@ -31,7 +31,7 @@ export async function updateSession(request: NextRequest) {
       auth: {
         flowType: SESSION_CONFIG.flowType,
         autoRefreshToken: SESSION_CONFIG.autoRefresh,
-        detectSessionInUrl: false,
+        detectSessionInUrl: true,
         persistSession: true,
       },
     }
