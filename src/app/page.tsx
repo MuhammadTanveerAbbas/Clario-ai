@@ -135,6 +135,14 @@ export default function Home() {
   const { user } = useAuth();
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    if (code) {
+      router.replace('/auth/callback' + window.location.search);
+    }
+  }, [router]);
+
+  useEffect(() => {
     return () => {
       setLoading(false);
     };
