@@ -145,27 +145,30 @@ export default function SignUpPage() {
   };
 
   const handleSocialLogin = async (provider: "github" | "google") => {
-    setLoading(true);
     try {
-      const redirectUrl = typeof window !== 'undefined' 
-        ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`
-        : `https://clario-hub.vercel.app/auth/callback?redirect=${encodeURIComponent(redirect)}`;
-      
+      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`,
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        setLoading(false);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message || `Failed to sign in with ${provider}.`,
+        });
+      }
     } catch (error: any) {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Error",
         description: error.message || `Failed to sign in with ${provider}.`,
       });
-      setLoading(false);
     }
   };
 

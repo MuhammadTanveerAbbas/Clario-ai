@@ -9,8 +9,6 @@ export const COOKIE_CONFIG = {
   sameSite: 'lax' as const,
   maxAge: 60 * 60 * 24 * 7, // 7 days
   path: '/',
-  domain: undefined,
-  priority: 'high' as const,
 }
 
 export const SESSION_CONFIG = {
