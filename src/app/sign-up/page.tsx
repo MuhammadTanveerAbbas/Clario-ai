@@ -150,9 +150,7 @@ export default function SignUpPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${
-            window.location.origin
-          }/auth/callback?redirect=${encodeURIComponent(redirect)}`,
+          redirectTo: `https://clario-hub.vercel.app/auth/callback?redirect=${encodeURIComponent(redirect)}`,
         },
       });
 
