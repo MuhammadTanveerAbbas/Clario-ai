@@ -19,21 +19,24 @@ export function MarkdownRenderer({ content, className = '' }: MarkdownRendererPr
       const key = `line-${lineCounter++}`
       
       if (line.startsWith('### ')) {
+        const text = line.slice(4).trim()
         elements.push(
           <h3 key={key} className="text-lg font-semibold text-white mt-4 mb-2">
-            {line.replace('### ', '')}
+            {text}
           </h3>
         )
       } else if (line.startsWith('## ')) {
+        const text = line.slice(3).trim()
         elements.push(
           <h2 key={key} className="text-xl font-semibold text-white mt-4 mb-2">
-            {line.replace('## ', '')}
+            {text}
           </h2>
         )
       } else if (line.startsWith('# ')) {
+        const text = line.slice(2).trim()
         elements.push(
           <h1 key={key} className="text-2xl font-bold text-white mt-4 mb-2">
-            {line.replace('# ', '')}
+            {text}
           </h1>
         )
       } else if (line.startsWith('```')) {

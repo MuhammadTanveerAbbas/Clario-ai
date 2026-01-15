@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
   },
   webpack: (config) => {
     config.output.chunkLoadTimeout = 120000;
+    config.ignoreWarnings = [
+      { module: /node_modules/ },
+    ];
     return config;
   },
   turbopack: {

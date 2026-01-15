@@ -8,7 +8,7 @@ import { MobileMenuButton } from "@/components/layout/mobile-menu-button";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Loader2, Send, Trash2, ArrowDown, Sparkles } from "lucide-react";
+import { Loader2, Send, Trash2, ArrowDown, Sparkles, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { checkUsageLimit } from "@/lib/usage-limits";
@@ -42,12 +42,15 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const [isThinking, setIsThinking] = useState(false);
   const [userTier, setUserTier] = useState<"free" | "pro" | "premium">("free");
   const [chatUsage, setChatUsage] = useState(0);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [allHistory, setAllHistory] = useState<Message[]>([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,6 +102,7 @@ export default function ChatPage() {
             timestamp: new Date(msg.created_at),
           })
         );
+        setAllHistory(historyMessages);
         setMessages(historyMessages);
       }
     } catch (error) {
@@ -273,18 +277,24 @@ export default function ChatPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
-                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  <span className="text-xs text-gray-300">Online</span>
-                </div>
                 <Button
-                  variant="ghost"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowHistory(!showHistory)}
+                  disabled={allHistory.length === 0}
+                  className="border-white/20 text-white hover:bg-white/10 h-10"
+                >
+                  <History className="h-4 w-4 mr-1" />
+                  History ({allHistory.filter(m => m.role === 'user').length})
+                </Button>
+                <Button
+                  variant="outline"
                   size="sm"
                   onClick={() => setShowClearDialog(true)}
                   disabled={messages.length === 0}
-                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                  className="border-white/20 text-white hover:bg-white/10 h-10 w-10 p-0"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-5 w-5 text-red-400" />
                 </Button>
               </div>
             </div>
@@ -306,25 +316,9 @@ export default function ChatPage() {
                   <h3 className="text-2xl font-bold text-white mb-2">
                     Start a Conversation
                   </h3>
-                  <p className="text-gray-400 mb-6">
-                    Ask me anything - I'm here to help!
+                  <p className="text-gray-400 text-sm">
+                    Type your message below to begin
                   </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    {[
-                      "Explain quantum physics",
-                      "Write a Python function",
-                      "Plan a project",
-                      "Debug my code",
-                    ].map((suggestion) => (
-                      <button
-                        key={suggestion}
-                        onClick={() => setInput(suggestion)}
-                        className="p-3 text-sm bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-all border border-white/10 hover:border-[#4169E1]/50 text-left"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
@@ -346,6 +340,40 @@ export default function ChatPage() {
             {loading && <TypingIndicator />}
             <div ref={messagesEndRef} />
           </div>
+
+          {/* History Panel */}
+          {showHistory && allHistory.length > 0 && (
+            <div className="absolute top-16 right-4 w-80 max-h-96 bg-gray-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-20">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-white">Chat History</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHistory(false)}
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-white"
+                >
+                  ×
+                </Button>
+              </div>
+              <div className="overflow-y-auto max-h-80 p-2">
+                {allHistory.filter(m => m.role === 'user').map((msg, idx) => (
+                  <button
+                    key={msg.id}
+                    onClick={() => {
+                      setMessages(allHistory.slice(0, allHistory.indexOf(msg) + 2));
+                      setShowHistory(false);
+                    }}
+                    className="w-full text-left p-3 mb-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
+                  >
+                    <p className="text-xs text-gray-400 mb-1">
+                      {msg.timestamp.toLocaleDateString()} {msg.timestamp.toLocaleTimeString()}
+                    </p>
+                    <p className="text-sm text-white truncate">{msg.content}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Scroll to Bottom Button */}
@@ -387,21 +415,16 @@ export default function ChatPage() {
                   disabled={loading}
                   maxRows={5}
                 />
-                {input.length > 0 && (
-                  <div className="absolute bottom-2 right-2 text-xs text-gray-500">
-                    {input.length}/2000
-                  </div>
-                )}
               </div>
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || loading}
-                className="bg-gradient-to-r from-[#4169E1] to-[#6B8EFF] hover:from-[#4169E1]/90 hover:to-[#6B8EFF]/90 text-white h-12 w-12 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 flex-shrink-0 p-0"
+                className="bg-gradient-to-r from-[#4169E1] to-[#6B8EFF] hover:from-[#4169E1]/90 hover:to-[#6B8EFF]/90 text-white h-14 w-14 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 flex-shrink-0 p-0"
               >
                 {loading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin" />
                 ) : (
-                  <Send className="h-5 w-5" />
+                  <Send className="h-6 w-6" />
                 )}
               </Button>
             </div>

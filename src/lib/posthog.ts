@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { useEffect } from 'react'
 
 export function initPostHog() {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && !posthog.__loaded) {
     const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com'
 

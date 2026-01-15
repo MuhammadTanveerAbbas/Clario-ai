@@ -9,12 +9,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' })
 
 export async function POST(request: Request) {
   try {
-    const req = new Request(request.url, {
-      method: request.method,
-      headers: request.headers,
-    })
-
-    const rateLimitCheck = checkRateLimit(req as any, 'api')
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
     if (!rateLimitCheck.allowed) {
       return rateLimitCheck.response!
     }
@@ -714,35 +709,45 @@ export async function POST(request: Request) {
 
     const prompt = `${modePrompts[mode] || 'Summarize the following text professionally with clear structure.'}
 
-CRITICAL FORMATTING RULES:
-- NEVER add spaces within words - keep all words intact
-- Use ## for main headers, ### for subheaders, #### for sub-sections
-- Use **bold** for key terms and important information
+CRITICAL TEXT FORMATTING REQUIREMENTS:
+- Write all words normally without any spacing between letters
+- Example of CORRECT formatting: "Complete Analysis"
+- Example of WRONG formatting: "C omplete A nalysis" or "C o m p l e t e"
+- Never insert spaces within individual words
+- Only use spaces to separate complete words from each other
+- All headings must use standard capitalization (e.g., "Key Findings" not "K ey F indings")
+- Use ## for main headers, ### for subheaders
+- Use **bold** for emphasis
 - Use bullet points (-) and numbered lists (1. 2. 3.)
 - Use > for blockquotes
 - Use --- for section dividers
-- Keep paragraphs concise (2-3 sentences)
-- Add blank lines between sections for readability
-- Use tables where appropriate for structured data
-- Professional tone throughout
-- Ensure proper spelling and grammar
-- Do not break words with spaces (e.g., write "Management" not "M anagement")
 
-Text:
+Text to summarize:
 ${sanitizedText}`
 
     const model = 'llama-3.3-70b-versatile'
     const completion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
       model,
-      temperature: 0.7,
+      temperature: 0.3,
       max_tokens: 2000,
     })
     const summary = completion.choices[0]?.message?.content || 'Failed to generate summary'
+    
+    // Fix letter spacing: remove spaces between single characters that form words
+    const cleanedSummary = summary
+      .split('\n')
+      .map(line => {
+        // Match patterns like "C o m p l e t e" or "A n a l y s i s"
+        return line.replace(/\b([a-zA-Z])( [a-zA-Z]){2,}\b/g, (match) => {
+          return match.replace(/\s+/g, '')
+        })
+      })
+      .join('\n')
 
     await supabase.from('ai_summaries').insert({
       user_id: user.id,
-      summary_text: summary,
+      summary_text: cleanedSummary,
       original_text: sanitizedText.substring(0, 10000),
       mode,
     })
@@ -753,7 +758,7 @@ ${sanitizedText}`
       p_count: 1,
     })
 
-    return NextResponse.json({ summary })
+    return NextResponse.json({ summary: cleanedSummary })
   } catch (error: any) {
     console.error('Summarize API error:', error)
     return NextResponse.json(

@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
 
   const avgRequestsPerDay = currentMonth?.length ? Math.round(currentTotal / currentMonth.length) : 0
 
-  const peakDay = currentMonth?.reduce((max, curr) => 
+  const peakDay = currentMonth?.length ? currentMonth.reduce((max, curr) => 
     (curr.total_requests || 0) > (max.total_requests || 0) ? curr : max
-  )?.date || null
+  )?.date : null
 
   let streak = 0
   if (currentMonth && currentMonth.length > 0) {

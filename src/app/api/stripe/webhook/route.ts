@@ -30,10 +30,11 @@ export async function POST(request: Request) {
 
         if (userId) {
           await supabase
-            .from('profiles')
+            .from('users')
             .update({
               subscription_tier: 'pro',
               subscription_status: 'active',
+              stripe_customer_id: session.customer as string,
             })
             .eq('id', userId)
         }
@@ -46,9 +47,10 @@ export async function POST(request: Request) {
 
         if (userId) {
           await supabase
-            .from('profiles')
+            .from('users')
             .update({
-              subscription_status: subscription.status === 'active' ? 'active' : 'inactive',
+              subscription_status: subscription.status === 'active' ? 'active' : 'canceled',
+              stripe_subscription_id: subscription.id,
             })
             .eq('id', userId)
         }
@@ -61,10 +63,10 @@ export async function POST(request: Request) {
 
         if (userId) {
           await supabase
-            .from('profiles')
+            .from('users')
             .update({
               subscription_tier: 'free',
-              subscription_status: 'inactive',
+              subscription_status: 'canceled',
             })
             .eq('id', userId)
         }

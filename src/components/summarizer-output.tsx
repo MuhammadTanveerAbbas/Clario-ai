@@ -13,6 +13,7 @@ import {
   FileText,
   Flame,
   Gavel,
+  History,
   LayoutList,
   ListTodo,
   Loader2,
@@ -22,6 +23,7 @@ import {
   SmilePlus,
   Sparkles,
   Swords,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,6 +55,13 @@ interface SummarizerOutputProps {
   showSuccess?: boolean;
   onRegenerate?: (newMode: ModeValue) => void;
   onRetry?: () => void;
+  history?: Array<{ id: string; text: string; mode: string; summary: string; timestamp: number }>;
+  showHistory?: boolean;
+  onToggleHistory?: () => void;
+  onLoadFromHistory?: (entry: any) => void;
+  onDeleteHistory?: (id: string) => void;
+  onSummarize?: () => void;
+  canSummarize?: boolean;
 }
 
 const MODE_CONFIG: Record<
@@ -92,6 +101,13 @@ export function SummarizerOutput({
   showSuccess,
   onRegenerate,
   onRetry,
+  history = [],
+  showHistory = false,
+  onToggleHistory,
+  onLoadFromHistory,
+  onDeleteHistory,
+  onSummarize,
+  canSummarize = false,
 }: SummarizerOutputProps) {
   const { toast } = useToast();
   const [copying, setCopying] = useState(false);
@@ -184,30 +200,150 @@ export function SummarizerOutput({
     try {
       const doc = new jsPDF();
       const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
       const margin = 20;
       const maxWidth = pageWidth - 2 * margin;
       let yPosition = 20;
 
+      // Helper to add new page if needed
+      const checkPageBreak = (requiredSpace: number) => {
+        if (yPosition + requiredSpace > pageHeight - margin) {
+          doc.addPage();
+          yPosition = margin;
+          return true;
+        }
+        return false;
+      };
+
+      // Header
       doc.setFontSize(18);
+      doc.setFont("helvetica", "bold");
       doc.text("CLARIO SUMMARY REPORT", margin, yPosition);
       yPosition += 10;
 
       doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
       doc.text(`Mode: ${mode}`, margin, yPosition);
       yPosition += 6;
       doc.text(`Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`, margin, yPosition);
-      yPosition += 10;
+      yPosition += 12;
 
-      doc.setFontSize(11);
-      const lines = doc.splitTextToSize(result, maxWidth);
-      lines.forEach((line: string) => {
-        if (yPosition > 280) {
-          doc.addPage();
-          yPosition = 20;
+      // Parse and format markdown content
+      const lines = result.split('\n');
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // Skip empty lines but add spacing
+        if (!line.trim()) {
+          yPosition += 4;
+          continue;
         }
-        doc.text(line, margin, yPosition);
-        yPosition += 6;
-      });
+
+        // H1 headers (# )
+        if (line.startsWith('# ')) {
+          checkPageBreak(15);
+          doc.setFontSize(16);
+          doc.setFont("helvetica", "bold");
+          const text = line.replace(/^#\s+/, '');
+          doc.text(text, margin, yPosition);
+          yPosition += 12;
+          continue;
+        }
+
+        // H2 headers (## )
+        if (line.startsWith('## ')) {
+          checkPageBreak(12);
+          doc.setFontSize(14);
+          doc.setFont("helvetica", "bold");
+          const text = line.replace(/^##\s+/, '');
+          doc.text(text, margin, yPosition);
+          yPosition += 10;
+          continue;
+        }
+
+        // H3 headers (### )
+        if (line.startsWith('### ')) {
+          checkPageBreak(10);
+          doc.setFontSize(12);
+          doc.setFont("helvetica", "bold");
+          const text = line.replace(/^###\s+/, '');
+          doc.text(text, margin, yPosition);
+          yPosition += 8;
+          continue;
+        }
+
+        // H4 headers (#### )
+        if (line.startsWith('#### ')) {
+          checkPageBreak(8);
+          doc.setFontSize(11);
+          doc.setFont("helvetica", "bold");
+          const text = line.replace(/^####\s+/, '');
+          doc.text(text, margin, yPosition);
+          yPosition += 7;
+          continue;
+        }
+
+        // Blockquotes (> )
+        if (line.startsWith('> ')) {
+          checkPageBreak(8);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "italic");
+          const text = line.replace(/^>\s+/, '');
+          const cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+          const wrappedLines = doc.splitTextToSize(cleanText, maxWidth - 10);
+          doc.text(wrappedLines, margin + 5, yPosition);
+          yPosition += wrappedLines.length * 6 + 2;
+          continue;
+        }
+
+        // Horizontal rules (--- or ***)
+        if (line.match(/^[-*]{3,}$/)) {
+          checkPageBreak(5);
+          yPosition += 3;
+          continue;
+        }
+
+        // Bullet points (- or * )
+        if (line.match(/^[\s]*[-*]\s+/)) {
+          checkPageBreak(8);
+          doc.setFontSize(11);
+          doc.setFont("helvetica", "normal");
+          const indent = (line.match(/^\s*/)?.[0].length || 0) / 2;
+          const text = line.replace(/^[\s]*[-*]\s+/, '');
+          const cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+          const wrappedLines = doc.splitTextToSize(cleanText, maxWidth - (indent * 5) - 10);
+          doc.text('•', margin + (indent * 5), yPosition);
+          doc.text(wrappedLines, margin + (indent * 5) + 5, yPosition);
+          yPosition += wrappedLines.length * 6;
+          continue;
+        }
+
+        // Numbered lists (1. 2. etc)
+        if (line.match(/^[\s]*\d+\.\s+/)) {
+          checkPageBreak(8);
+          doc.setFontSize(11);
+          doc.setFont("helvetica", "normal");
+          const indent = (line.match(/^\s*/)?.[0].length || 0) / 2;
+          const number = line.match(/\d+\./)?.[0] || '';
+          const text = line.replace(/^[\s]*\d+\.\s+/, '');
+          const cleanText = text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+          const wrappedLines = doc.splitTextToSize(cleanText, maxWidth - (indent * 5) - 15);
+          doc.text(number, margin + (indent * 5), yPosition);
+          doc.text(wrappedLines, margin + (indent * 5) + 10, yPosition);
+          yPosition += wrappedLines.length * 6;
+          continue;
+        }
+
+        // Regular paragraphs
+        checkPageBreak(8);
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        const cleanText = line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+        const wrappedLines = doc.splitTextToSize(cleanText, maxWidth);
+        doc.text(wrappedLines, margin, yPosition);
+        yPosition += wrappedLines.length * 6 + 2;
+      }
 
       doc.save(`Clario-Summary-${mode.replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`);
 
@@ -275,12 +411,73 @@ export function SummarizerOutput({
   // Empty state
   if (!result) {
     return (
-      <div className="mt-8 text-center text-gray-400 py-12">
-        <Sparkles className="h-12 w-12 mx-auto mb-4 text-[#4169E1]" />
-        <p className="text-base">Your summary will appear here</p>
-        <p className="text-sm mt-2 text-gray-500">
-          Enter text and select a summary mode to get started
-        </p>
+      <div className="mt-8">
+        {/* Actions Bar */}
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onToggleHistory}
+            disabled={history.length === 0}
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
+          >
+            <History className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <span className="hidden sm:inline">History ({history.length})</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px] min-w-[44px] opacity-50 cursor-not-allowed"
+          >
+            <ClipboardCopy className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <span className="hidden sm:inline">Copy</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSummarize}
+            disabled={!canSummarize || isLoading}
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
+          >
+            {isLoading ? (
+              <Loader2 className="mr-0 sm:mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            )}
+            <span className="hidden sm:inline">Summarize</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
+          >
+            <Download className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <span className="hidden sm:inline">Download</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
+          >
+            <RefreshCw className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <span className="hidden sm:inline">Regenerate</span>
+          </Button>
+        </div>
+
+        <div className="text-center text-gray-400 py-12">
+          <Sparkles className="h-12 w-12 mx-auto mb-4 text-[#4169E1]" />
+          <p className="text-base">Your summary will appear here</p>
+          <p className="text-sm mt-2 text-gray-500">
+            Enter text and select a summary mode to get started
+          </p>
+        </div>
       </div>
     );
   }
@@ -288,19 +485,19 @@ export function SummarizerOutput({
   // Success state with result
   return (
     <div className="mt-8">
-      {/* Mode Badge */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${modeConfig.bgColor}`}>
-          <ModeIcon className={`h-4 w-4 ${modeConfig.color}`} />
-          <span className={`text-sm font-semibold ${modeConfig.color}`}>{mode}</span>
-        </div>
-        {showSuccess && (
-          <CheckCircle2 className="h-6 w-6 text-[#4169E1] animate-in fade-in zoom-in" />
-        )}
-      </div>
-
       {/* Actions Bar */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap justify-center gap-2 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggleHistory}
+          disabled={history.length === 0}
+          className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
+        >
+          <History className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+          <span className="hidden sm:inline">History ({history.length})</span>
+        </Button>
+        
         <Button
           variant="outline"
           size="sm"
@@ -314,6 +511,21 @@ export function SummarizerOutput({
             <ClipboardCopy className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
           )}
           <span className="hidden sm:inline">Copy</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onSummarize}
+          disabled={!canSummarize || isLoading}
+          className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
+        >
+          {isLoading ? (
+            <Loader2 className="mr-0 sm:mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+          )}
+          <span className="hidden sm:inline">Summarize</span>
         </Button>
         
         <DropdownMenu>
@@ -344,7 +556,7 @@ export function SummarizerOutput({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {onRegenerate && (
+        {onRegenerate ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -368,6 +580,16 @@ export function SummarizerOutput({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled
+            className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
+          >
+            <RefreshCw className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <span className="hidden sm:inline">Regenerate</span>
+          </Button>
         )}
       </div>
 
@@ -375,22 +597,22 @@ export function SummarizerOutput({
       <Card className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] border-white/10 shadow-2xl relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#4169E1]/5 via-transparent to-[#4169E1]/5 pointer-events-none"></div>
         <CardContent className="p-0 relative z-10">
-          <div className="summary-prose p-4 sm:p-6 md:p-10 max-w-[800px] mx-auto">
+          <div className="summary-prose p-6 sm:p-8 md:p-12 max-w-none">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                h1: ({ children }) => <h1 className="text-2xl sm:text-3xl md:text-4xl">{children}</h1>,
-                h2: ({ children }) => <h2 className="text-xl sm:text-2xl md:text-3xl">{children}</h2>,
-                h3: ({ children }) => <h3 className="text-lg sm:text-xl md:text-2xl">{children}</h3>,
-                h4: ({ children }) => <h4 className="text-base sm:text-lg md:text-xl">{children}</h4>,
-                p: ({ children }) => <p className="text-sm sm:text-base leading-relaxed">{children}</p>,
-                li: ({ children }) => <li className="text-sm sm:text-base">{children}</li>,
+                h1: ({ children }) => <h1 style={{ letterSpacing: 0 }} className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{children}</h1>,
+                h2: ({ children }) => <h2 style={{ letterSpacing: 0 }} className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">{children}</h2>,
+                h3: ({ children }) => <h3 style={{ letterSpacing: 0 }} className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">{children}</h3>,
+                h4: ({ children }) => <h4 style={{ letterSpacing: 0 }} className="text-base sm:text-lg md:text-xl">{children}</h4>,
+                p: ({ children }) => <p style={{ letterSpacing: 0 }} className="text-sm sm:text-base leading-relaxed">{children}</p>,
+                li: ({ children }) => <li style={{ letterSpacing: 0 }} className="text-sm sm:text-base">{children}</li>,
                 code: ({ inline, children, ...props }: any) =>
                   inline ? (
-                    <code {...props}>{children}</code>
+                    <code style={{ letterSpacing: 0 }} {...props}>{children}</code>
                   ) : (
                     <pre className="overflow-x-auto">
-                      <code {...props}>{children}</code>
+                      <code style={{ letterSpacing: 0 }} {...props}>{children}</code>
                     </pre>
                   ),
               }}

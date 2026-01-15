@@ -499,25 +499,15 @@ export function SummarizerTool() {
               >
                 Your Text
               </Label>
-              <div className="relative">
-                <Textarea
-                  id="text-input"
-                  placeholder="Paste your transcript, meeting notes, article, or any text here..."
-                  className="h-[200px] sm:h-[250px] resize-none pr-20 sm:pr-24 bg-black/50 border-white/20 text-white text-sm placeholder:text-gray-500 focus:border-white/40 focus:outline-none focus:ring-0 custom-scrollbar"
-                  aria-label="Text to summarize"
-                  value={state.text}
-                  onChange={(e) => handleTextChange(e.target.value)}
-                />
-                <div
-                  className={cn(
-                    "absolute bottom-2 right-2 text-[10px] sm:text-xs font-semibold",
-                    wordLimitColor
-                  )}
-                >
-                  {state.wordCount.toLocaleString()} /{" "}
-                  {MAX_WORD_COUNT.toLocaleString()} words
-                </div>
-              </div>
+              <Textarea
+                id="text-input"
+                placeholder="Paste your transcript, meeting notes, article, or any text here..."
+                className="h-[200px] sm:h-[250px] resize-none bg-black/50 border-white/20 text-white text-sm placeholder:text-gray-500 focus:border-white/40 focus:outline-none focus:ring-0 text-justify"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                aria-label="Text to summarize"
+                value={state.text}
+                onChange={(e) => handleTextChange(e.target.value)}
+              />
             </div>
 
             <div className="space-y-3">
@@ -563,77 +553,16 @@ export function SummarizerTool() {
                 ))}
               </RadioGroup>
             </div>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-2">
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isSubmitDisabled}
-                aria-label="Summarize (Ctrl+Enter)"
-                className="w-full sm:w-auto bg-white text-black hover:bg-white/90 font-semibold disabled:opacity-40 shadow-lg min-h-[44px]"
-              >
-                {state.isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin text-[#4169E1]" />
-                    <span className="text-sm sm:text-base">Summarizing...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
-                    <span className="text-sm sm:text-base">Summarize</span>
-                  </>
-                )}
-              </Button>
-              {state.history.length > 0 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  onClick={() =>
-                    setState((prev) => ({
-                      ...prev,
-                      showHistory: !prev.showHistory,
-                    }))
-                  }
-                  className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 min-h-[44px]"
-                >
-                  <History className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
-                  <span className="text-sm sm:text-base">
-                    History ({state.history.length})
-                  </span>
-                </Button>
-              )}
-              <Button
-                type="button"
-                variant="ghost"
-                size="lg"
-                onClick={() => {
-                  toast({
-                    title: "Keyboard Shortcuts",
-                    description:
-                      "Ctrl+Enter: Summarize • Ctrl+K: Copy • Ctrl+S: Export",
-                  });
-                }}
-                className="w-full sm:w-auto text-white hover:bg-white/10 min-h-[44px]"
-              >
-                <Keyboard className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
-                <span className="text-sm sm:text-base">Shortcuts</span>
-              </Button>
-            </div>
           </form>
 
           {/* Usage Warning */}
-          {state.usageRemaining <= state.usageLimit * 0.2 && (
+          {state.usageRemaining <= state.usageLimit * 0.1 && state.usageRemaining > 0 && (
             <div className="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
               <p className={`text-sm ${usageWarningColor}`}>
-                {state.usageRemaining === 0 ? (
-                  <span className="font-semibold">Limit reached! Upgrade to Pro for more requests.</span>
-                ) : (
-                  <span>
-                    <span className="font-semibold">{state.usageRemaining}</span> of {state.usageLimit} requests remaining this month.
-                  </span>
-                )}
+                <span>
+                  <span className="font-semibold">{state.usageRemaining}</span> of {state.usageLimit} requests remaining this month.
+                </span>
               </p>
             </div>
           )}
@@ -646,13 +575,41 @@ export function SummarizerTool() {
             showSuccess={state.showSuccess}
             onRegenerate={handleRegenerate}
             onRetry={handleRetry}
+            history={state.history}
+            showHistory={state.showHistory}
+            onToggleHistory={() =>
+              setState((prev) => ({
+                ...prev,
+                showHistory: !prev.showHistory,
+              }))
+            }
+            onLoadFromHistory={handleLoadFromHistory}
+            onDeleteHistory={handleDeleteHistory}
+            onSummarize={() => handleSubmit({ preventDefault: () => {} } as any)}
+            canSummarize={!isSubmitDisabled}
           />
 
           {state.showHistory && state.history.length > 0 && (
             <div className="mt-8">
-              <h3 className="text-xl font-bold text-white mb-4">
-                Recent Summaries
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-white">
+                  Recent Summaries
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm('Delete all history? This cannot be undone.')) {
+                      localStorage.removeItem('summarizerHistory');
+                      setState((prev) => ({ ...prev, history: [], showHistory: false }));
+                    }
+                  }}
+                  className="border-red-500/30 text-red-400 hover:bg-red-500/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete All
+                </Button>
+              </div>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {state.history.map((entry) => (
                   <Card

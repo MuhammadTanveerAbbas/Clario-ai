@@ -75,81 +75,57 @@ export default function DashboardPage() {
       }
     }
 
+    // Auto-refresh every 30 seconds
+    const refreshInterval = setInterval(() => {
+      if (user && !document.hidden) {
+        loadDashboardData()
+      }
+    }, 30000)
+
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      clearInterval(refreshInterval)
+    }
   }, [user, authLoading])
 
   const loadDashboardData = async () => {
     try {
-      const { data: userData } = await supabase
-        .from('users')
-        .select('subscription_tier')
-        .eq('id', user?.id)
-        .single()
+      setLoading(true)
+      
+      const [usageRes, summaries, chats, meetings, writing, usageStats] = await Promise.all([
+        fetch('/api/usage'),
+        supabase.from('ai_summaries').select('*', { count: 'exact', head: true }).eq('user_id', user?.id),
+        supabase.from('chat_messages').select('*', { count: 'exact', head: true }).eq('user_id', user?.id),
+        supabase.from('meeting_notes').select('*', { count: 'exact', head: true }).eq('user_id', user?.id),
+        supabase.from('writing_sessions').select('*', { count: 'exact', head: true }).eq('user_id', user?.id),
+        supabase.from('usage_stats').select('*').eq('user_id', user?.id).order('date', { ascending: false }).limit(30)
+      ])
 
-      const tier = userData?.subscription_tier || 'free'
-      const limits = {
-        free: 100,
-        pro: 1000,
-      }[tier] || 100
-
-      const { data: usageData } = await supabase
-        .from('usage_stats')
-        .select('*')
-        .eq('user_id', user?.id)
-        .order('date', { ascending: false })
-        .limit(30)
-
-      const { count: summariesCount } = await supabase
-        .from('ai_summaries')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-
-      const { count: chatsCount } = await supabase
-        .from('chat_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-
-      const { count: meetingNotesCount } = await supabase
-        .from('meeting_notes')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-
-      const { count: writingCount } = await supabase
-        .from('writing_sessions')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user?.id)
-
-      const currentMonth = new Date().toISOString().slice(0, 7)
-      const currentMonthUsage = usageData?.find((u) => u?.date?.startsWith(currentMonth))
-
-      const totalRequests = (currentMonthUsage?.summaries_count || 0) +
-        (currentMonthUsage?.chats_count || 0) +
-        (currentMonthUsage?.meeting_notes_count || 0) +
-        (currentMonthUsage?.writing_count || 0)
+      const usageData = usageRes.ok ? await usageRes.json() : { subscription_tier: 'free', requests_used: 0 }
+      const tier = usageData.subscription_tier || 'free'
+      const limits = { free: 100, pro: 1000 }[tier] || 100
+      const totalRequests = usageData.requests_used || 0
 
       setStats({
-        totalSummaries: summariesCount || 0,
-        totalChats: chatsCount || 0,
-        totalMeetingNotes: meetingNotesCount || 0,
-        totalWriting: writingCount || 0,
+        totalSummaries: summaries.count || 0,
+        totalChats: Math.floor((chats.count || 0) / 2),
+        totalMeetingNotes: meetings.count || 0,
+        totalWriting: writing.count || 0,
         currentTier: tier,
         requestsUsed: totalRequests,
         requestsLimit: limits,
       })
 
-      const chartData = usageData?.slice(0, 7).reverse().map((u) => ({
-        date: new Date(u?.date || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        summaries: u?.summaries_count || 0,
-        chats: u?.chats_count || 0,
-      })) || []
-
-      setChartData(chartData)
+      setChartData(usageStats.data?.slice(0, 7).reverse().map(u => ({
+        date: new Date(u.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        summaries: u.summaries_count || 0,
+        chats: u.chats_count || 0,
+      })) || [])
 
       const analyticsResponse = await fetch(`/api/analytics?userId=${user?.id}`)
       if (analyticsResponse.ok) {
-        const analyticsInsights = await analyticsResponse.json()
-        setInsights(analyticsInsights)
+        setInsights(await analyticsResponse.json())
       }
     } catch (error) {
       console.error('Error loading dashboard data:', error)

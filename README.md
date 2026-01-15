@@ -81,7 +81,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 4. **Set up database**:
 
    - Go to your Supabase project SQL Editor
-   - Run the migration script from `database/migrations/001_initial_schema.sql`
+   - Run the schema from `supabase/schema.sql`
 
 5. **Start development server**:
 
@@ -97,7 +97,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 - **[POSTHOG_SETUP.md](./POSTHOG_SETUP.md)**: Step-by-step PostHog analytics setup guide
 - **[ANALYTICS_REVIEW.md](./ANALYTICS_REVIEW.md)**: Analytics tracking implementation review
 - **API Documentation**: See `/src/app/api` for API route implementations
-- **Database Schema**: See `database/migrations/001_initial_schema.sql`
+- **Database Schema**: See `supabase/schema.sql`
 
 ## 🏗️ Project Structure
 
