@@ -18,7 +18,7 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">1. Information We Collect</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">1.1 Account Information:</strong> Email address, password (encrypted), subscription tier (Free or Pro), and payment information (processed securely by Paddle).</p>
+              <p><strong className="text-white">1.1 Account Information:</strong> Email address, password (encrypted), subscription tier (Free or Pro), and payment information (processed securely by Stripe).</p>
               <p><strong className="text-white">1.2 Usage Data:</strong> AI request counts (summaries, chat messages, writing sessions, meeting notes, quick notes), feature usage patterns, and timestamps.</p>
               <p><strong className="text-white">1.3 Content Data:</strong> Text submitted for summarization, chat conversations, writing drafts, meeting transcripts, and quick notes you create.</p>
               <p><strong className="text-white">1.4 Technical Data:</strong> IP address, browser type, device information, and session data for security and analytics.</p>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">2.1 Service Delivery:</strong> Process AI requests, provide chat responses, analyze text, deliver writing assistance, and generate meeting notes.</p>
               <p><strong className="text-white">2.2 Usage Tracking:</strong> Monitor monthly request limits (100 for Free, 1000 for Pro), track feature usage, and provide analytics dashboard.</p>
-              <p><strong className="text-white">2.3 Billing:</strong> Process payments for Pro subscriptions ($20/month), manage subscriptions, and handle refunds via Paddle.</p>
+              <p><strong className="text-white">2.3 Billing:</strong> Process payments for Pro subscriptions ($20/month), manage subscriptions, and handle refunds via Stripe.</p>
               <p><strong className="text-white">2.4 Improvements:</strong> Analyze usage patterns to improve AI models and enhance features.</p>
               <p><strong className="text-white">2.5 Communications:</strong> Send service updates, billing notifications, and security alerts.</p>
             </CardContent>
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
               <CardTitle className="text-white">5. Data Sharing and Third Parties</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">5.1 Payment Processing:</strong> Paddle acts as Merchant of Record and processes all payments. For sales to US-based customers: Paddle.com Inc. For sales to UK-based customers (VAT purposes): Paddle Payments Limited. For all other customers: Paddle.com Market Limited. Paddle's privacy policy at https://paddle.com/privacy governs payment data.</p>
+              <p><strong className="text-white">5.1 Payment Processing:</strong> Stripe processes all payments securely. Stripe's privacy policy at https://stripe.com/privacy governs payment data.</p>
               <p><strong className="text-white">5.2 Infrastructure:</strong> Supabase hosts our database. Vercel hosts our application.</p>
               <p><strong className="text-white">5.3 Analytics:</strong> PostHog provides privacy-focused analytics. No personal data sold to third parties.</p>
               <p><strong className="text-white">5.4 Legal Requirements:</strong> We may disclose data to comply with legal obligations or protect rights.</p>
@@ -145,12 +145,12 @@ export default function PrivacyPage() {
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">12.1 Service Provider:</strong> Muhammad Tanveer Abbas</p>
-              <p><strong className="text-white">12.2 Payment Processor:</strong> Paddle (Merchant of Record)</p>
+              <p><strong className="text-white">12.2 Payment Processor:</strong> Stripe</p>
               <p><strong className="text-white">12.3 Contact Methods:</strong></p>
               <p>For privacy questions or to exercise your rights:</p>
               <p>Email: privacy@clario.ai<br />Data Protection Officer: dpo@clario.ai<br />Website: https://clario.ai</p>
-              <p><strong className="text-white">12.4 Paddle Contact:</strong></p>
-              <p>For payment-related privacy inquiries:<br />Paddle Privacy Policy: https://paddle.com/privacy<br />Paddle Legal: legal@paddle.com</p>
+              <p><strong className="text-white">12.4 Stripe Contact:</strong></p>
+              <p>For payment-related privacy inquiries:<br />Stripe Privacy Policy: https://stripe.com/privacy<br />Stripe Support: https://support.stripe.com</p>
             </CardContent>
           </Card>
         </div>

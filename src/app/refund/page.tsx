@@ -18,7 +18,7 @@ export default function RefundPage() {
               <CardTitle className="text-white">1. Money-Back Guarantee</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p>We offer a <strong className="text-white">30-day money-back guarantee</strong> on all Pro plan ($20/month) purchases. If you're not satisfied with Clario for any reason, we'll refund your payment in full. Refunds are processed by Paddle, our Merchant of Record.</p>
+              <p>We offer a <strong className="text-white">30-day money-back guarantee</strong> on all Pro plan ($20/month) purchases. If you're not satisfied with Clario for any reason, we'll refund your payment in full.</p>
             </CardContent>
           </Card>
 
@@ -40,9 +40,8 @@ export default function RefundPage() {
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">3.1 Contact Support:</strong> Email support@clario.ai with your request and reason for refund.</p>
               <p><strong className="text-white">3.2 Provide Details:</strong> Include your account email and order/transaction ID.</p>
-              <p><strong className="text-white">3.3 Processing Time:</strong> Refunds are processed by Paddle within 5-10 business days after approval.</p>
-              <p><strong className="text-white">3.4 Refund Method:</strong> Refunds are issued to the original payment method used for purchase via Paddle's payment system.</p>
-              <p><strong className="text-white">3.5 Paddle as Merchant of Record:</strong> As Paddle is the Merchant of Record, all refunds are handled through Paddle's systems in accordance with their Master Services Agreement.</p>
+              <p><strong className="text-white">3.3 Processing Time:</strong> Refunds are processed within 5-10 business days after approval.</p>
+              <p><strong className="text-white">3.4 Refund Method:</strong> Refunds are issued to the original payment method used for purchase via Stripe.</p>
             </CardContent>
           </Card>
 
@@ -87,8 +86,8 @@ export default function RefundPage() {
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">7.1 Contact First:</strong> If you initiate a chargeback instead of requesting a refund through our process, your account will be permanently suspended. We encourage you to contact support first to resolve any issues.</p>
-              <p><strong className="text-white">7.2 Chargeback Fees:</strong> Chargebacks incur fees from Paddle (up to $20-40 depending on currency). These fees may be charged to you if the chargeback is found to be unjustified.</p>
-              <p><strong className="text-white">7.3 Dispute Resolution:</strong> Paddle, as Merchant of Record, handles all chargeback disputes in accordance with Card Scheme Rules and Payment Scheme Rules.</p>
+              <p><strong className="text-white">7.2 Chargeback Fees:</strong> Chargebacks incur fees from payment processors (up to $15-25 depending on currency). These fees may be charged to you if the chargeback is found to be unjustified.</p>
+              <p><strong className="text-white">7.3 Dispute Resolution:</strong> Stripe handles all chargeback disputes in accordance with card network rules.</p>
             </CardContent>
           </Card>
 
@@ -100,8 +99,8 @@ export default function RefundPage() {
               <p><strong className="text-white">8.1 Service Provider:</strong> Muhammad Tanveer Abbas</p>
               <p>For refund requests or billing questions:</p>
               <p>Email: support@clario.ai<br />Response Time: Within 24 hours<br />Website: https://clario.ai</p>
-              <p><strong className="text-white">8.2 Payment Processor:</strong> Paddle (Merchant of Record)</p>
-              <p>For payment-related inquiries:<br />Paddle Support: https://paddle.com/support<br />Paddle Legal: legal@paddle.com<br />Paddle Terms: https://paddle.com/legal</p>
+              <p><strong className="text-white">8.2 Payment Processor:</strong> Stripe</p>
+              <p>For payment-related inquiries:<br />Stripe Support: https://support.stripe.com<br />Stripe Terms: https://stripe.com/legal</p>
             </CardContent>
           </Card>
 

@@ -45,7 +45,7 @@ const coreFeatures = [
   {
     title: "Text Summarizer",
     description:
-      "Transform long content into concise summaries with 6 AI-powered modes. Perfect for quickly understanding documents, articles, and reports.",
+      "Transform long content into concise summaries with 6 AI powered modes. Perfect for quickly understanding documents, articles, and reports.",
     icon: FileText,
     color: "from-blue-500 to-cyan-500",
   },
@@ -99,7 +99,7 @@ const faqItems = [
   {
     question: "What is Clario?",
     answer:
-      "Clario is an AI-powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and quick notes. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
+      "Clario is an AI powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and quick notes. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
   },
 
   {
@@ -136,9 +136,9 @@ export default function Home() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const code = params.get('code');
+    const code = params.get("code");
     if (code) {
-      router.replace('/auth/callback' + window.location.search);
+      router.replace("/auth/callback" + window.location.search);
     }
   }, [router]);
 
@@ -196,7 +196,7 @@ export default function Home() {
               </div>
               <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white animate-fade-in-up px-4">
                 <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
-                  AI-Powered Productivity
+                  AI Powered Productivity
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient leading-tight">
@@ -207,9 +207,13 @@ export default function Home() {
                 className="mx-auto mt-4 sm:mt-6 max-w-3xl text-sm sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4 leading-relaxed"
                 style={{ animationDelay: "0.2s" }}
               >
-                5 powerful AI features in one platform. Summarize documents, chat with AI, improve writing, generate meeting notes, and organize quick notes. Start free with 100 requests per month.
+                Transform your workflow with powerful AI features in one unified
+                platform. Instantly summarize lengthy documents, chat with
+                advanced AI, enhance your writing, generate structured meeting
+                notes, and organize quick notes all.
               </p>
-              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up px-4"
+              <div
+                className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up px-4"
                 style={{ animationDelay: "0.4s" }}
               >
                 <Button
@@ -231,13 +235,16 @@ export default function Home() {
                 style={{ animationDelay: "0.6s" }}
               >
                 <span className="flex items-center gap-1 sm:gap-1.5">
-                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> Free Plan
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
+                  Free Plan
                 </span>
                 <span className="flex items-center gap-1 sm:gap-1.5">
-                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> $20/mo Pro
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
+                  $20/mo Pro
                 </span>
                 <span className="flex items-center gap-1 sm:gap-1.5">
-                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" /> 30-day Guarantee
+                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
+                  30-day Guarantee
                 </span>
               </div>
             </div>
@@ -249,7 +256,6 @@ export default function Home() {
             className="py-24 sm:py-32 relative overflow-hidden"
             style={{ backgroundColor: "#000000" }}
           >
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-purple-500/5"></div>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
               <div className="mx-auto max-w-2xl text-center mb-20">
                 <h2 className="text-base font-semibold leading-7 text-blue-400">
@@ -266,7 +272,7 @@ export default function Home() {
                     <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 rounded-full opacity-30"></div>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-8 max-w-6xl mx-auto">
                   <motion.div
                     initial={{ opacity: 0, y: 30 }}
@@ -280,8 +286,13 @@ export default function Home() {
                         <span className="text-3xl font-bold text-white">1</span>
                       </div>
                       <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 hover:scale-105">
-                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Sign Up Free</h3>
-                        <p className="text-gray-400 text-center leading-relaxed">Create your account in seconds. No credit card required.</p>
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">
+                          Sign Up Free
+                        </h3>
+                        <p className="text-gray-400 text-center leading-relaxed">
+                          Create your account in seconds. No credit card
+                          required.
+                        </p>
                       </div>
                     </div>
                   </motion.div>
@@ -298,8 +309,12 @@ export default function Home() {
                         <span className="text-3xl font-bold text-white">2</span>
                       </div>
                       <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-purple-500/40 transition-all duration-300 hover:scale-105">
-                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Choose Feature</h3>
-                        <p className="text-gray-400 text-center leading-relaxed">Select from 5 AI-powered features based on your needs.</p>
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">
+                          Choose Feature
+                        </h3>
+                        <p className="text-gray-400 text-center leading-relaxed">
+                          Select from 5 AI powered features based on your needs.
+                        </p>
                       </div>
                     </div>
                   </motion.div>
@@ -316,8 +331,12 @@ export default function Home() {
                         <span className="text-3xl font-bold text-white">3</span>
                       </div>
                       <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-green-500/40 transition-all duration-300 hover:scale-105">
-                        <h3 className="text-2xl font-bold text-white mb-3 text-center">Get Results</h3>
-                        <p className="text-gray-400 text-center leading-relaxed">Receive instant AI-powered insights and outputs.</p>
+                        <h3 className="text-2xl font-bold text-white mb-3 text-center">
+                          Get Results
+                        </h3>
+                        <p className="text-gray-400 text-center leading-relaxed">
+                          Receive instant AI powered insights and outputs.
+                        </p>
                       </div>
                     </div>
                   </motion.div>
@@ -343,10 +362,30 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
-                  { title: "Students", desc: "Summarize research papers and study materials", icon: BookOpen, color: "from-blue-500 to-cyan-500" },
-                  { title: "Executives", desc: "Quick meeting notes and decision summaries", icon: Briefcase, color: "from-purple-500 to-pink-500" },
-                  { title: "Writers", desc: "Improve content quality and writing style", icon: Edit3, color: "from-orange-500 to-red-500" },
-                  { title: "Researchers", desc: "Analyze documents and extract insights", icon: Microscope, color: "from-green-500 to-emerald-500" },
+                  {
+                    title: "Students",
+                    desc: "Summarize research papers and study materials",
+                    icon: BookOpen,
+                    color: "from-blue-500 to-cyan-500",
+                  },
+                  {
+                    title: "Executives",
+                    desc: "Quick meeting notes and decision summaries",
+                    icon: Briefcase,
+                    color: "from-purple-500 to-pink-500",
+                  },
+                  {
+                    title: "Writers",
+                    desc: "Improve content quality and writing style",
+                    icon: Edit3,
+                    color: "from-orange-500 to-red-500",
+                  },
+                  {
+                    title: "Researchers",
+                    desc: "Analyze documents and extract insights",
+                    icon: Microscope,
+                    color: "from-green-500 to-emerald-500",
+                  },
                 ].map((useCase, i) => (
                   <motion.div
                     key={useCase.title}
@@ -357,10 +396,14 @@ export default function Home() {
                   >
                     <Card className="bg-white/5 border-white/10 hover:border-white/30 transition-all h-full group">
                       <CardContent className="p-6 text-center">
-                        <div className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${useCase.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                        <div
+                          className={`mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br ${useCase.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                        >
                           <useCase.icon className="h-8 w-8 text-white" />
                         </div>
-                        <h3 className="text-lg font-semibold text-white mb-2">{useCase.title}</h3>
+                        <h3 className="text-lg font-semibold text-white mb-2">
+                          {useCase.title}
+                        </h3>
                         <p className="text-sm text-gray-400">{useCase.desc}</p>
                       </CardContent>
                     </Card>
@@ -417,7 +460,8 @@ export default function Home() {
                   Everything You Need
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-400">
-                  Five AI-driven features designed to boost your productivity and streamline your workflow.
+                  Five AI driven features designed to boost your productivity
+                  and streamline your workflow.
                 </p>
               </div>
               <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -473,24 +517,50 @@ export default function Home() {
                   Choose Your Plan
                 </p>
                 <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base leading-6 sm:leading-7 text-gray-400 px-4">
-                  Start free or upgrade to Pro. Cancel anytime with our 30-day money-back guarantee.
+                  Start free or upgrade to Pro. Cancel anytime with our 30-day
+                  money-back guarantee.
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-3xl mx-auto">
                 <Card className="bg-white/5 border-white/10 relative overflow-hidden">
                   <CardHeader className="pb-3 sm:pb-4 pt-4 sm:pt-6 px-4 sm:px-5">
-                    <CardTitle className="text-lg sm:text-xl text-white">Free</CardTitle>
-                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">Perfect for getting started</p>
+                    <CardTitle className="text-lg sm:text-xl text-white">
+                      Free
+                    </CardTitle>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">
+                      Perfect for getting started
+                    </p>
                   </CardHeader>
                   <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-5 pb-4 sm:pb-6">
-                    <div className="text-2xl sm:text-3xl font-bold text-white">$0<span className="text-sm sm:text-base text-gray-400">/month</span></div>
+                    <div className="text-2xl sm:text-3xl font-bold text-white">
+                      $0
+                      <span className="text-sm sm:text-base text-gray-400">
+                        /month
+                      </span>
+                    </div>
                     <ul className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-300">
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> 100 requests/month</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> All 5 AI features</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Email support</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> No credit card required</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        100 requests/month
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        All 5 AI features
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        Email support
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        No credit card required
+                      </li>
                     </ul>
-                    <Button type="button" onClick={handleCTAClick} className="w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm py-4 sm:py-5">
+                    <Button
+                      type="button"
+                      onClick={handleCTAClick}
+                      className="w-full bg-white text-black hover:bg-white/90 text-xs sm:text-sm py-4 sm:py-5"
+                    >
                       {user ? "Go to Dashboard" : "Start Free"}
                     </Button>
                   </CardContent>
@@ -503,18 +573,43 @@ export default function Home() {
                     </Badge>
                   </div>
                   <CardHeader className="pb-3 sm:pb-4 pt-4 sm:pt-6 px-4 sm:px-5">
-                    <CardTitle className="text-lg sm:text-xl text-white">Pro</CardTitle>
-                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">For power users</p>
+                    <CardTitle className="text-lg sm:text-xl text-white">
+                      Pro
+                    </CardTitle>
+                    <p className="text-gray-400 text-[10px] sm:text-xs mt-1.5">
+                      For power users
+                    </p>
                   </CardHeader>
                   <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-5 pb-4 sm:pb-6">
-                    <div className="text-2xl sm:text-3xl font-bold text-white">$20<span className="text-sm sm:text-base text-gray-400">/month</span></div>
+                    <div className="text-2xl sm:text-3xl font-bold text-white">
+                      $20
+                      <span className="text-sm sm:text-base text-gray-400">
+                        /month
+                      </span>
+                    </div>
                     <ul className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-300">
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> 1000 requests/month</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> All 5 AI features</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Priority support</li>
-                      <li className="flex items-center gap-1.5 sm:gap-2"><CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" /> Early access</li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        1000 requests/month
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        All 5 AI features
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        Priority support
+                      </li>
+                      <li className="flex items-center gap-1.5 sm:gap-2">
+                        <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
+                        Early access
+                      </li>
                     </ul>
-                    <Button type="button" onClick={handleCTAClick} className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 text-xs sm:text-sm py-4 sm:py-5">
+                    <Button
+                      type="button"
+                      onClick={handleCTAClick}
+                      className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600 text-xs sm:text-sm py-4 sm:py-5"
+                    >
                       {user ? "Go to Dashboard" : "Upgrade to Pro"}
                     </Button>
                   </CardContent>
@@ -522,8 +617,12 @@ export default function Home() {
               </div>
               <div className="text-center mt-5 sm:mt-6">
                 <Link href="/pricing">
-                  <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 text-xs sm:text-sm py-4 sm:py-5">
-                    View Full Pricing <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  <Button
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10 text-xs sm:text-sm py-4 sm:py-5"
+                  >
+                    View Full Pricing{" "}
+                    <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-3.5 sm:w-3.5" />
                   </Button>
                 </Link>
               </div>
@@ -635,8 +734,13 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
                       <Rocket className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Fast & Reliable</h3>
-                    <p className="text-gray-400">Powered by Groq and Google Gemini for instant, accurate results.</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      Fast & Reliable
+                    </h3>
+                    <p className="text-gray-400">
+                      Powered by Groq and Google Gemini for instant, accurate
+                      results.
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -645,8 +749,12 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mb-4">
                       <Shield className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Enterprise Security</h3>
-                    <p className="text-gray-400">Row Level Security, encryption, and GDPR/CCPA compliance.</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      Enterprise Security
+                    </h3>
+                    <p className="text-gray-400">
+                      Row Level Security, encryption, and GDPR/CCPA compliance.
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -655,8 +763,13 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4">
                       <BarChart3 className="h-6 w-6 text-white" />
                     </div>
-                    <h3 className="text-lg font-semibold text-white mb-2">Smart Analytics</h3>
-                    <p className="text-gray-400">Track usage, streaks, and trends with comprehensive insights.</p>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      Smart Analytics
+                    </h3>
+                    <p className="text-gray-400">
+                      Track usage, streaks, and trends with comprehensive
+                      insights.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -694,7 +807,9 @@ export default function Home() {
                     className="text-center"
                   >
                     <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all">
-                      <p className="text-white font-semibold text-lg mb-1">{tech.name}</p>
+                      <p className="text-white font-semibold text-lg mb-1">
+                        {tech.name}
+                      </p>
                       <p className="text-gray-400 text-sm">{tech.desc}</p>
                     </div>
                   </motion.div>
@@ -749,7 +864,10 @@ export default function Home() {
           >
             <div className="absolute inset-0">
               <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-              <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }}></div>
+              <div
+                className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse"
+                style={{ animationDelay: "1s" }}
+              ></div>
             </div>
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
               <div className="mx-auto max-w-2xl text-center mb-16">
@@ -769,7 +887,8 @@ export default function Home() {
                     Save Hours Every Day
                   </p>
                   <p className="mt-6 text-lg leading-8 text-gray-400">
-                    Join thousands who've revolutionized their productivity with AI
+                    Join thousands who've revolutionized their productivity with
+                    AI
                   </p>
                 </motion.div>
               </div>
@@ -790,12 +909,18 @@ export default function Home() {
                           <Zap className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-2xl font-bold text-white mb-2">Lightning Fast</h3>
-                          <p className="text-sm text-blue-400 font-semibold">Instant Results</p>
+                          <h3 className="text-2xl font-bold text-white mb-2">
+                            Lightning Fast
+                          </h3>
+                          <p className="text-sm text-blue-400 font-semibold">
+                            Instant Results
+                          </p>
                         </div>
                       </div>
                       <p className="text-gray-300 leading-relaxed mb-6">
-                        Get AI-powered summaries, chat responses, and writing improvements in seconds. No more spending hours reading lengthy documents or crafting perfect emails.
+                        Get AI powered summaries, chat responses, and writing
+                        improvements in seconds. No more spending hours reading
+                        lengthy documents or crafting perfect emails.
                       </p>
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm text-gray-400">
@@ -803,11 +928,17 @@ export default function Home() {
                           <span>Summarize 10-page docs in 30 seconds</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" style={{ animationDelay: "0.3s" }}></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
+                            style={{ animationDelay: "0.3s" }}
+                          ></div>
                           <span>Instant chat responses</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: "0.6s" }}></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"
+                            style={{ animationDelay: "0.6s" }}
+                          ></div>
                           <span>Real-time writing improvements</span>
                         </div>
                       </div>
@@ -830,12 +961,18 @@ export default function Home() {
                           <Sparkles className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-2xl font-bold text-white mb-2">Premium Quality</h3>
-                          <p className="text-sm text-purple-400 font-semibold">Professional Results</p>
+                          <h3 className="text-2xl font-bold text-white mb-2">
+                            Premium Quality
+                          </h3>
+                          <p className="text-sm text-purple-400 font-semibold">
+                            Professional Results
+                          </p>
                         </div>
                       </div>
                       <p className="text-gray-300 leading-relaxed mb-6">
-                        Enterprise-grade AI delivers accurate summaries, intelligent responses, and polished writing. Perfect for professionals who demand excellence.
+                        Enterprise-grade AI delivers accurate summaries,
+                        intelligent responses, and polished writing. Perfect for
+                        professionals who demand excellence.
                       </p>
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm text-gray-400">
@@ -843,11 +980,17 @@ export default function Home() {
                           <span>10 specialized summary modes</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <div className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" style={{ animationDelay: "0.3s" }}></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-pink-400 animate-pulse"
+                            style={{ animationDelay: "0.3s" }}
+                          ></div>
                           <span>Context-aware intelligence</span>
                         </div>
                         <div className="flex items-center gap-3 text-sm text-gray-400">
-                          <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" style={{ animationDelay: "0.6s" }}></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"
+                            style={{ animationDelay: "0.6s" }}
+                          ></div>
                           <span>Professional-grade outputs</span>
                         </div>
                       </div>
@@ -877,13 +1020,17 @@ export default function Home() {
                         <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                           10x
                         </div>
-                        <p className="text-sm text-gray-400">Faster Workflows</p>
+                        <p className="text-sm text-gray-400">
+                          Faster Workflows
+                        </p>
                       </div>
                       <div className="space-y-2">
                         <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
                           100%
                         </div>
-                        <p className="text-sm text-gray-400">Satisfaction Rate</p>
+                        <p className="text-sm text-gray-400">
+                          Satisfaction Rate
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -898,7 +1045,6 @@ export default function Home() {
             className="py-24 sm:py-32"
             style={{ backgroundColor: "#000000" }}
           >
-
             <div className="mx-auto max-w-4xl px-6 lg:px-8">
               <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 backdrop-blur-sm p-12 text-center">
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
@@ -907,14 +1053,22 @@ export default function Home() {
                     Ready to Boost Your Productivity?
                   </h2>
                   <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                    Start free with 100 requests per month. No credit card required. 30-day money-back guarantee on Pro.
+                    Start free with 100 requests per month. No credit card
+                    required. 30-day money-back guarantee on Pro.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button type="button" onClick={handleCTAClick} className="bg-white text-black hover:bg-white/90 px-8">
+                    <Button
+                      type="button"
+                      onClick={handleCTAClick}
+                      className="bg-white text-black hover:bg-white/90 px-8"
+                    >
                       {user ? "Go to Dashboard" : "Get Started Free"}
                     </Button>
                     <Link href="/pricing">
-                      <Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8">
+                      <Button
+                        variant="outline"
+                        className="border-white/20 text-white hover:bg-white/10 px-8"
+                      >
                         View Pricing
                       </Button>
                     </Link>

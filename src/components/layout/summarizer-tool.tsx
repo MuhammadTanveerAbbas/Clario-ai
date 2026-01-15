@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import posthog from 'posthog-js';
 import {
   Baby,
   Briefcase,
   Check,
-  CheckCircle2,
-  ClipboardCopy,
-  Download,
   Flame,
   Gavel,
   History,
@@ -22,6 +19,7 @@ import {
   Sparkles,
   Swords,
   Trash2,
+  AlertCircle,
 } from "lucide-react";
 
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -38,6 +36,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { SummarizerOutput } from "@/components/summarizer-output";
+import { useAuth } from "@/contexts/AuthContext";
+import { checkUsageLimit } from "@/lib/usage-limits";
 
 // Types
 type ModeValue =
@@ -73,6 +74,8 @@ interface SummaryState {
   showHistory: boolean;
   history: HistoryEntry[];
   wordCount: number;
+  usageRemaining: number;
+  usageLimit: number;
 }
 
 // Constants
@@ -84,6 +87,8 @@ const STORAGE_KEYS = {
 const MIN_TEXT_LENGTH = 10;
 const MAX_WORD_COUNT = 10000;
 const SUCCESS_DISPLAY_DURATION = 2000;
+const API_TIMEOUT = 30000;
+const MAX_HISTORY_ITEMS = 50;
 
 /**
  * Counts words in a text string
@@ -171,9 +176,6 @@ const setStorageValue = (key: string, value: string): void => {
   }
 };
 
-const extractTextContent = (element: HTMLElement): string =>
-  element.innerText || element.textContent || "";
-
 // Storage service
 interface StorageService {
   loadInitialState(): Pick<SummaryState, "text" | "mode">;
@@ -195,33 +197,6 @@ const createStorageService = (): StorageService => ({
   saveMode: (mode: ModeValue) => setStorageValue(STORAGE_KEYS.MODE, mode),
 });
 
-// Clipboard service
-interface ClipboardService {
-  copyText(text: string): Promise<void>;
-}
-
-const createClipboardService = (
-  toast: ReturnType<typeof useToast>["toast"]
-): ClipboardService => ({
-  copyText: async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast({
-        title: "Copied to clipboard!",
-        description: "The summary has been copied to your clipboard.",
-      });
-    } catch (error) {
-      console.error("Clipboard copy failed:", error);
-      toast({
-        variant: "destructive",
-        title: "Copy failed",
-        description:
-          "Could not copy to clipboard. Please try selecting and copying manually.",
-      });
-    }
-  },
-});
-
 // Summary service
 interface SummaryService {
   generateSummary(request: SummaryRequest): Promise<string>;
@@ -229,27 +204,41 @@ interface SummaryService {
 
 const createSummaryService = (): SummaryService => ({
   generateSummary: async (request: SummaryRequest) => {
-    // Use the new API route that includes usage tracking
-    const response = await fetch("/api/summarize", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-    });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(
-        error.error || error.message || "Failed to generate summary"
-      );
+    try {
+      const response = await fetch("/api/summarize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || error.message || "Failed to generate summary"
+        );
+      }
+
+      const result = await response.json();
+      return sanitizeHtml(result.summary);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === "AbortError") {
+        throw new Error("Request timed out. Please try again.");
+      }
+      throw error;
     }
-
-    const result = await response.json();
-    return sanitizeHtml(result.summary);
   },
 });
 
 // Main component
 export function SummarizerTool() {
+  const { user } = useAuth();
   const [state, setState] = useState<SummaryState>({
     text: "",
     mode: "Full Breakdown",
@@ -260,26 +249,36 @@ export function SummarizerTool() {
     showHistory: false,
     history: [],
     wordCount: 0,
+    usageRemaining: 0,
+    usageLimit: 100,
   });
 
-  const summaryRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Services - injected dependencies
   const storageService = createStorageService();
-  const clipboardService = createClipboardService(toast);
   const summaryService = createSummaryService();
 
   // Initialize state from storage and setup keyboard shortcuts
   useEffect(() => {
     const initialState = storageService.loadInitialState();
-    const history = getHistory();
+    let history = getHistory();
+    
+    // Limit history to MAX_HISTORY_ITEMS
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history = history.slice(0, MAX_HISTORY_ITEMS);
+      localStorage.setItem('summarizerHistory', JSON.stringify(history));
+    }
+
     setState((prev) => ({
       ...prev,
       ...initialState,
       history,
       wordCount: countWords(initialState.text),
     }));
+
+    // Fetch usage data
+    fetchUsageData();
 
     // Add keyboard shortcuts
     document.addEventListener("keydown", handleKeyboardShortcuts);
@@ -324,105 +323,59 @@ export function SummarizerTool() {
     setState((prev) => ({ ...prev, mode }));
   };
 
-  const handleExportMarkdown = async (): Promise<void> => {
-    if (!summaryRef.current) return;
 
-    // Get clean text content
-    let text =
-      summaryRef.current.innerText || summaryRef.current.textContent || "";
-
-    // Clean up text thoroughly
-    text = text
-      .replace(/\s+/g, " ") // Multiple spaces to single
-      .replace(/[^\x20-\x7E\n\r]/g, "") // Remove non-printable characters
-      .replace(/&#39;/g, "'")
-      .replace(/&quot;/g, '"')
-      .replace(/&amp;/g, "&")
-      .replace(/&lt;/g, "<")
-      .replace(/&gt;/g, ">")
-      .trim();
-
-    // Create formatted document content
-    const content = `# CLARIO SUMMARY REPORT
-
-**Summary Mode:** ${state.mode}
-**Generated:** ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}
-**Word Count:** ${text.split(" ").length} words
-
----
-
-## Summary Content
-
-${text}
-
----
-
-*Generated by Clario Summarizer - Transform text into clear, actionable summaries.*`;
-
-    // Create and download file
-    const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
-    const filename = `Clario-Summary-${state.mode.replace(
-      /\s+/g,
-      "-"
-    )}-${timestamp}.md`;
-    a.download = filename;
-
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    posthog.capture('summary_exported', { mode: state.mode });
-
-    toast({
-      title: "Exported Successfully!",
-      description:
-        "High-quality Markdown file downloaded with clean formatting.",
-    });
-  };
-
-  const handleCopyToClipboard = async (): Promise<void> => {
-    if (!summaryRef.current) {
-      toast({
-        variant: "destructive",
-        title: "Copy failed",
-        description: "No summary content found to copy.",
-      });
-      return;
-    }
-
-    const text = extractTextContent(summaryRef.current);
-    await clipboardService.copyText(text);
-    posthog.capture('summary_copied', { mode: state.mode });
-  };
 
   const handleKeyboardShortcuts = (e: KeyboardEvent): void => {
     if (e.ctrlKey || e.metaKey) {
-      switch (e.key) {
-        case "Enter":
-          e.preventDefault();
-          if (!isSubmitDisabled) {
-            handleSubmit(e as any);
-          }
-          break;
-        case "k":
-          e.preventDefault();
-          if (hasSummary) {
-            handleCopyToClipboard();
-          }
-          break;
-        case "s":
-          e.preventDefault();
-          if (hasSummary) {
-            handleExportMarkdown();
-          }
-          break;
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (!isSubmitDisabled) {
+          handleSubmit(e as any);
+        }
+      } else if (e.key === "k" && state.summary) {
+        e.preventDefault();
+        handleCopyFromKeyboard();
+      } else if (e.key === "s" && state.summary) {
+        e.preventDefault();
+        // Trigger download - handled by SummarizerOutput
       }
+    }
+  };
+
+  const handleCopyFromKeyboard = async () => {
+    if (state.summary) {
+      try {
+        await navigator.clipboard.writeText(state.summary);
+        toast({
+          title: "Copied to clipboard!",
+          description: "The summary has been copied to your clipboard.",
+        });
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Copy failed",
+          description: "Could not copy to clipboard.",
+        });
+      }
+    }
+  };
+
+  const fetchUsageData = async () => {
+    try {
+      const response = await fetch('/api/usage');
+      if (response.ok) {
+        const data = await response.json();
+        const tier = data.subscription_tier || 'free';
+        const currentUsage = data.requests_used || 0;
+        const usage = checkUsageLimit(tier, undefined, currentUsage);
+        setState((prev) => ({
+          ...prev,
+          usageRemaining: usage.remaining,
+          usageLimit: usage.limit,
+        }));
+      }
+    } catch (error) {
+      console.warn('Could not fetch usage data:', error);
     }
   };
 
@@ -449,9 +402,18 @@ ${text}
       });
 
       saveToHistory({ text: state.text, mode: state.mode, summary });
-      const history = getHistory();
+      let history = getHistory();
+      
+      // Limit history
+      if (history.length > MAX_HISTORY_ITEMS) {
+        history = history.slice(0, MAX_HISTORY_ITEMS);
+        localStorage.setItem('summarizerHistory', JSON.stringify(history));
+      }
 
       setState((prev) => ({ ...prev, summary, showSuccess: true, history }));
+
+      // Refresh usage data
+      fetchUsageData();
 
       posthog.capture('summarize_completed', {
         mode: state.mode,
@@ -497,14 +459,31 @@ ${text}
     setState((prev) => ({ ...prev, history: getHistory() }));
   };
 
+  const handleRegenerate = (newMode: ModeValue): void => {
+    setState((prev) => ({ ...prev, mode: newMode }));
+    setTimeout(() => {
+      handleSubmit({ preventDefault: () => {} } as any);
+    }, 100);
+  };
+
+  const handleRetry = (): void => {
+    handleSubmit({ preventDefault: () => {} } as any);
+  };
+
   // Computed values
   const isSubmitDisabled =
     state.isLoading || state.wordCount < 1 || state.wordCount > MAX_WORD_COUNT;
-  const hasSummary = Boolean(state.summary);
   const wordLimitColor =
     state.wordCount > MAX_WORD_COUNT
       ? "text-red-500"
       : state.wordCount > MAX_WORD_COUNT * 0.9
+      ? "text-yellow-500"
+      : "text-gray-400";
+  
+  const usageWarningColor =
+    state.usageRemaining === 0
+      ? "text-red-500"
+      : state.usageRemaining < state.usageLimit * 0.1
       ? "text-yellow-500"
       : "text-gray-400";
 
@@ -591,7 +570,7 @@ ${text}
                 size="lg"
                 disabled={isSubmitDisabled}
                 aria-label="Summarize (Ctrl+Enter)"
-                className="w-full sm:w-auto bg-white text-black hover:bg-white/90 font-semibold disabled:opacity-40 shadow-lg"
+                className="w-full sm:w-auto bg-white text-black hover:bg-white/90 font-semibold disabled:opacity-40 shadow-lg min-h-[44px]"
               >
                 {state.isLoading ? (
                   <>
@@ -616,7 +595,7 @@ ${text}
                       showHistory: !prev.showHistory,
                     }))
                   }
-                  className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10"
+                  className="w-full sm:w-auto border-white/20 text-white hover:bg-white/10 min-h-[44px]"
                 >
                   <History className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
                   <span className="text-sm sm:text-base">
@@ -635,7 +614,7 @@ ${text}
                       "Ctrl+Enter: Summarize • Ctrl+K: Copy • Ctrl+S: Export",
                   });
                 }}
-                className="w-full sm:w-auto text-white hover:bg-white/10"
+                className="w-full sm:w-auto text-white hover:bg-white/10 min-h-[44px]"
               >
                 <Keyboard className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
                 <span className="text-sm sm:text-base">Shortcuts</span>
@@ -643,72 +622,31 @@ ${text}
             </div>
           </form>
 
-          {state.error && (
-            <div className="mt-6 rounded-lg border border-red-500/50 bg-red-500/10 p-4 text-center">
-              <p className="text-sm sm:text-base text-red-400 font-semibold">
-                {state.error}
+          {/* Usage Warning */}
+          {state.usageRemaining <= state.usageLimit * 0.2 && (
+            <div className="mt-4 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-yellow-500 flex-shrink-0" />
+              <p className={`text-sm ${usageWarningColor}`}>
+                {state.usageRemaining === 0 ? (
+                  <span className="font-semibold">Limit reached! Upgrade to Pro for more requests.</span>
+                ) : (
+                  <span>
+                    <span className="font-semibold">{state.usageRemaining}</span> of {state.usageLimit} requests remaining this month.
+                  </span>
+                )}
               </p>
             </div>
           )}
 
-          <div className="mt-8">
-            {hasSummary ? (
-              <>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
-                      Your Summary
-                    </h3>
-                    {state.showSuccess && (
-                      <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-[#4169E1] animate-in fade-in zoom-in" />
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleCopyToClipboard}
-                      aria-label="Copy summary to clipboard (Ctrl+K)"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <ClipboardCopy className="mr-2 h-4 w-4 flex-shrink-0 text-[#4169E1]" />
-                      <span className="truncate">Copy</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleExportMarkdown}
-                      aria-label="Export as Markdown (Ctrl+S)"
-                      className="border-white/20 text-white hover:bg-white/10"
-                    >
-                      <Download className="mr-2 h-4 w-4 flex-shrink-0 text-[#4169E1]" />
-                      <span className="truncate">Export</span>
-                    </Button>
-                  </div>
-                </div>
-                <Card className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] border-white/10 shadow-2xl relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#4169E1]/5 via-transparent to-[#4169E1]/5 pointer-events-none"></div>
-                  <CardContent className="p-0 relative z-10">
-                    <div
-                      id="summary-content"
-                      ref={summaryRef}
-                      className="summary-prose p-6 sm:p-10 text-sm sm:text-base leading-relaxed text-gray-100"
-                      dangerouslySetInnerHTML={{ __html: state.summary }}
-                    />
-                  </CardContent>
-                </Card>
-              </>
-            ) : (
-              !state.isLoading && (
-                <div className="text-center text-gray-400 py-8 sm:py-12">
-                  <Sparkles className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 text-[#4169E1]" />
-                  <p className="text-sm sm:text-base">
-                    Your summary will appear here instantly.
-                  </p>
-                </div>
-              )
-            )}
-          </div>
+          <SummarizerOutput
+            result={state.summary || ""}
+            mode={state.mode}
+            isLoading={state.isLoading}
+            error={state.error || undefined}
+            showSuccess={state.showSuccess}
+            onRegenerate={handleRegenerate}
+            onRetry={handleRetry}
+          />
 
           {state.showHistory && state.history.length > 0 && (
             <div className="mt-8">

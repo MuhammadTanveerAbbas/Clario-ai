@@ -714,7 +714,8 @@ export async function POST(request: Request) {
 
     const prompt = `${modePrompts[mode] || 'Summarize the following text professionally with clear structure.'}
 
-FORMATTING RULES:
+CRITICAL FORMATTING RULES:
+- NEVER add spaces within words - keep all words intact
 - Use ## for main headers, ### for subheaders, #### for sub-sections
 - Use **bold** for key terms and important information
 - Use bullet points (-) and numbered lists (1. 2. 3.)
@@ -724,6 +725,8 @@ FORMATTING RULES:
 - Add blank lines between sections for readability
 - Use tables where appropriate for structured data
 - Professional tone throughout
+- Ensure proper spelling and grammar
+- Do not break words with spaces (e.g., write "Management" not "M anagement")
 
 Text:
 ${sanitizedText}`

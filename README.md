@@ -1,6 +1,6 @@
 # Clario - AI Powered Productivity Platform
 
-An AI-powered SaaS platform built with Next.js, featuring text summarization, AI chat, writing assistance, and meeting notes.
+An AI powered SaaS platform built with Next.js, featuring text summarization, AI chat, writing assistance, and meeting notes.
 
 ## 🚀 Features
 
@@ -8,9 +8,9 @@ An AI-powered SaaS platform built with Next.js, featuring text summarization, AI
 
 - **Text Summarizer**: 10 different summary modes (Action Items, Decisions Made, Brutal Roast, Executive Brief, Full Breakdown, Key Quotes, Sentiment Analysis, ELI5, SWOT Analysis, Meeting Minutes) powered by Groq Llama 3.3 70B with export to Markdown
 - **AI Chat**: Conversational AI powered by Groq's Llama 3.1 8B with persistent chat history and clear explanations of AI capabilities
-- **Writing Assistant**: AI-powered writing improvement with 5 action types (improve, rewrite, expand, summarize, grammar) and 5 tone options using Groq Llama 3.3 70B
+- **Writing Assistant**: AI powered writing improvement with 5 action types (improve, rewrite, expand, summarize, grammar) and 5 tone options using Groq Llama 3.3 70B
 - **Meeting Notes**: Convert meeting transcripts into structured notes with summary, action items, and key points using Groq Llama 3.3 70B
-- **Quick Notes**: Organize and categorize quick notes with AI-powered summaries and tagging
+- **Quick Notes**: Organize and categorize quick notes with AI powered summaries and tagging
 
 ### Platform Features
 
@@ -53,7 +53,7 @@ An AI-powered SaaS platform built with Next.js, featuring text summarization, AI
 
 - Node.js 18+
 - npm or yarn
-- Accounts for: Supabase, Groq, Sentry, PostHog
+- Accounts for: Supabase, Groq, Sentry (optional), PostHog (optional), Stripe (for payments)
 
 ### Quick Start
 
@@ -94,6 +94,8 @@ An AI-powered SaaS platform built with Next.js, featuring text summarization, AI
 ## 📚 Documentation
 
 - **[SETUP_GUIDE.md](./SETUP_GUIDE.md)**: Comprehensive setup instructions for all services
+- **[POSTHOG_SETUP.md](./POSTHOG_SETUP.md)**: Step-by-step PostHog analytics setup guide
+- **[ANALYTICS_REVIEW.md](./ANALYTICS_REVIEW.md)**: Analytics tracking implementation review
 - **API Documentation**: See `/src/app/api` for API route implementations
 - **Database Schema**: See `database/migrations/001_initial_schema.sql`
 
@@ -138,11 +140,13 @@ Clario/
 ## 💰 Pricing
 
 ### Free Plan - $0/month
+
 - 100 AI requests per month
 - All 5 AI features included
 - Email support
 
 ### Pro Plan - $20/month
+
 - 1000 AI requests per month
 - All 5 AI features included
 - Priority email support
@@ -161,7 +165,11 @@ See `.env.example` for all required environment variables. Key variables include
 - `SENTRY_DSN` - Sentry DSN for error tracking
 - `NEXT_PUBLIC_SENTRY_DSN` - Public Sentry DSN
 - `NEXT_PUBLIC_POSTHOG_KEY` - PostHog API key
-- `NEXT_PUBLIC_POSTHOG_HOST` - PostHog host URL
+- `NEXT_PUBLIC_POSTHOG_HOST` - PostHog host URL (e.g., https://us.posthog.com)
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
+- `NEXT_PUBLIC_STRIPE_PRICE_ID` - Stripe price ID for Pro plan
 
 ## 🚢 Deployment
 
@@ -206,7 +214,7 @@ Make sure to:
 
 ## 💳 Payments
 
-- Paddle payment processor for Pro plan subscriptions
+- Stripe payment processor for Pro plan subscriptions
 - 30-day money-back guarantee
 - Cancel anytime with no penalties
 
@@ -228,7 +236,9 @@ MIT License - see LICENSE file for details.
 - UI components from [ShadCN UI](https://ui.shadcn.com/)
 - AI powered by [Groq](https://groq.com/)
 - Database by [Supabase](https://supabase.com/)
-- Payments by [Paddle](https://paddle.com/)
+- Payments by [Stripe](https://stripe.com/)
+- Analytics by [PostHog](https://posthog.com/)
+- Error tracking by [Sentry](https://sentry.io/)
 
 ---
 

@@ -4,9 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
-import { PostHogProvider } from "@/components/providers/posthog-provider";
-import { PostHogPageView } from "./posthog-pageview";
-import { Suspense } from "react";
+import { ClientProviders } from "@/components/providers/client-providers";
 
 
 export const metadata: Metadata = {
@@ -108,10 +106,7 @@ export default function RootLayout({
 
       </head>
       <body className="font-body antialiased">
-        <PostHogProvider>
-          <Suspense fallback={null}>
-            <PostHogPageView />
-          </Suspense>
+        <ClientProviders>
           <AuthProvider>
             <SidebarProvider>
               {children}
@@ -119,7 +114,7 @@ export default function RootLayout({
               <ScrollToTop />
             </SidebarProvider>
           </AuthProvider>
-        </PostHogProvider>
+        </ClientProviders>
       </body>
     </html>
   );

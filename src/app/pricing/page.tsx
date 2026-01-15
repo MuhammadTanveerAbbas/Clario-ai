@@ -9,14 +9,16 @@ import { Badge } from '@/components/ui/badge'
 import { Check, Zap, Star, Sparkles } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
+import { useState } from 'react'
 
 const plans = [
   {
     name: 'Free',
     price: '$0',
     period: 'forever',
-    description: 'Perfect for getting started with AI-powered productivity',
+    description: 'Perfect for getting started with AI powered productivity',
     features: [
       '100 AI requests per month',
       'Text Summarizer (10 modes)',
@@ -64,13 +66,43 @@ const plans = [
 export default function PricingPage() {
   const { user } = useAuth()
   const router = useRouter()
+  const { toast } = useToast()
+  const [loading, setLoading] = useState(false)
 
-  const handleSubscribe = (tier: 'free' | 'pro') => {
+  const handleSubscribe = async (tier: 'free' | 'pro') => {
     if (!user) {
       router.push(`/sign-up?redirect=/pricing`)
       return
     }
-    router.push('/dashboard')
+
+    if (tier === 'free') {
+      router.push('/dashboard')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID }),
+      })
+
+      const data = await response.json()
+
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error(data.error || 'Failed to create checkout session')
+      }
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message || 'Failed to start checkout',
+      })
+      setLoading(false)
+    }
   }
 
   return (
@@ -78,7 +110,8 @@ export default function PricingPage() {
       <Navbar />
       <div className="relative overflow-hidden">
         {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black/50 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black/50"></div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
 
@@ -165,8 +198,9 @@ export default function PricingPage() {
                             : 'bg-white text-black hover:bg-gray-100 hover:scale-105'
                         }`}
                         onClick={() => handleSubscribe(plan.tier)}
+                        disabled={loading}
                       >
-                        {plan.cta}
+                        {loading && plan.tier === 'pro' ? 'Loading...' : plan.cta}
                       </Button>
                       <p className="text-center text-xs text-gray-500">
                         {plan.tier === 'free' ? 'No credit card required' : '30-day money-back guarantee'}

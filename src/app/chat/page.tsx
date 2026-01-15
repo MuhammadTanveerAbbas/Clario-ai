@@ -8,14 +8,23 @@ import { MobileMenuButton } from "@/components/layout/mobile-menu-button";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Loader2, Send, Copy, RefreshCw, User, Bot } from "lucide-react";
+import { Loader2, Send, Trash2, ArrowDown, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { checkUsageLimit } from "@/lib/usage-limits";
-import { MarkdownRenderer } from "@/components/markdown-renderer";
+import { ChatMessage } from "@/components/chat-message";
+import { TypingIndicator } from "@/components/typing-indicator";
+import { AutoExpandTextarea } from "@/components/auto-expand-textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Message {
   id: string;
@@ -37,6 +46,9 @@ export default function ChatPage() {
   const [userTier, setUserTier] = useState<"free" | "pro" | "premium">("free");
   const [chatUsage, setChatUsage] = useState(0);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [showClearDialog, setShowClearDialog] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -51,24 +63,46 @@ export default function ChatPage() {
   }, [user, authLoading]);
 
   useEffect(() => {
+    if (!showScrollButton) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, showScrollButton]);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isNearBottom && messages.length > 0);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [messages.length]);
+
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  };
 
   const loadChatHistory = async () => {
     try {
-      const response = await fetch('/api/chat/history');
+      const response = await fetch("/api/chat/history");
       if (response.ok) {
         const data = await response.json();
-        const historyMessages = data.messages.map((msg: any, index: number) => ({
-          id: msg.id || `history-${index}-${Date.now()}`,
-          role: msg.message ? 'user' : 'assistant',
-          content: msg.message || msg.response,
-          timestamp: new Date(msg.created_at),
-        }));
+        const historyMessages = data.messages.map(
+          (msg: any, index: number) => ({
+            id: msg.id || `history-${index}-${Date.now()}`,
+            role: msg.message ? "user" : "assistant",
+            content: msg.message || msg.response,
+            timestamp: new Date(msg.created_at),
+          })
+        );
         setMessages(historyMessages);
       }
     } catch (error) {
-      console.error('Error loading chat history:', error);
+      console.error("Error loading chat history:", error);
     } finally {
       setLoadingHistory(false);
     }
@@ -76,9 +110,10 @@ export default function ChatPage() {
 
   const handleClearHistory = async () => {
     try {
-      const response = await fetch('/api/chat/history', { method: 'DELETE' });
+      const response = await fetch("/api/chat/history", { method: "DELETE" });
       if (response.ok) {
         setMessages([]);
+        setShowClearDialog(false);
         toast({
           title: "History Cleared",
           description: "All chat messages have been deleted.",
@@ -221,160 +256,125 @@ export default function ChatPage() {
         } flex flex-col h-screen`}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#4169E1]/10 via-purple-500/5 to-pink-500/5 border-b border-[#4169E1]/20 p-4 md:p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                AI Chat
-              </h1>
-              <p className="text-xs md:text-sm text-gray-400 mt-1">
-                Powered by Clario Engine
-              </p>
-            </div>
-            <div className="flex items-center gap-2 md:gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearHistory}
-                disabled={messages.length === 0}
-                className="border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs"
-              >
-                Clear History
-              </Button>
-              <div className="px-2 md:px-3 py-1 bg-green-500/20 text-green-400 text-[10px] md:text-xs font-medium rounded-full border border-green-500/30">
-                ⚡ Online
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-[#4169E1]/10 via-purple-500/5 to-pink-500/5 border-b border-[#4169E1]/20 backdrop-blur-sm">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] rounded-xl flex items-center justify-center">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg md:text-xl font-bold text-white">
+                    AI Chat
+                  </h1>
+                  <p className="text-xs text-gray-400">
+                    Powered by Clario Engine
+                  </p>
+                </div>
               </div>
-              <div className="text-[10px] md:text-xs text-gray-400">
-                {chatUsage} / {userTier === 'free' ? 100 : 1000}
+              <div className="flex items-center gap-2">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <span className="text-xs text-gray-300">Online</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowClearDialog(true)}
+                  disabled={messages.length === 0}
+                  className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4 md:space-y-6 bg-gradient-to-b from-transparent to-gray-900/20">
-          {messages.length === 0 && !loading && (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center p-6 md:p-8 rounded-2xl bg-gradient-to-br from-[#4169E1]/10 to-purple-500/10 border border-[#4169E1]/20">
-                <div className="relative mb-4 md:mb-6">
-                  <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] rounded-full flex items-center justify-center mx-auto">
-                    <Bot className="h-6 w-6 md:h-8 md:w-8 text-white" />
+        <div
+          ref={messagesContainerRef}
+          className="flex-1 overflow-y-auto p-4 md:p-6 bg-gradient-to-b from-transparent to-gray-900/20"
+        >
+          <div className="max-w-[1400px] mx-auto">
+            {messages.length === 0 && !loading && (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="text-center max-w-md">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] rounded-2xl flex items-center justify-center mx-auto mb-6">
+                    <Sparkles className="h-8 w-8 text-white" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 bg-green-400 rounded-full border-2 border-black animate-pulse" />
-                </div>
-                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">
-                  Ready to Chat!
-                </h3>
-                <p className="text-sm md:text-base text-gray-400 mb-4">
-                  Ask me anything - I'm here to help with your questions.
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {[
-                    "Explain a concept",
-                    "Write code",
-                    "Brainstorm ideas",
-                    "Solve problems",
-                  ].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      onClick={() => setInput(suggestion)}
-                      className="px-2 md:px-3 py-1 text-[10px] md:text-xs bg-white/10 text-gray-300 rounded-full hover:bg-white/20 transition-colors"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
+                  <h3 className="text-2xl font-bold text-white mb-2">
+                    Start a Conversation
+                  </h3>
+                  <p className="text-gray-400 mb-6">
+                    Ask me anything - I'm here to help!
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      "Explain quantum physics",
+                      "Write a Python function",
+                      "Plan a project",
+                      "Debug my code",
+                    ].map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        onClick={() => setInput(suggestion)}
+                        className="p-3 text-sm bg-white/5 text-gray-300 rounded-xl hover:bg-white/10 transition-all border border-white/10 hover:border-[#4169E1]/50 text-left"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <AnimatePresence mode="popLayout">
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`flex gap-3 md:gap-4 ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {message.role === "assistant" && (
-                  <div className="relative">
-                    <Avatar className="h-8 w-8 md:h-10 md:w-10 ring-2 ring-[#4169E1]/30">
-                      <AvatarFallback className="bg-gradient-to-br from-[#4169E1] to-[#6B8EFF] text-white">
-                        <Bot className="h-4 w-4 md:h-5 md:w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-green-400 rounded-full border-2 border-black" />
-                  </div>
-                )}
-                <Card
-                  className={`max-w-[85%] md:max-w-[75%] transition-all duration-200 hover:shadow-lg ${
-                    message.role === "user"
-                      ? "bg-gradient-to-br from-[#4169E1]/20 to-[#6B8EFF]/10 border-[#4169E1]/30"
-                      : "bg-gradient-to-br from-white/5 to-white/10 border-white/10"
-                  }`}
+            <AnimatePresence mode="popLayout">
+              {messages.map((message) => (
+                <motion.div
+                  key={message.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <CardContent className="p-3 md:p-4">
-                    {message.role === "assistant" ? (
-                      <MarkdownRenderer content={message.content} />
-                    ) : (
-                      <p className="text-white whitespace-pre-wrap leading-relaxed text-sm md:text-base">
-                        {message.content}
-                      </p>
-                    )}
-                    <div className="flex items-center justify-between mt-2 md:mt-3 pt-2 border-t border-white/10">
-                      <span className="text-[10px] md:text-xs text-gray-400">
-                        {message.timestamp.toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 md:h-7 md:w-7 p-0 text-gray-400 hover:text-white hover:bg-white/10 transition-all"
-                        onClick={() => handleCopy(message.content)}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-                {message.role === "user" && (
-                  <Avatar className="h-8 w-8 md:h-10 md:w-10 ring-2 ring-gray-600/30">
-                    <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-700 text-white">
-                      <User className="h-4 w-4 md:h-5 md:w-5" />
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                  <ChatMessage message={message} onCopy={handleCopy} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
-          {loading && (
-            <div className="flex gap-4 justify-start">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-[#4169E1] text-white">
-                    <Bot className="h-4 w-4" />
-                  </AvatarFallback>
-                </Avatar>
-                <Card className="bg-white/5 border-white/10">
-                  <CardContent className="p-4">
-                    <Loader2 className="h-4 w-4 animate-spin text-[#4169E1]" />
-                  </CardContent>
-                </Card>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+            {loading && <TypingIndicator />}
+            <div ref={messagesEndRef} />
+          </div>
         </div>
 
+        {/* Scroll to Bottom Button */}
+        <AnimatePresence>
+          {showScrollButton && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10"
+            >
+              <Button
+                onClick={scrollToBottom}
+                className="bg-[#4169E1] hover:bg-[#4169E1]/90 text-white rounded-full shadow-lg"
+                size="sm"
+              >
+                <ArrowDown className="h-4 w-4 mr-1" />
+                New messages
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Input */}
-        <div className="bg-gradient-to-r from-black/50 via-gray-900/50 to-black/50 border-t border-white/10 p-3 md:p-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex gap-2 md:gap-4 items-stretch">
+        <div className="sticky bottom-0 bg-gradient-to-t from-black via-gray-900/95 to-transparent border-t border-white/10 backdrop-blur-sm">
+          <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4">
+            <div className="flex gap-3 items-end">
               <div className="flex-1 relative">
-                <Textarea
+                <AutoExpandTextarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => {
@@ -383,19 +383,20 @@ export default function ChatPage() {
                       handleSend();
                     }
                   }}
-                  placeholder="Type your message..."
-                  className="bg-white/5 border-white/20 text-white resize-none rounded-xl focus:ring-2 focus:ring-[#4169E1]/50 focus:border-[#4169E1]/50 transition-all text-sm min-h-[42px] max-h-[42px] py-2.5"
-                  rows={1}
+                  placeholder="Ask me anything..."
                   disabled={loading}
+                  maxRows={5}
                 />
-                <div className="absolute bottom-2 right-2 text-[10px] text-gray-500">
-                  {input.length}/2000
-                </div>
+                {input.length > 0 && (
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+                    {input.length}/2000
+                  </div>
+                )}
               </div>
               <Button
                 onClick={handleSend}
                 disabled={!input.trim() || loading}
-                className="bg-gradient-to-r from-[#4169E1] to-[#6B8EFF] hover:from-[#4169E1]/90 hover:to-[#6B8EFF]/90 text-white border-0 w-[42px] rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 flex-shrink-0 p-0 self-stretch"
+                className="bg-gradient-to-r from-[#4169E1] to-[#6B8EFF] hover:from-[#4169E1]/90 hover:to-[#6B8EFF]/90 text-white h-12 w-12 rounded-xl transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 flex-shrink-0 p-0"
               >
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -404,22 +405,49 @@ export default function ChatPage() {
                 )}
               </Button>
             </div>
-            <div className="flex items-center justify-between mt-2 md:mt-3 text-[10px] md:text-xs text-gray-400">
+            <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
               <span className="hidden sm:inline">
-                Press Shift + Enter for new line
+                Press Enter to send, Shift + Enter for new line
               </span>
+              <span className="sm:hidden">Enter to send</span>
               <span
-                className={`px-2 py-1 rounded-full ${
-                  chatUsage >= (userTier === 'free' ? 100 : 1000)
-                    ? "bg-red-500/20 text-red-400"
-                    : "bg-green-500/20 text-green-400"
-                }`}
+                className={
+                  chatUsage >= (userTier === "free" ? 100 : 1000)
+                    ? "text-red-400"
+                    : "text-gray-400"
+                }
               >
-                {chatUsage} / {userTier === 'free' ? 100 : 1000} messages
+                {chatUsage} / {userTier === "free" ? 100 : 1000} used
               </span>
             </div>
           </div>
         </div>
+
+        {/* Clear History Dialog */}
+        <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+          <AlertDialogContent className="bg-gray-900 border-white/10">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-white">
+                Clear Chat History?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-400">
+                This will permanently delete all your chat messages. This action
+                cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="bg-white/5 text-white border-white/10 hover:bg-white/10">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleClearHistory}
+                className="bg-red-500 hover:bg-red-600 text-white"
+              >
+                Clear History
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
