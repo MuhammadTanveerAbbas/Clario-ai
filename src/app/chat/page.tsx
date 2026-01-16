@@ -49,8 +49,7 @@ export default function ChatPage() {
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [allHistory, setAllHistory] = useState<Message[]>([]);
+  const [conversationId, setConversationId] = useState<string>("");
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -60,8 +59,16 @@ export default function ChatPage() {
     }
 
     if (user) {
+      const params = new URLSearchParams(window.location.search);
+      const convId = params.get("conversation");
+      if (convId) {
+        setConversationId(convId);
+        loadConversation(convId);
+      } else {
+        const newConvId = `conv-${Date.now()}`;
+        setConversationId(newConvId);
+      }
       loadUserData();
-      loadChatHistory();
     }
   }, [user, authLoading]);
 
@@ -89,24 +96,35 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const loadChatHistory = async () => {
+  const loadConversation = async (convId: string) => {
     try {
-      const response = await fetch("/api/chat/history");
-      if (response.ok) {
-        const data = await response.json();
-        const historyMessages = data.messages.map(
-          (msg: any, index: number) => ({
-            id: msg.id || `history-${index}-${Date.now()}`,
-            role: msg.message ? "user" : "assistant",
-            content: msg.message || msg.response,
-            timestamp: new Date(msg.created_at),
-          })
-        );
-        setAllHistory(historyMessages);
-        setMessages(historyMessages);
-      }
+      const { data, error } = await supabase
+        .from("chat_messages")
+        .select("*")
+        .eq("user_id", user?.id)
+        .eq("conversation_id", convId)
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      const msgs: Message[] = [];
+      data?.forEach((msg: any) => {
+        msgs.push({
+          id: `user-${msg.id}`,
+          role: "user",
+          content: msg.message,
+          timestamp: new Date(msg.created_at),
+        });
+        msgs.push({
+          id: `assistant-${msg.id}`,
+          role: "assistant",
+          content: msg.response,
+          timestamp: new Date(msg.created_at),
+        });
+      });
+      setMessages(msgs);
     } catch (error) {
-      console.error("Error loading chat history:", error);
+      console.error("Error loading conversation:", error);
     } finally {
       setLoadingHistory(false);
     }
@@ -188,7 +206,6 @@ export default function ChatPage() {
     setLoading(true);
 
     try {
-      // Call API route
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
@@ -196,6 +213,7 @@ export default function ChatPage() {
         },
         body: JSON.stringify({
           message: input,
+          conversationId: conversationId,
           conversationHistory: messages.slice(-10).map((m) => ({
             role: m.role,
             content: m.content,
@@ -280,12 +298,11 @@ export default function ChatPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setShowHistory(!showHistory)}
-                  disabled={allHistory.length === 0}
+                  onClick={() => router.push('/chat/history')}
                   className="border-white/20 text-white hover:bg-white/10 h-10"
                 >
                   <History className="h-4 w-4 mr-1" />
-                  History ({allHistory.filter(m => m.role === 'user').length})
+                  History
                 </Button>
                 <Button
                   variant="outline"
@@ -340,40 +357,6 @@ export default function ChatPage() {
             {loading && <TypingIndicator />}
             <div ref={messagesEndRef} />
           </div>
-
-          {/* History Panel */}
-          {showHistory && allHistory.length > 0 && (
-            <div className="absolute top-16 right-4 w-80 max-h-96 bg-gray-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-20">
-              <div className="p-4 border-b border-white/10 flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-white">Chat History</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowHistory(false)}
-                  className="h-6 w-6 p-0 text-gray-400 hover:text-white"
-                >
-                  ×
-                </Button>
-              </div>
-              <div className="overflow-y-auto max-h-80 p-2">
-                {allHistory.filter(m => m.role === 'user').map((msg, idx) => (
-                  <button
-                    key={msg.id}
-                    onClick={() => {
-                      setMessages(allHistory.slice(0, allHistory.indexOf(msg) + 2));
-                      setShowHistory(false);
-                    }}
-                    className="w-full text-left p-3 mb-2 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
-                  >
-                    <p className="text-xs text-gray-400 mb-1">
-                      {msg.timestamp.toLocaleDateString()} {msg.timestamp.toLocaleTimeString()}
-                    </p>
-                    <p className="text-sm text-white truncate">{msg.content}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Scroll to Bottom Button */}

@@ -1,5 +1,6 @@
--- Clario Database Schema
+-- Clario Complete Database Schema
 -- Run this in Supabase SQL Editor
+-- Includes all tables, RLS policies, functions, triggers, and real-time tracking
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -297,7 +298,7 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  -- Update usage_stats table
+  -- Update usage_stats table with real-time tracking
   INSERT INTO public.usage_stats (user_id, date, total_requests, summaries_count, chats_count, writing_count, meeting_notes_count)
   VALUES (p_user_id, CURRENT_DATE, p_count,
     CASE WHEN p_type = 'summary' THEN p_count ELSE 0 END,
@@ -310,16 +311,19 @@ BEGIN
     summaries_count = usage_stats.summaries_count + CASE WHEN p_type = 'summary' THEN p_count ELSE 0 END,
     chats_count = usage_stats.chats_count + CASE WHEN p_type = 'chat' THEN p_count ELSE 0 END,
     writing_count = usage_stats.writing_count + CASE WHEN p_type = 'writing' THEN p_count ELSE 0 END,
-    meeting_notes_count = usage_stats.meeting_notes_count + CASE WHEN p_type = 'meeting' THEN p_count ELSE 0 END;
+    meeting_notes_count = usage_stats.meeting_notes_count + CASE WHEN p_type = 'meeting' THEN p_count ELSE 0 END,
+    updated_at = NOW();
   
-  -- Update profiles table requests_used
+  -- Update profiles table requests_used for current month with timestamp
   UPDATE public.profiles
-  SET requests_used = (
-    SELECT COALESCE(SUM(total_requests), 0)
-    FROM public.usage_stats
-    WHERE user_id = p_user_id
-      AND date >= DATE_TRUNC('month', CURRENT_DATE)
-  )
+  SET 
+    requests_used = (
+      SELECT COALESCE(SUM(total_requests), 0)
+      FROM public.usage_stats
+      WHERE user_id = p_user_id
+        AND date >= DATE_TRUNC('month', CURRENT_DATE)
+    ),
+    updated_at = NOW()
   WHERE id = p_user_id;
 END;
 $$;

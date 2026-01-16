@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -18,7 +18,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Mail, Lock, Github, Eye, EyeOff } from "lucide-react";
 
-export default function SignInPage() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/dashboard";
@@ -309,5 +309,13 @@ export default function SignInPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-[#0a0a1a] to-[#1a1a2e]"><Loader2 className="h-8 w-8 animate-spin text-[#4169E1]" /></div>}>
+      <SignInForm />
+    </Suspense>
   );
 }

@@ -15,16 +15,26 @@ export function createClient() {
         },
         set(name: string, value: string, options: any) {
           if (typeof document === 'undefined') return
-          let cookieString = `${name}=${encodeURIComponent(value)}; path=/`
-          if (options?.maxAge) cookieString += `; max-age=${options.maxAge}`
-          cookieString += '; SameSite=Lax'
-          if (window.location.protocol === 'https:') cookieString += '; Secure'
-          document.cookie = cookieString
+          const cookieOptions = [
+            `${name}=${encodeURIComponent(value)}`,
+            'path=/',
+            'SameSite=Lax',
+          ]
+          if (options?.maxAge) cookieOptions.push(`max-age=${options.maxAge}`)
+          if (window.location.protocol === 'https:') cookieOptions.push('Secure')
+          document.cookie = cookieOptions.join('; ')
         },
         remove(name: string) {
           if (typeof document === 'undefined') return
-          document.cookie = `${name}=; path=/; max-age=0`
+          document.cookie = `${name}=; path=/; max-age=0; SameSite=Lax`
         },
+      },
+      auth: {
+        flowType: 'pkce',
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        persistSession: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined,
       },
     }
   )

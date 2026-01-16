@@ -598,25 +598,7 @@ export function SummarizerOutput({
         <div className="absolute inset-0 bg-gradient-to-br from-[#4169E1]/5 via-transparent to-[#4169E1]/5 pointer-events-none"></div>
         <CardContent className="p-0 relative z-10">
           <div className="summary-prose p-6 sm:p-8 md:p-12 max-w-none">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                h1: ({ children }) => <h1 style={{ letterSpacing: 0 }} className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4">{children}</h1>,
-                h2: ({ children }) => <h2 style={{ letterSpacing: 0 }} className="text-xl sm:text-2xl md:text-3xl font-semibold mb-3">{children}</h2>,
-                h3: ({ children }) => <h3 style={{ letterSpacing: 0 }} className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">{children}</h3>,
-                h4: ({ children }) => <h4 style={{ letterSpacing: 0 }} className="text-base sm:text-lg md:text-xl">{children}</h4>,
-                p: ({ children }) => <p style={{ letterSpacing: 0 }} className="text-sm sm:text-base leading-relaxed">{children}</p>,
-                li: ({ children }) => <li style={{ letterSpacing: 0 }} className="text-sm sm:text-base">{children}</li>,
-                code: ({ inline, children, ...props }: any) =>
-                  inline ? (
-                    <code style={{ letterSpacing: 0 }} {...props}>{children}</code>
-                  ) : (
-                    <pre className="overflow-x-auto">
-                      <code style={{ letterSpacing: 0 }} {...props}>{children}</code>
-                    </pre>
-                  ),
-              }}
-            >
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {result}
             </ReactMarkdown>
           </div>

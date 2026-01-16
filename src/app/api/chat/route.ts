@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       return parseResult.error!
     }
 
-    const { message, conversationHistory } = parseResult.data
+    const { message, conversationId, conversationHistory } = parseResult.data
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
@@ -124,6 +124,7 @@ You should be helpful, professional, and knowledgeable about productivity tools.
     // Save to database
     await supabase.from('chat_messages').insert({
       user_id: user.id,
+      conversation_id: conversationId || `conv-${Date.now()}`,
       message: sanitizedMessage,
       response: response,
     })

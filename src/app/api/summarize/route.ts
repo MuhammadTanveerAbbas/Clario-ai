@@ -14,7 +14,14 @@ export async function POST(request: Request) {
       return rateLimitCheck.response!
     }
 
-    const { text, mode } = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (e) {
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
+
+    const { text, mode } = body
 
     if (!text || !mode) {
       return NextResponse.json({ error: 'Text and mode are required' }, { status: 400 })
@@ -733,15 +740,44 @@ ${sanitizedText}`
       max_tokens: 2000,
     })
     const summary = completion.choices[0]?.message?.content || 'Failed to generate summary'
-    
-    // Fix letter spacing: remove spaces between single characters that form words
+
+    // Fix letter spacing: remove spaces between the first capital letter and the rest of the word
+    // This fixes patterns like "C ap", "T he", "W hy", "R eal" -> "Cap", "The", "Why", "Real"
     const cleanedSummary = summary
       .split('\n')
       .map(line => {
-        // Match patterns like "C o m p l e t e" or "A n a l y s i s"
-        return line.replace(/\b([a-zA-Z])( [a-zA-Z]){2,}\b/g, (match) => {
+        // Skip markdown code blocks and preserve them
+        if (line.trim().startsWith('```')) {
+          return line
+        }
+
+        let cleaned = line
+
+        // MAIN FIX: Single capital letter + space + lowercase letters = broken word
+        // Pattern: "C ap", "T he", "W hy", "R eal" -> "Cap", "The", "Why", "Real"
+        // This is the core issue - first letter separated from the rest
+        cleaned = cleaned.replace(/([A-Z])\s+([a-z]+)/g, (match, first, rest) => {
+          // Very short exception words that might legitimately follow a single letter
+          const exceptions = ['a', 'an', 'am', 'is', 'it', 'or', 'of', 'to', 'in', 'on', 'at', 'by', 'as', 'if', 'we', 'us', 'be', 'do', 'go', 'no', 'so', 'up']
+          // Only skip if it's a very short exception word (1-2 chars)
+          if (exceptions.includes(rest.toLowerCase()) && rest.length <= 2) {
+            return match
+          }
+          // Combine them - this fixes "C ap" -> "Cap", "T he" -> "The", etc.
+          return first + rest
+        })
+
+        // Also fix multiple spaces between letters (like "C o m p l e t e")
+        cleaned = cleaned.replace(/([a-zA-Z])( [a-zA-Z]){2,}/g, (match) => {
           return match.replace(/\s+/g, '')
         })
+
+        // Fix ALL CAPS with spaces (like "S I M P L E")
+        cleaned = cleaned.replace(/\b([A-Z])( [A-Z])+\b/g, (match) => {
+          return match.replace(/\s+/g, '')
+        })
+
+        return cleaned
       })
       .join('\n')
 

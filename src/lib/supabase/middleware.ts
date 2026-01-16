@@ -24,10 +24,11 @@ export async function updateSession(request: NextRequest) {
             try {
               supabaseResponse.cookies.set(name, value, {
                 ...options,
-                httpOnly: false,
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
                 path: '/',
+                maxAge: 60 * 60 * 24 * 30, // 30 days
               })
             } catch (error) {
               // Ignore cookie errors
