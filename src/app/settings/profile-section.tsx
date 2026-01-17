@@ -44,7 +44,7 @@ export function ProfileSection({
       if (!userId) throw new Error("User ID not found");
 
       const { error } = await supabase
-        .from("users")
+        .from("profiles")
         .update({ name })
         .eq("id", userId);
 

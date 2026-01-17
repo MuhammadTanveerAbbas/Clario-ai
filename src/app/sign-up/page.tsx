@@ -72,12 +72,7 @@ function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Anti-spam checks
-    if (honeypot) {
-      // Bot detected - don't process
-      return;
-    }
-
+    if (honeypot) return;
     if (!canSubmit()) {
       toast({
         variant: "destructive",
@@ -86,7 +81,6 @@ function SignUpForm() {
       });
       return;
     }
-
     if (!validateEmailDomain(formData.email)) {
       toast({
         variant: "destructive",
@@ -95,10 +89,7 @@ function SignUpForm() {
       });
       return;
     }
-
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
 
@@ -107,9 +98,7 @@ function SignUpForm() {
         email: formData.email,
         password: formData.password,
         options: {
-          data: {
-            name: formData.name,
-          },
+          data: { name: formData.name },
           emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
@@ -117,27 +106,18 @@ function SignUpForm() {
       if (error) throw error;
 
       if (data.user) {
-        // Update user metadata with name
-        await supabase.auth.updateUser({
-          data: { name: formData.name },
-        });
-
         toast({
           title: "Account created!",
-          description: "Please check your email to verify your account.",
+          description: "Redirecting to dashboard...",
         });
-
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-          router.push(redirect);
-        }, 1500);
+        setTimeout(() => router.push(redirect), 1000);
       }
     } catch (error: any) {
+      if (error.name === 'AbortError') return;
       toast({
         variant: "destructive",
         title: "Error",
-        description:
-          error.message || "Failed to create account. Please try again.",
+        description: error.message || "Failed to create account. Please try again.",
       });
     } finally {
       setLoading(false);

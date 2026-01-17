@@ -42,687 +42,517 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userData } = await supabase
-      .from('users')
-      .select('subscription_tier')
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, requests_used_this_month, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (userData?.subscription_tier || 'free') as 'free' | 'pro' | 'premium'
+    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used_this_month || 0
+    
+    // Unlimited access for admin
+    if (profile?.email !== 'muhammadtanveerabbas.dev@gmail.com') {
+      const usageCheck = checkUsageLimit(tier, currentUsage)
 
-    const startOfMonth = new Date()
-    startOfMonth.setDate(1)
-    startOfMonth.setHours(0, 0, 0, 0)
-
-    const { data: usageData } = await supabase
-      .from('usage_stats')
-      .select('summaries_count')
-      .eq('user_id', user.id)
-      .gte('date', startOfMonth.toISOString().split('T')[0])
-
-    const currentUsage = usageData?.reduce((sum, row) => sum + (row.summaries_count || 0), 0) || 0
-    const usageCheck = checkUsageLimit(tier, 'summaries', currentUsage)
-
-    if (!usageCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: 'Usage limit reached',
-          message: `You've reached your ${tier} tier limit of ${usageCheck.limit} summaries per month. Please upgrade to continue.`,
-        },
-        { status: 403 }
-      )
+      if (!usageCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: 'Usage limit reached',
+            message: `You've reached your ${tier} plan limit of ${usageCheck.limit} requests per month. Please upgrade to continue.`,
+          },
+          { status: 403 }
+        )
+      }
     }
 
     const modePrompts: Record<string, string> = {
-      'Action Items Only': `Extract and organize all action items from the text.
+      'Action Items Only': `Extract all action items in a clean format.
 
-## ACTION ITEMS
+# Action Items
 
-### High Priority
-- **[Action Item Title]**
-  - Description: [Clear description]
-  - Owner: [Person responsible]
-  - Due Date: [Deadline]
-  - Status: [Not Started/In Progress/Blocked]
+## 🔴 High Priority
+**[Action Title]**
+- Owner: [Person]
+- Due: [Date]
+- Status: Not Started
 
-### Medium Priority
-- **[Action Item Title]**
-  - Description: [What needs to be done]
-  - Owner: [Person responsible]
-  - Due Date: [Deadline]
+## 🟡 Medium Priority  
+**[Action Title]**
+- Owner: [Person]
+- Due: [Date]
 
-### Low Priority
-- **[Action Item Title]**
-  - Description: [What needs to be done]
-  - Owner: [Person responsible]
+## 🟢 Low Priority
+**[Action Title]**
+- Owner: [Person]
+- Due: [Date]
 
 ---
 
-### Summary
-- **Total Action Items:** [Number]
-- **High Priority:** [Number]
-- **Medium Priority:** [Number]
-- **Low Priority:** [Number]`,
+**Summary:** [X] total • [X] high • [X] medium • [X] low`,
 
-      'Decisions Made': `Extract all decisions made in the text with full context.
+      'Decisions Made': `Extract all key decisions with context.
 
-## KEY DECISIONS
+# Key Decisions
 
-### Decision 1: [Clear Decision Title]
+## Decision 1: [Title]
 
-**Context**
-[Background information and situation]
+**What was decided:**
+[Clear statement]
 
-**Decision**
-[Exactly what was decided]
+**Why:**
+[Rationale]
 
-**Rationale**
-[Why this decision was made]
+**Impact:**
+[Expected outcomes]
 
-**Impact**
-[Expected outcomes and consequences]
-
-**Stakeholders**
-[Who is affected or involved]
+**Stakeholders:**
+[Who's affected]
 
 ---
 
-### Decision 2: [Title]
-[Repeat structure for each decision]
+## Decision 2: [Title]
+[Repeat structure]
 
 ---
 
-### Decision Summary
-- **Total Decisions:** [Number]
-- **Strategic Decisions:** [Number]
-- **Operational Decisions:** [Number]`,
+**Total:** [X] • **Strategic:** [X] • **Operational:** [X]`,
 
-      'Brutal Roast': `Provide a brutally honest, sarcastic critique with actionable fixes.
+      'Brutal Roast': `Provide witty, honest critique with real solutions.
 
-## THE BRUTAL ROAST
+# The Brutal Truth
 
-### What Went Wrong
-[Deliver a sarcastic, witty critique of the main issues]
+## 🔥 What Went Wrong
+[Sarcastic but insightful commentary]
 
-**The Biggest Offenders:**
-1. **[Issue 1]** - [Sarcastic commentary]
-2. **[Issue 2]** - [Sarcastic commentary]
-3. **[Issue 3]** - [Sarcastic commentary]
+**Top Offenders:**
+1. **[Issue]** - [Witty critique]
+2. **[Issue]** - [Witty critique]  
+3. **[Issue]** - [Witty critique]
 
 ---
 
-### Reality Check
-[Honest, professional assessment]
-
+## 💡 Reality Check
 **Core Problems:**
-- **Problem 1:** [Honest assessment]
-- **Problem 2:** [Honest assessment]
-- **Problem 3:** [Honest assessment]
+- [Honest assessment]
+- [Honest assessment]
 
 ---
 
-### How to Actually Fix This
+## ✅ How to Fix This
 
-1. **[Fix Title]**
-   - **Problem:** [What's wrong]
-   - **Solution:** [Specific fix]
-   - **Impact:** [Expected improvement]
+**Fix 1: [Title]**
+- Problem: [What's wrong]
+- Solution: [Specific fix]
+- Impact: [Expected improvement]
 
-2. **[Fix Title]**
-   - **Problem:** [What's wrong]
-   - **Solution:** [Specific fix]
-   - **Impact:** [Expected improvement]
+**Fix 2: [Title]**
+[Repeat structure]
 
 ---
 
-### Silver Lining
-[What's actually good or salvageable]`,
+## 🌟 Silver Lining
+[What's actually good]`,
 
-      'Executive Brief': `Create a concise executive summary for leadership.
+      'Executive Brief': `Create concise executive summary.
 
-## EXECUTIVE BRIEF
+# Executive Brief
 
-### Executive Summary
-[2-3 sentences capturing the essence]
+## Summary
+[2-3 sentences capturing essence]
 
 ---
 
-### Key Highlights
+## Key Highlights
 
-**Strategic Points:**
-- **[Point 1]:** [Concise description with business impact]
-- **[Point 2]:** [Concise description with business impact]
-- **[Point 3]:** [Concise description with business impact]
+**Strategic:**
+- [Point with business impact]
+- [Point with business impact]
 
-**Financial Implications:**
-- [Any cost, revenue, or budget impacts]
+**Financial:**
+- [Cost/revenue implications]
 
 **Timeline:**
-- [Key dates and milestones]
+- [Key dates]
 
 ---
 
-### Strategic Implications
+## Implications
 
 **Opportunities:**
-[How this creates value or competitive advantage]
+[Value creation potential]
 
 **Risks:**
-[Potential challenges or concerns]
+[Key concerns]
 
-**Resource Requirements:**
-[What's needed to execute]
-
----
-
-### Recommended Next Steps
-
-1. **[Action]** - [Owner] - [Timeline]
-2. **[Action]** - [Owner] - [Timeline]
-3. **[Action]** - [Owner] - [Timeline]
+**Resources Needed:**
+[Requirements]
 
 ---
 
-### Decision Required
-[What needs executive approval or input]`,
+## Next Steps
+1. [Action] - [Owner] - [Timeline]
+2. [Action] - [Owner] - [Timeline]
 
-      'Full Breakdown': `Provide a comprehensive, detailed analysis of the entire text.
+**Decision Required:** [What needs approval]`,
 
-## COMPLETE ANALYSIS
+      'Full Breakdown': `Provide comprehensive analysis.
 
-### Executive Summary
-[Comprehensive 3-4 sentence overview]
+# Complete Analysis
+
+## Overview
+[3-4 sentence summary]
 
 ---
 
-### Main Points
+## Main Points
 
-#### 1. [First Major Point Title]
-
-**Overview:**
-[Detailed explanation]
-
+### 1. [Topic]
 **Key Details:**
-- [Detail 1]
-- [Detail 2]
-- [Detail 3]
+- [Detail]
+- [Detail]
 
-**Significance:**
-[Why this matters]
-
----
-
-#### 2. [Second Major Point Title]
-[Repeat structure for each major point]
+**Why It Matters:**
+[Significance]
 
 ---
 
-### Key Takeaways
-
-1. **[Takeaway 1]**
-   [Explanation and context]
-
-2. **[Takeaway 2]**
-   [Explanation and context]
-
-3. **[Takeaway 3]**
-   [Explanation and context]
+### 2. [Topic]
+[Repeat structure]
 
 ---
 
-### Action Items
-- [ ] **[Action 1]** - [Details]
-- [ ] **[Action 2]** - [Details]
-- [ ] **[Action 3]** - [Details]
+## Key Takeaways
+1. **[Takeaway]** - [Context]
+2. **[Takeaway]** - [Context]
 
 ---
 
-### Recommendations
+## Action Items
+- [ ] [Action with details]
+- [ ] [Action with details]
 
-**Immediate Actions:**
+---
+
+## Recommendations
+
+**Immediate:**
 1. [Action with rationale]
-2. [Action with rationale]
 
-**Long-term Considerations:**
-1. [Consideration with rationale]
-2. [Consideration with rationale]
+**Long-term:**
+1. [Consideration with rationale]`,
 
----
+      'Key Quotes': `Extract most impactful quotes.
 
-### Summary Statistics
-- **Total Topics Covered:** [Number]
-- **Action Items Identified:** [Number]
-- **Key Decisions:** [Number]
-- **Stakeholders Mentioned:** [Number]`,
+# Key Quotes
 
-      'Key Quotes': `Extract the most impactful and meaningful quotes.
+## Most Impactful
 
-## KEY QUOTES
+> "[The most powerful quote]"
 
-### Most Impactful Quote
-
-> "[The single most powerful or important quote]"
-
-**Context:**
-[When/where this was said]
-
-**Why This Matters:**
-[Significance and implications]
-
-**Speaker:**
-[Who said it, if mentioned]
-
-**Key Insight:**
-[What this reveals or teaches]
+**Context:** [When/where]
+**Why It Matters:** [Significance]
+**Speaker:** [Who]
 
 ---
 
-### Notable Quotes
+## Notable Quotes
 
-#### Quote 2
-> "[Second important quote]"
-
-- **Context:** [Background]
-- **Significance:** [Why it matters]
-- **Theme:** [What topic it relates to]
+### Quote 2
+> "[Important quote]"
+- Context: [Background]
+- Theme: [Topic]
 
 ---
 
-#### Quote 3
-> "[Third important quote]"
-
-- **Context:** [Background]
-- **Significance:** [Why it matters]
-- **Theme:** [What topic it relates to]
+### Quote 3
+> "[Important quote]"
+- Context: [Background]
+- Theme: [Topic]
 
 ---
 
-### Quotes by Theme
+## By Theme
 
 **Leadership:**
-> "[Quote about leadership]"
+> "[Quote]"
 
 **Strategy:**
-> "[Quote about strategy]"
-
-**Innovation:**
-> "[Quote about innovation]"
+> "[Quote]"
 
 ---
 
-### Quote Analysis
-- **Total Quotes Extracted:** [Number]
-- **Dominant Theme:** [Theme]
-- **Overall Tone:** [Tone description]`,
+**Total:** [X] • **Dominant Theme:** [Theme]`,
 
-      'Sentiment Analysis': `Analyze the emotional tone, sentiment, and underlying feelings.
+      'Sentiment Analysis': `Analyze emotional tone and sentiment.
 
-## SENTIMENT ANALYSIS
+# Sentiment Analysis
 
-### Overall Sentiment
+## Overall Sentiment
 
-**Sentiment Rating:** [Positive/Negative/Neutral/Mixed]
-**Confidence Score:** [X/10]
-**Emotional Intensity:** [Low/Medium/High]
+**Rating:** [Positive/Negative/Neutral/Mixed]
+**Confidence:** [X/10]
+**Intensity:** [Low/Medium/High]
 
-[2-3 sentence summary of the overall emotional tone]
+[2-3 sentence summary]
 
 ---
 
-### Emotional Breakdown
+## Emotional Breakdown
 
-**Positive Emotions (X%):**
-- **[Emotion]:** [Examples and context]
-- **[Emotion]:** [Examples and context]
-- **[Emotion]:** [Examples and context]
+**Positive (X%):**
+- [Emotion]: [Examples]
+- [Emotion]: [Examples]
 
-**Negative Emotions (X%):**
-- **[Emotion]:** [Examples and context]
-- **[Emotion]:** [Examples and context]
-- **[Emotion]:** [Examples and context]
+**Negative (X%):**
+- [Emotion]: [Examples]
+- [Emotion]: [Examples]
 
-**Neutral Elements (X%):**
-- **[Element]:** [Examples and context]
+**Neutral (X%):**
+- [Element]: [Examples]
 
 ---
 
-### Tone Analysis
+## Tone Analysis
 
-**Primary Tone:** [Professional/Casual/Urgent/Optimistic/etc.]
+**Primary Tone:** [Type]
 
-**Tone Characteristics:**
-- **Formality Level:** [Formal/Informal/Mixed]
-- **Urgency:** [High/Medium/Low]
-- **Confidence:** [High/Medium/Low]
-- **Objectivity:** [Objective/Subjective/Balanced]
+**Characteristics:**
+- Formality: [Level]
+- Urgency: [Level]
+- Confidence: [Level]
 
 **Language Patterns:**
-[Notable patterns in word choice or phrasing]
+[Notable patterns]
 
 ---
 
-### Key Insights
+## Key Insights
 
 **Emotional Drivers:**
-[What's driving the emotions]
-
-**Sentiment Shifts:**
-[Any changes in tone throughout]
+[What's driving emotions]
 
 **Underlying Concerns:**
-[Implicit worries or anxieties]
-
-**Motivations:**
-[What seems to be motivating the communication]
+[Implicit worries]
 
 ---
 
-### Sentiment Timeline
-- **Beginning:** [Initial sentiment]
-- **Middle:** [How it evolved]
-- **End:** [Final sentiment]
+## Recommendations
+[How to respond based on analysis]`,
+
+      'ELI5': `Explain in simplest terms possible.
+
+# Simple Explanation
+
+## The Big Idea
+[Explain using simple words and short sentences]
 
 ---
 
-### Recommendations
-[How to respond or act based on this analysis]`,
-
-      'ELI5': `Explain the content in the simplest possible terms.
-
-## SIMPLE EXPLANATION
-
-### The Big Idea
-
-[Explain the main concept using simple words and short sentences]
+## Why Should You Care?
+[Why this matters simply]
 
 ---
 
-### Why Should You Care?
-
-[Explain why this matters in simple terms]
-
----
-
-### Real-Life Example
+## Real-Life Example
 
 **Imagine this:**
-[Create a relatable analogy using everyday situations]
+[Relatable analogy]
 
 **Here's how it works:**
-1. [Step 1 in simple terms]
-2. [Step 2 in simple terms]
-3. [Step 3 in simple terms]
+1. [Simple step]
+2. [Simple step]
+3. [Simple step]
 
 ---
 
-### The Important Parts
+## The Important Parts
 
-**Thing 1: [Simple name]**
-[One sentence explanation]
-
-**Thing 2: [Simple name]**
-[One sentence explanation]
-
-**Thing 3: [Simple name]**
-[One sentence explanation]
+**Thing 1:** [One sentence]
+**Thing 2:** [One sentence]
+**Thing 3:** [One sentence]
 
 ---
 
-### In One Sentence
-
-[Summarize in one super simple sentence]
+## In One Sentence
+[Super simple summary]
 
 ---
 
-### Fun Fact
+## Fun Fact
+[Interesting tidbit]`,
 
-[Add an interesting, simple fact]`,
+      'SWOT Analysis': `Conduct strategic SWOT analysis.
 
-      'SWOT Analysis': `Conduct a strategic SWOT analysis.
+# SWOT Analysis
 
-## SWOT ANALYSIS
+## Strengths
 
-### Strengths
+**1. [Strength Title]**
+- What: [Description]
+- Evidence: [Proof]
+- Impact: [Value created]
 
-**Internal Advantages:**
-
-1. **[Strength 1 Title]**
-   - **Description:** [What makes this a strength]
-   - **Evidence:** [Proof or examples]
-   - **Impact:** [How this creates value]
-
-2. **[Strength 2 Title]**
-   [Repeat structure]
+**2. [Strength Title]**
+[Repeat]
 
 **Key Capabilities:**
-- [Capability 1]
-- [Capability 2]
-- [Capability 3]
+- [Capability]
+- [Capability]
 
 ---
 
-### Weaknesses
+## Weaknesses
 
-**Internal Limitations:**
+**1. [Weakness Title]**
+- What: [Description]
+- Impact: [Risk]
+- Fix: [How to address]
 
-1. **[Weakness 1 Title]**
-   - **Description:** [What the weakness is]
-   - **Evidence:** [Examples]
-   - **Impact:** [How this creates risk]
-   - **Mitigation:** [How to address it]
-
-2. **[Weakness 2 Title]**
-   [Repeat structure]
-
-**Areas for Improvement:**
-- [Area 1]
-- [Area 2]
-- [Area 3]
+**2. [Weakness Title]**
+[Repeat]
 
 ---
 
-### Opportunities
+## Opportunities
 
-**External Possibilities:**
+**1. [Opportunity Title]**
+- What: [Description]
+- Potential: [What could be gained]
+- Requirements: [What's needed]
+- Timeline: [When to act]
 
-1. **[Opportunity 1 Title]**
-   - **Description:** [What the opportunity is]
-   - **Potential:** [What could be gained]
-   - **Requirements:** [What's needed]
-   - **Timeline:** [When to act]
-
-2. **[Opportunity 2 Title]**
-   [Repeat structure]
-
-**Market Trends:**
-- [Trend 1 and how to leverage it]
-- [Trend 2 and how to leverage it]
+**2. [Opportunity Title]**
+[Repeat]
 
 ---
 
-### Threats
+## Threats
 
-**External Risks:**
+**1. [Threat Title]**
+- What: [Description]
+- Likelihood: [High/Medium/Low]
+- Impact: [Potential damage]
+- Response: [How to defend]
 
-1. **[Threat 1 Title]**
-   - **Description:** [What the threat is]
-   - **Likelihood:** [High/Medium/Low]
-   - **Impact:** [Potential damage]
-   - **Response:** [How to defend]
-
-2. **[Threat 2 Title]**
-   [Repeat structure]
-
-**Risk Factors:**
-- [Risk 1]
-- [Risk 2]
-- [Risk 3]
+**2. [Threat Title]**
+[Repeat]
 
 ---
 
-### Strategic Recommendations
+## Strategic Recommendations
 
 **Leverage Strengths:**
-1. [How to use strength 1]
-2. [How to use strength 2]
+1. [How to use strength]
 
 **Address Weaknesses:**
-1. [How to fix weakness 1]
-2. [How to fix weakness 2]
+1. [How to fix weakness]
 
 **Capture Opportunities:**
-1. [How to seize opportunity 1]
-2. [How to seize opportunity 2]
+1. [How to seize opportunity]
 
 **Mitigate Threats:**
-1. [How to defend against threat 1]
-2. [How to defend against threat 2]
+1. [How to defend]
 
 ---
 
-### SWOT Summary Matrix
+| Category | Count | Priority |
+|----------|-------|----------|
+| Strengths | [#] | [Level] |
+| Weaknesses | [#] | [Level] |
+| Opportunities | [#] | [Level] |
+| Threats | [#] | [Level] |`,
 
-| Category | Count | Priority Level |
-|----------|-------|----------------|
-| Strengths | [#] | [High/Med/Low] |
-| Weaknesses | [#] | [High/Med/Low] |
-| Opportunities | [#] | [High/Med/Low] |
-| Threats | [#] | [High/Med/Low] |
+      'Meeting Minutes': `Create professional meeting minutes.
 
-**Overall Assessment:** [Brief strategic conclusion]`,
+# Meeting Minutes
 
-      'Meeting Minutes': `Create formal, professional meeting minutes.
+## Meeting Info
 
-## MEETING MINUTES
-
-### Meeting Information
-
-**Date:** [Extract or indicate "Not specified"]
-**Time:** [Extract or indicate "Not specified"]
-**Location:** [Extract or indicate "Not specified"]
-**Meeting Type:** [Regular/Special/Emergency/etc.]
+**Date:** [Date or "Not specified"]
+**Time:** [Time or "Not specified"]
+**Type:** [Regular/Special/Emergency]
 
 **Attendees:**
-- [Name 1] - [Role, if mentioned]
-- [Name 2] - [Role, if mentioned]
-- [Name 3] - [Role, if mentioned]
+- [Name] - [Role]
+- [Name] - [Role]
 
-**Absent:**
-- [Name, if mentioned]
-
-**Meeting Chair:** [Name, if mentioned]
-**Note Taker:** [Name, if mentioned]
+**Chair:** [Name]
 
 ---
 
-### Meeting Objectives
-
-1. [Objective 1]
-2. [Objective 2]
-3. [Objective 3]
+## Objectives
+1. [Objective]
+2. [Objective]
 
 ---
 
-### Agenda Items
+## Agenda Items
 
-#### 1. [First Agenda Item Title]
+### 1. [Item Title]
 
 **Discussion:**
-[Detailed summary]
+[Summary]
 
-**Key Points Raised:**
-- [Point 1]
-- [Point 2]
-- [Point 3]
+**Key Points:**
+- [Point]
+- [Point]
 
 **Decision:**
-[What was decided, if applicable]
+[What was decided]
 
-**Action Items:**
-- [ ] **[Task]** - Owner: [Name] - Due: [Date]
-- [ ] **[Task]** - Owner: [Name] - Due: [Date]
-
----
-
-#### 2. [Second Agenda Item Title]
-[Repeat structure for each agenda item]
+**Actions:**
+- [ ] [Task] - Owner: [Name] - Due: [Date]
+- [ ] [Task] - Owner: [Name] - Due: [Date]
 
 ---
 
-### Key Decisions
-
-1. **[Decision 1]**
-   - **Context:** [Why this decision was needed]
-   - **Decision:** [What was decided]
-   - **Rationale:** [Why]
-   - **Approved By:** [Name/Role]
-
-2. **[Decision 2]**
-   [Repeat structure]
+### 2. [Item Title]
+[Repeat structure]
 
 ---
 
-### Action Items Summary
+## Key Decisions
+
+**1. [Decision]**
+- Context: [Why needed]
+- Decision: [What was decided]
+- Rationale: [Why]
+- Approved By: [Name]
+
+---
+
+## Action Items Summary
 
 **High Priority:**
-- [ ] **[Task]** - Owner: [Name] - Due: [Date] - Status: [Not Started]
-- [ ] **[Task]** - Owner: [Name] - Due: [Date] - Status: [Not Started]
+- [ ] [Task] - [Owner] - [Due Date]
 
 **Medium Priority:**
-- [ ] **[Task]** - Owner: [Name] - Due: [Date]
-- [ ] **[Task]** - Owner: [Name] - Due: [Date]
-
-**Low Priority:**
-- [ ] **[Task]** - Owner: [Name] - Due: [Date]
+- [ ] [Task] - [Owner] - [Due Date]
 
 ---
 
-### Issues & Concerns
+## Issues & Concerns
 
 **Open Issues:**
-1. **[Issue]** - [Description] - Owner: [Name]
-2. **[Issue]** - [Description] - Owner: [Name]
+1. [Issue] - Owner: [Name]
 
-**Risks Identified:**
-- [Risk 1 and mitigation plan]
-- [Risk 2 and mitigation plan]
+**Risks:**
+- [Risk and mitigation]
 
 ---
 
-### Next Steps
+## Next Steps
+1. [Next step]
+2. [Next step]
 
-1. [Next step 1]
-2. [Next step 2]
-3. [Next step 3]
-
-**Next Meeting:**
-- **Date:** [Date, if mentioned]
-- **Time:** [Time, if mentioned]
-- **Agenda:** [Topics for next meeting]
-
----
-
-### Attachments & References
-
-- [Document 1, if mentioned]
-- [Document 2, if mentioned]
-
----
-
-**Minutes Prepared By:** [Auto-generated by Clario]
-**Date Prepared:** [Current date]
-**Distribution:** [All attendees]`,
+**Next Meeting:** [Date] at [Time]`,
     }
 
-    const prompt = `${modePrompts[mode] || 'Summarize the following text professionally with clear structure.'}
+    const prompt = `${modePrompts[mode] || 'Summarize professionally with clear structure.'}
 
-CRITICAL TEXT FORMATTING REQUIREMENTS:
-- Write all words normally without any spacing between letters
-- Example of CORRECT formatting: "Complete Analysis"
-- Example of WRONG formatting: "C omplete A nalysis" or "C o m p l e t e"
-- Never insert spaces within individual words
-- Only use spaces to separate complete words from each other
-- All headings must use standard capitalization (e.g., "Key Findings" not "K ey F indings")
+FORMATTING RULES:
+- Write words normally without spacing between letters
 - Use ## for main headers, ### for subheaders
 - Use **bold** for emphasis
 - Use bullet points (-) and numbered lists (1. 2. 3.)
@@ -741,38 +571,27 @@ ${sanitizedText}`
     })
     const summary = completion.choices[0]?.message?.content || 'Failed to generate summary'
 
-    // Fix letter spacing: remove spaces between the first capital letter and the rest of the word
-    // This fixes patterns like "C ap", "T he", "W hy", "R eal" -> "Cap", "The", "Why", "Real"
     const cleanedSummary = summary
       .split('\n')
       .map(line => {
-        // Skip markdown code blocks and preserve them
         if (line.trim().startsWith('```')) {
           return line
         }
 
         let cleaned = line
 
-        // MAIN FIX: Single capital letter + space + lowercase letters = broken word
-        // Pattern: "C ap", "T he", "W hy", "R eal" -> "Cap", "The", "Why", "Real"
-        // This is the core issue - first letter separated from the rest
         cleaned = cleaned.replace(/([A-Z])\s+([a-z]+)/g, (match, first, rest) => {
-          // Very short exception words that might legitimately follow a single letter
           const exceptions = ['a', 'an', 'am', 'is', 'it', 'or', 'of', 'to', 'in', 'on', 'at', 'by', 'as', 'if', 'we', 'us', 'be', 'do', 'go', 'no', 'so', 'up']
-          // Only skip if it's a very short exception word (1-2 chars)
           if (exceptions.includes(rest.toLowerCase()) && rest.length <= 2) {
             return match
           }
-          // Combine them - this fixes "C ap" -> "Cap", "T he" -> "The", etc.
           return first + rest
         })
 
-        // Also fix multiple spaces between letters (like "C o m p l e t e")
         cleaned = cleaned.replace(/([a-zA-Z])( [a-zA-Z]){2,}/g, (match) => {
           return match.replace(/\s+/g, '')
         })
 
-        // Fix ALL CAPS with spaces (like "S I M P L E")
         cleaned = cleaned.replace(/\b([A-Z])( [A-Z])+\b/g, (match) => {
           return match.replace(/\s+/g, '')
         })
@@ -788,11 +607,15 @@ ${sanitizedText}`
       mode,
     })
 
-    await supabase.rpc('track_usage', {
+    const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'summary',
       p_count: 1,
     })
+
+    if (trackError) {
+      console.error("Failed to track usage:", trackError)
+    }
 
     return NextResponse.json({ summary: cleanedSummary })
   } catch (error: any) {

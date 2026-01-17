@@ -33,31 +33,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: userData } = await supabase
-      .from('users')
-      .select('subscription_tier')
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, requests_used_this_month, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (userData?.subscription_tier || 'free') as 'free' | 'pro' | 'premium'
+    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used_this_month || 0
+    const limit = tier === 'pro' ? 1000 : 100
 
-    const startOfMonth = new Date()
-    startOfMonth.setDate(1)
-    startOfMonth.setHours(0, 0, 0, 0)
-    
-    const { data: usageData } = await supabase
-      .from('usage_stats')
-      .select('meeting_notes_count')
-      .eq('user_id', user.id)
-      .gte('date', startOfMonth.toISOString().split('T')[0])
-
-    const currentUsage = usageData?.reduce((sum, row) => sum + (row.meeting_notes_count || 0), 0) || 0
-    const limits = { free: 100, pro: 1000, premium: 1000 }
-    const limit = limits[tier]
-
-    if (currentUsage >= limit) {
+    // Unlimited access for admin
+    if (profile?.email !== 'muhammadtanveerabbas.dev@gmail.com' && currentUsage >= limit) {
       return NextResponse.json(
-        { error: 'Usage limit reached', message: `You've reached your ${tier} tier limit of ${limit} meeting notes per month.` },
+        { error: 'Usage limit reached', message: `You've reached your ${tier} plan limit of ${limit} requests per month. Please upgrade to continue.` },
         { status: 403 }
       )
     }
@@ -79,16 +68,16 @@ export async function POST(request: Request) {
     })
 
     let content = completion.choices[0]?.message?.content || '{}'
-    
+
     // Extract JSON from markdown code blocks if present
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/)
     if (jsonMatch) {
       content = jsonMatch[1].trim()
     }
-    
+
     // Remove any leading/trailing whitespace
     content = content.trim()
-    
+
     const structuredNotes = JSON.parse(content)
 
     await supabase.from('meeting_notes').insert({
@@ -98,11 +87,15 @@ export async function POST(request: Request) {
       structured_notes: structuredNotes,
     })
 
-    await supabase.rpc('track_usage', {
+    const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'meeting',
       p_count: 1,
     })
+
+    if (trackError) {
+      console.error("Failed to track usage:", trackError)
+    }
 
     return NextResponse.json({ structuredNotes })
   } catch (error: any) {

@@ -16,21 +16,16 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, {
-                ...options,
-                ...COOKIE_CONFIG,
-              })
+              cookieStore.set(name, value, options)
             })
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // Ignore - called from Server Component
           }
         },
       },
       auth: {
-        flowType: SESSION_CONFIG.flowType,
-        autoRefreshToken: SESSION_CONFIG.autoRefresh,
+        flowType: 'pkce',
+        autoRefreshToken: true,
         detectSessionInUrl: false,
         persistSession: true,
       },

@@ -484,121 +484,109 @@ export function SummarizerOutput({
 
   // Success state with result
   return (
-    <div className="mt-8">
-      {/* Actions Bar */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onToggleHistory}
-          disabled={history.length === 0}
-          className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
-        >
-          <History className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-          <span className="hidden sm:inline">History ({history.length})</span>
-        </Button>
+    <div className="mt-8 space-y-4">
+      {/* Mode Badge & Actions */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#4169E1]/10 to-purple-500/10 border border-[#4169E1]/20">
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${modeConfig.bgColor}`}>
+            <ModeIcon className={`h-5 w-5 ${modeConfig.color}`} />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-white">{mode}</h3>
+            <p className="text-xs text-gray-400">Generated {new Date().toLocaleTimeString()}</p>
+          </div>
+        </div>
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleCopy}
-          disabled={copying}
-          className="border-white/20 text-white hover:bg-white/10 min-h-[44px] min-w-[44px]"
-        >
-          {copying ? (
-            <Loader2 className="mr-0 sm:mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <ClipboardCopy className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-          )}
-          <span className="hidden sm:inline">Copy</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onSummarize}
-          disabled={!canSummarize || isLoading}
-          className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
-        >
-          {isLoading ? (
-            <Loader2 className="mr-0 sm:mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <Sparkles className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-          )}
-          <span className="hidden sm:inline">Summarize</span>
-        </Button>
-        
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={downloading}
-              className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
-            >
-              <Download className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-              <span className="hidden sm:inline">Download</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="bg-[#1a1a2e] border-white/20">
-            <DropdownMenuItem onClick={handleDownloadPdf} className="text-white hover:bg-white/10 cursor-pointer">
-              <FileText className="mr-2 h-4 w-4 text-[#4169E1]" />
-              PDF
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDownloadMd} className="text-white hover:bg-white/10 cursor-pointer">
-              <FileText className="mr-2 h-4 w-4 text-[#4169E1]" />
-              Markdown
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDownloadTxt} className="text-white hover:bg-white/10 cursor-pointer">
-              <FileText className="mr-2 h-4 w-4 text-[#4169E1]" />
-              Text
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {onRegenerate ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
-              >
-                <RefreshCw className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-                <span className="hidden sm:inline">Regenerate</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#1a1a2e] border-white/20 max-h-[300px] overflow-y-auto">
-              {ALL_MODES.filter(m => m !== mode).map((m) => (
-                <DropdownMenuItem
-                  key={m}
-                  onClick={() => onRegenerate(m)}
-                  className="text-white hover:bg-white/10 cursor-pointer"
-                >
-                  {m}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
+        <div className="flex flex-wrap gap-2">
           <Button
             variant="outline"
             size="sm"
-            disabled
-            className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
+            onClick={onToggleHistory}
+            disabled={history.length === 0}
+            className="border-white/20 text-white hover:bg-white/10"
           >
-            <RefreshCw className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
-            <span className="hidden sm:inline">Regenerate</span>
+            <History className="mr-2 h-4 w-4" />
+            {history.length}
           </Button>
-        )}
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopy}
+            disabled={copying}
+            className="border-white/20 text-white hover:bg-white/10"
+          >
+            {copying ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ClipboardCopy className="mr-2 h-4 w-4" />}
+            Copy
+          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" disabled={downloading} className="border-white/20 text-white hover:bg-white/10">
+                <Download className="mr-2 h-4 w-4" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-[#1a1a2e] border-white/20">
+              <DropdownMenuItem onClick={handleDownloadPdf} className="text-white hover:bg-white/10 cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" /> PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownloadMd} className="text-white hover:bg-white/10 cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" /> Markdown
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDownloadTxt} className="text-white hover:bg-white/10 cursor-pointer">
+                <FileText className="mr-2 h-4 w-4" /> Text
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          {onRegenerate && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Change Mode
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#1a1a2e] border-white/20 max-h-[300px] overflow-y-auto">
+                {ALL_MODES.filter(m => m !== mode).map((m) => (
+                  <DropdownMenuItem key={m} onClick={() => onRegenerate(m)} className="text-white hover:bg-white/10 cursor-pointer">
+                    {m}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
-      {/* Summary Content */}
-      <Card className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] border-white/10 shadow-2xl relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#4169E1]/5 via-transparent to-[#4169E1]/5 pointer-events-none"></div>
-        <CardContent className="p-0 relative z-10">
-          <div className="summary-prose p-6 sm:p-8 md:p-12 max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+      {/* Summary Content - New Modern Design */}
+      <Card className="bg-gradient-to-br from-[#0f0f1a] via-[#1a1a2e] to-[#0f0f1a] border-[#4169E1]/20 shadow-2xl overflow-hidden">
+        <CardContent className="p-0">
+          <div className="summary-prose-modern p-6 sm:p-10 max-w-none text-gray-100">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-6 pb-3 border-b border-[#4169E1]/30 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-2xl font-semibold mt-8 mb-4 text-white flex items-center gap-2" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-6 mb-3 text-blue-200" {...props} />,
+                h4: ({node, ...props}) => <h4 className="text-lg font-medium mt-4 mb-2 text-blue-300" {...props} />,
+                p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-gray-300" {...props} />,
+                ul: ({node, ...props}) => <ul className="space-y-2 mb-4 ml-6" {...props} />,
+                ol: ({node, ...props}) => <ol className="space-y-2 mb-4 ml-6" {...props} />,
+                li: ({node, ...props}) => <li className="text-gray-300 leading-relaxed" {...props} />,
+                blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-[#4169E1] bg-[#4169E1]/5 pl-4 py-2 my-4 italic text-blue-100" {...props} />,
+                strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
+                code: ({node, inline, ...props}: any) => 
+                  inline ? 
+                    <code className="bg-[#4169E1]/10 text-blue-300 px-1.5 py-0.5 rounded text-sm" {...props} /> : 
+                    <code className="block bg-[#0a0a0a] text-green-300 p-4 rounded-lg my-4 overflow-x-auto" {...props} />,
+                hr: ({node, ...props}) => <hr className="my-6 border-[#4169E1]/20" {...props} />,
+                table: ({node, ...props}) => <div className="overflow-x-auto my-4"><table className="w-full border-collapse" {...props} /></div>,
+                th: ({node, ...props}) => <th className="border border-[#4169E1]/30 bg-[#4169E1]/10 px-4 py-2 text-left font-semibold text-white" {...props} />,
+                td: ({node, ...props}) => <td className="border border-[#4169E1]/20 px-4 py-2 text-gray-300" {...props} />,
+              }}
+            >
               {result}
             </ReactMarkdown>
           </div>

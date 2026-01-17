@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
+import { checkUsageLimit } from '@/lib/usage-limits'
 import Groq from 'groq-sdk'
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
@@ -25,6 +26,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check usage limits
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, requests_used_this_month, email')
+      .eq('id', user.id)
+      .single()
+
+    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used_this_month || 0
+    
+    // Unlimited access for admin
+    if (profile?.email !== 'muhammadtanveerabbas.dev@gmail.com') {
+      const usageCheck = checkUsageLimit(tier, currentUsage)
+      if (!usageCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: 'Usage limit reached',
+            message: `You've reached your ${tier} plan limit of ${usageCheck.limit} requests per month. Please upgrade to continue.`,
+          },
+          { status: 403 }
+        )
+      }
+    }
+
     // AI categorizes and summarizes the note
     const completion = await groq.chat.completions.create({
       messages: [
@@ -43,7 +68,7 @@ export async function POST(request: Request) {
     })
 
     let aiResponse = completion.choices[0]?.message?.content || '{}'
-    
+
     // Extract JSON from markdown if present
     const jsonMatch = aiResponse.match(/```(?:json)?\s*([\s\S]*?)```/)
     if (jsonMatch) {
@@ -67,12 +92,17 @@ export async function POST(request: Request) {
 
     if (error) throw error
 
-    // Track usage
-    await supabase.rpc('track_usage', {
+    // Track usage (note: quick_notes may not be tracked in usage_stats)
+    const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'note',
       p_count: 1,
     })
+
+    if (trackError) {
+      console.error("Failed to track usage for quick note:", trackError)
+      // Continue even if tracking fails - don't break the user's request
+    }
 
     return NextResponse.json({ note })
   } catch (error: any) {

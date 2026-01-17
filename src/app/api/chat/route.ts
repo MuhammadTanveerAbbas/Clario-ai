@@ -6,20 +6,15 @@ import { sanitizeInput } from '@/lib/security'
 import { checkUsageLimit } from '@/lib/usage-limits'
 import { parseRequestJSON } from '@/lib/api-utils'
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'muhammadtanveerabbas.dev@gmail.com'
+
 export async function POST(request: Request) {
   try {
-    const req = new Request(request.url, {
-      method: request.method,
-      headers: request.headers,
-    })
-
-    // Rate limiting
-    const rateLimitCheck = checkRateLimit(req as any, 'api')
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
     if (!rateLimitCheck.allowed) {
       return rateLimitCheck.response!
     }
 
-    // Parse JSON safely
     const parseResult = await parseRequestJSON(request)
     if (!parseResult.success) {
       return parseResult.error!
@@ -31,10 +26,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    // Sanitize input
     const sanitizedMessage = sanitizeInput(message)
 
-    // Get user and check usage limits
     const supabase = await createClient()
     const {
       data: { user },
@@ -44,41 +37,34 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user tier
-    const { data: userData } = await supabase
-      .from('users')
-      .select('subscription_tier')
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, requests_used_this_month, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (userData?.subscription_tier || 'free') as 'free' | 'pro' | 'premium'
-
-    // Get current month usage
-    const startOfMonth = new Date()
-    startOfMonth.setDate(1)
-    startOfMonth.setHours(0, 0, 0, 0)
+    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used_this_month || 0
     
-    const { data: usageData } = await supabase
-      .from('usage_stats')
-      .select('chats_count')
-      .eq('user_id', user.id)
-      .gte('date', startOfMonth.toISOString().split('T')[0])
+    if (profile?.email !== ADMIN_EMAIL) {
+      const usageCheck = checkUsageLimit(tier, currentUsage)
+      if (!usageCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: 'Usage limit reached',
+            message: `You've reached your ${tier} plan limit of ${usageCheck.limit} requests per month. Please upgrade to continue.`,
+          },
+          { status: 403 }
+        )
+      }
+    }
 
-    const currentUsage = usageData?.reduce((sum, row) => sum + (row.chats_count || 0), 0) || 0
-    const usageCheck = checkUsageLimit(tier, 'chats', currentUsage)
-
-    if (!usageCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: 'Usage limit reached',
-          message: `You've reached your ${tier} tier limit of ${usageCheck.limit} chats per month. Please upgrade to continue.`,
-        },
-        { status: 403 }
-      )
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: 'Service misconfigured' }, { status: 500 })
     }
 
     const groq = new Groq({
-      apiKey: process.env.GROQ_API_KEY || '',
+      apiKey: process.env.GROQ_API_KEY,
     })
 
     const completion = await groq.chat.completions.create({
@@ -130,17 +116,21 @@ You should be helpful, professional, and knowledgeable about productivity tools.
     })
 
     // Update usage stats
-    await supabase.rpc('track_usage', {
+    const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'chat',
       p_count: 1,
     })
 
+    if (trackError) {
+      console.error("Failed to track usage:", trackError)
+    }
+
     return NextResponse.json({ response })
   } catch (error: any) {
     console.error('Chat API error:', error)
     return NextResponse.json(
-      { error: error.message || 'Failed to generate response' },
+      { error: 'Failed to generate response' },
       { status: 500 }
     )
   }
