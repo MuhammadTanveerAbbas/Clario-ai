@@ -18,7 +18,7 @@ export default function RefundPage() {
               <CardTitle className="text-white">1. Money-Back Guarantee</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p>We offer a <strong className="text-white">30-day money-back guarantee</strong> on all Pro plan ($20/month) purchases. If you're not satisfied with Clario for any reason, we'll refund your payment in full.</p>
+              <p>We offer a <strong className="text-white">30-day money-back guarantee</strong> on all Pro plan ($9/month) purchases. If you're not satisfied with Clario for any reason, we'll refund your payment in full.</p>
             </CardContent>
           </Card>
 
@@ -28,7 +28,7 @@ export default function RefundPage() {
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">2.1 Refund Window:</strong> Refund requests must be submitted within 30 days of the original purchase date.</p>
-              <p><strong className="text-white">2.2 First Purchase Only:</strong> The 30-day guarantee applies to your first Pro plan ($20/month) purchase. Subsequent renewals are not eligible for refunds but can be cancelled to prevent future charges.</p>
+              <p><strong className="text-white">2.2 First Purchase Only:</strong> The 30-day guarantee applies to your first Pro plan ($9/month) purchase. Subsequent renewals are not eligible for refunds but can be cancelled to prevent future charges.</p>
               <p><strong className="text-white">2.3 Free Plan:</strong> The free plan (100 requests/month) has no charges and therefore no refunds apply.</p>
             </CardContent>
           </Card>
@@ -50,10 +50,10 @@ export default function RefundPage() {
               <CardTitle className="text-white">4. Cancellation Policy</CardTitle>
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
-              <p><strong className="text-white">4.1 Cancel Anytime:</strong> You can cancel your Pro subscription ($20/month) anytime without penalty.</p>
+              <p><strong className="text-white">4.1 Cancel Anytime:</strong> You can cancel your Pro subscription ($9/month) anytime without penalty.</p>
               <p><strong className="text-white">4.2 Access Until End of Billing Period:</strong> You'll retain access to Pro features (1000 requests/month) until the end of your current billing period.</p>
               <p><strong className="text-white">4.3 Automatic Downgrade:</strong> After cancellation, your account automatically reverts to the free plan (100 requests/month).</p>
-              <p><strong className="text-white">4.4 Data Retention:</strong> All your data (summaries, chat history, writing drafts, meeting notes, quick notes) remain intact after downgrade.</p>
+              <p><strong className="text-white">4.4 Data Retention:</strong> All your data (summaries, chat history, writing drafts, and meeting notes) remain intact after downgrade.</p>
             </CardContent>
           </Card>
 

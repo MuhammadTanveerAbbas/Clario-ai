@@ -5,7 +5,9 @@ import { createCheckoutSession } from '@/lib/stripe'
 export async function POST(request: Request) {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -13,11 +15,16 @@ export async function POST(request: Request) {
 
     const { priceId } = await request.json()
 
-    if (!priceId) {
+    const effectivePriceId = priceId || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID
+    // NOTE: When changing pricing to $9/month, be sure to update
+    // STRIPE_PRICE_ID / NEXT_PUBLIC_STRIPE_PRICE_ID in your environment
+    // to the correct Pro plan price ID in Stripe.
+
+    if (!effectivePriceId) {
       return NextResponse.json({ error: 'Price ID required' }, { status: 400 })
     }
 
-    const session = await createCheckoutSession(user.id, user.email!, priceId)
+    const session = await createCheckoutSession(user.id, user.email!, effectivePriceId)
 
     return NextResponse.json({ url: session.url })
   } catch (error: any) {

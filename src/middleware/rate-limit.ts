@@ -15,7 +15,11 @@ export function rateLimit(
   maxRequests: number,
   windowMs: number
 ): { allowed: boolean; remaining: number; resetTime: number } {
-  const identifier = request.ip || 'anonymous'
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'anonymous'
+  const identifier = ip
   const now = Date.now()
   const key = `${identifier}-${Math.floor(now / windowMs)}`
 

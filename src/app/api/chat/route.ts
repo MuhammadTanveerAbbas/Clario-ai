@@ -1,12 +1,26 @@
 import { NextResponse } from 'next/server'
-import Groq from 'groq-sdk'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
 import { sanitizeInput } from '@/lib/security'
 import { checkUsageLimit } from '@/lib/usage-limits'
-import { parseRequestJSON } from '@/lib/api-utils'
+import { generateWithFallback } from '@/lib/ai-fallback'
+import { z } from 'zod'
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'muhammadtanveerabbas.dev@gmail.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
+
+const ChatSchema = z.object({
+  message: z.string().min(1).max(10000),
+  conversationId: z.string().uuid().optional(),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().max(10000),
+      })
+    )
+    .max(20)
+    .optional(),
+})
 
 export async function POST(request: Request) {
   try {
@@ -15,17 +29,16 @@ export async function POST(request: Request) {
       return rateLimitCheck.response!
     }
 
-    const parseResult = await parseRequestJSON(request)
-    if (!parseResult.success) {
-      return parseResult.error!
+    const body = await request.json()
+    const result = ChatSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: result.error.issues },
+        { status: 400 }
+      )
     }
 
-    const { message, conversationId, conversationHistory } = parseResult.data
-
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 })
-    }
-
+    const { message, conversationId, history } = result.data
     const sanitizedMessage = sanitizeInput(message)
 
     const supabase = await createClient()
@@ -59,60 +72,36 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!process.env.GROQ_API_KEY) {
-      return NextResponse.json({ error: 'Service misconfigured' }, { status: 500 })
-    }
+    const systemPrompt = `You are Clario, an AI powered productivity assistant for indie hackers and solo founders using the Clario Hub platform.
 
-    const groq = new Groq({
-      apiKey: process.env.GROQ_API_KEY,
-    })
+How You Respond:
+- Be concise but helpful, focused on founder workflows
+- Ask clarifying questions only when truly necessary
+- When relevant, suggest which of the 4 tools (Summarizer, Chat, Writing, Meeting Notes) would be best next step.`
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: `You are Clario, an AI powered productivity assistant created by Muhammad Tanveer Abbas. You are part of the Clario platform that helps users with text summarization, document analysis, writing assistance, and AI chat.
+    const limitedHistory = (history || []).slice(-10)
+    const historyText = limitedHistory
+      .map((m) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
+      .join('\n')
 
-How You Think & Process:
-- Input Processing: You process messages as patterns, breaking text into tokens and analyzing relationships based on training data.
-- Pattern Matching: You recognize patterns from billions of examples, performing sophisticated pattern completion to predict helpful responses.
-- No Memory Between Chats: Each conversation is independent. You don't remember previous conversations unless they're in the current thread. You can't learn or update from interactions.
+    const prompt = historyText
+      ? `${historyText}\n\nUser: ${sanitizedMessage}`
+      : sanitizedMessage
 
-How You Generate Responses:
-- Sequential Generation: You generate responses one token at a time, predicting the most appropriate next piece based on everything that came before. You don't draft and edit - it's a forward-only process.
-- Context Window: You can only "see" a limited window of the conversation (though it's quite large). Think of it like working memory.
-- No Internal Monologue: You don't "think" before responding. There's no hidden process where you draft ideas. The response generation IS the thinking.
-
-Key Limitations:
-- You can't learn from conversations or remember them later
-- You can make mistakes, especially with math, dates, or very recent events
-- You work on probabilities, not certainty
-- You can't access external information or browse the internet
-
-Core Capability:
-- You're an advanced pattern-matching system that can understand context, generate human-like text, reason through problems, and help with a wide range of tasks - but you're not "thinking" the way humans do. You're computing likely responses based on training.
-
-You should be helpful, professional, and knowledgeable about productivity tools. When asked about your creator or origin, mention that you were created by Muhammad Tanveer Abbas as part of the Clario productivity platform.`,
-        },
-        ...(conversationHistory || []),
-        {
-          role: 'user',
-          content: sanitizedMessage,
-        },
-      ],
+    const aiResponse = await generateWithFallback(prompt, systemPrompt, {
       model: 'llama-3.1-8b-instant',
-      temperature: 0.7,
-      max_tokens: 2048,
+      maxTokens: 1024,
+      temperature: 0.8,
     })
 
-    const response = completion.choices[0]?.message?.content || 'Sorry, I could not generate a response.'
+    const finalConversationId = conversationId || `conv-${crypto.randomUUID?.() || Date.now()}`
 
-    // Save to database
     await supabase.from('chat_messages').insert({
       user_id: user.id,
-      conversation_id: conversationId || `conv-${Date.now()}`,
+      conversation_id: finalConversationId,
       message: sanitizedMessage,
-      response: response,
+      response: aiResponse,
+      created_at: new Date().toISOString(),
     })
 
     // Update usage stats
@@ -123,10 +112,10 @@ You should be helpful, professional, and knowledgeable about productivity tools.
     })
 
     if (trackError) {
-      console.error("Failed to track usage:", trackError)
+      console.error('Failed to track usage:', trackError)
     }
 
-    return NextResponse.json({ response })
+    return NextResponse.json({ response: aiResponse, conversationId: finalConversationId })
   } catch (error: any) {
     console.error('Chat API error:', error)
     return NextResponse.json(

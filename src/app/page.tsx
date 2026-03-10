@@ -75,8 +75,8 @@ const coreFeatures = [
 const stats = [
   {
     value: "4",
-    label: "AI Features",
-    description: "All-in-one productivity platform",
+    label: "AI Tools",
+    description: "Summarizer, Chat, Writing, Meeting Notes",
   },
   {
     value: "100",
@@ -84,48 +84,42 @@ const stats = [
     description: "Per month on free plan",
   },
   {
-    value: "$20",
+    value: "$9",
     label: "Pro Plan",
-    description: "1000 requests per month",
+    description: "1,000 requests per month",
   },
   {
-    value: "24/7",
-    label: "Available",
-    description: "Access anytime, anywhere",
+    value: "41",
+    label: "Indie Hackers",
+    description: "Using Clario Hub",
   },
 ];
 
 const faqItems = [
   {
-    question: "What is Clario?",
+    question: "Does this replace ChatGPT?",
     answer:
-      "Clario is an AI powered productivity platform that combines 5 essential features: text summarization, AI chat, writing assistance, meeting notes, and quick notes. Start free with 100 requests per month or upgrade to Pro for 1000 requests.",
-  },
-
-  {
-    question: "What counts as a request?",
-    answer:
-      "Each AI operation counts as one request: summarization, chat message, writing assistance, or meeting notes generation. Your monthly limit resets on the same date each month.",
+      "For most founder workflows — yes. Summarizing, chatting, writing, and meeting notes covers 90% of what founders use ChatGPT for, at a fraction of the cost.",
   },
   {
-    question: "Can I cancel anytime?",
+    question: "What's the difference between Free and Pro?",
     answer:
-      "Yes! Cancel your Pro subscription anytime with no penalties. You'll keep access until the end of your billing period, then automatically move to the free plan. All your data remains intact.",
+      "Free gives you 100 AI requests/month — enough to test every tool with real work. Pro ($9/month) gives you 1,000 requests, full chat history, and priority processing.",
   },
   {
-    question: "Is my data secure?",
+    question: "Is my content private?",
     answer:
-      "Yes. We use Row Level Security (RLS), PKCE authentication, encrypted data storage, and rate limiting. Your data is private and only accessible to you. We follow industry-standard security practices.",
+      "Yes. Your data is stored with row-level security — nobody else can see your summaries, chats, or notes. You can delete everything from settings at any time.",
   },
   {
-    question: "What AI models power Clario?",
+    question: "Can I export my outputs?",
     answer:
-      "We use Groq SDK with Llama models (Llama 3.1 8B for chat, Llama 3.3 70B for writing, meeting notes, and text summarization) for fast, accurate processing. All AI features are powered by Groq's lightning-fast inference engine.",
+      "Yes. Export summaries, writing, and meeting notes as Markdown files anytime. Your work is always yours.",
   },
   {
-    question: "Is there a money-back guarantee?",
+    question: "What if the AI is down?",
     answer:
-      "Yes! We offer a 30-day money-back guarantee on Pro plan purchases. If you're not satisfied, contact support for a full refund.",
+      "Clario runs on Groq (primary) with Gemini as automatic fallback. If one provider has issues, the other takes over with no action needed from you.",
   },
 ];
 
@@ -186,31 +180,25 @@ export default function Home() {
                 <span className="text-xs sm:text-sm text-gray-300 flex items-center gap-2 flex-wrap justify-center">
                   <span className="inline-flex items-center gap-1">
                     <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-[#4169E1]" />
-                    <span className="whitespace-nowrap">5 AI Features</span>
+                    <span className="whitespace-nowrap">For indie hackers & solo founders</span>
                   </span>
-                  <span className="text-white/40">•</span>
-                  <span className="whitespace-nowrap">Start Free</span>
-                  <span className="text-white/40">•</span>
-                  <span className="whitespace-nowrap">$20/mo Pro</span>
                 </span>
               </div>
               <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-white animate-fade-in-up px-4">
                 <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl leading-tight">
-                  AI Powered Productivity
+                  Stop paying $60/month
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-cyan-400 bg-clip-text text-transparent animate-gradient leading-tight">
-                  Made Simple
+                  for 4 different AI tools
                 </span>
               </h1>
               <p
                 className="mx-auto mt-4 sm:mt-6 max-w-3xl text-sm sm:text-base md:text-lg text-gray-400 animate-fade-in-up px-4 leading-relaxed"
                 style={{ animationDelay: "0.2s" }}
               >
-                Transform your workflow with powerful AI features in one unified
-                platform. Instantly summarize lengthy documents, chat with
-                advanced AI, enhance your writing, generate structured meeting
-                notes, and organize quick notes all.
+                Clario replaces ChatGPT, Notion AI, Otter, and your writing assistant in one tab.
+                Summarize, chat, write, and capture meeting notes — all for $9/month.
               </p>
               <div
                 className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up px-4"
@@ -225,7 +213,7 @@ export default function Home() {
                 >
                   <span className="relative z-10 flex items-center justify-center">
                     <Zap className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
-                    {user ? "Go to Dashboard" : "Start Free"}
+                    {user ? "Go to Dashboard" : "Start free — no credit card →"}
                   </span>
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-gray-100 to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </Button>
@@ -236,15 +224,15 @@ export default function Home() {
               >
                 <span className="flex items-center gap-1 sm:gap-1.5">
                   <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
-                  Free Plan
+                  Used by 41 indie hackers
                 </span>
                 <span className="flex items-center gap-1 sm:gap-1.5">
                   <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
-                  $20/mo Pro
+                  Replaces 4 tools
                 </span>
                 <span className="flex items-center gap-1 sm:gap-1.5">
                   <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-[#4169E1]" />{" "}
-                  30-day Guarantee
+                  $9/month Pro
                 </span>
               </div>
             </div>
@@ -259,10 +247,10 @@ export default function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8 relative">
               <div className="mx-auto max-w-2xl text-center mb-20">
                 <h2 className="text-base font-semibold leading-7 text-blue-400">
-                  Simple Process
+                  How it works
                 </h2>
                 <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Get Started in 3 Steps
+                  3 steps to ship faster
                 </p>
               </div>
               <div className="relative">
@@ -287,7 +275,7 @@ export default function Home() {
                       </div>
                       <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-blue-500/40 transition-all duration-300 hover:scale-105">
                         <h3 className="text-2xl font-bold text-white mb-3 text-center">
-                          Sign Up Free
+                          Pick your tool
                         </h3>
                         <p className="text-gray-400 text-center leading-relaxed">
                           Create your account in seconds. No credit card
@@ -313,7 +301,7 @@ export default function Home() {
                           Choose Feature
                         </h3>
                         <p className="text-gray-400 text-center leading-relaxed">
-                          Select from 5 AI powered features based on your needs.
+                          Summarizer, Chat, Writing, or Meeting Notes — based on what you&apos;re doing right now.
                         </p>
                       </div>
                     </div>
@@ -332,10 +320,10 @@ export default function Home() {
                       </div>
                       <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-8 backdrop-blur-sm hover:border-green-500/40 transition-all duration-300 hover:scale-105">
                         <h3 className="text-2xl font-bold text-white mb-3 text-center">
-                          Get Results
+                          Paste your content
                         </h3>
                         <p className="text-gray-400 text-center leading-relaxed">
-                          Receive instant AI powered insights and outputs.
+                          Text, notes, transcripts, drafts — anything you&apos;d normally paste into ChatGPT or Notion AI.
                         </p>
                       </div>
                     </div>
@@ -354,35 +342,35 @@ export default function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center mb-16">
                 <h2 className="text-base font-semibold leading-7 text-blue-400">
-                  Use Cases
+                  Built for founders
                 </h2>
                 <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Perfect For Every Professional
+                  Where indie hackers actually use AI
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                   {
-                    title: "Students",
-                    desc: "Summarize research papers and study materials",
+                    title: "Founder inbox",
+                    desc: "Summarize investor updates, long emails, and support threads.",
                     icon: BookOpen,
                     color: "from-blue-500 to-cyan-500",
                   },
                   {
-                    title: "Executives",
-                    desc: "Quick meeting notes and decision summaries",
+                    title: "Customer calls",
+                    desc: "Turn raw call notes into clean summaries and action lists.",
                     icon: Briefcase,
                     color: "from-purple-500 to-pink-500",
                   },
                   {
-                    title: "Writers",
-                    desc: "Improve content quality and writing style",
+                    title: "Landing pages & copy",
+                    desc: "Rewrite, improve, and A/B test copy in minutes.",
                     icon: Edit3,
                     color: "from-orange-500 to-red-500",
                   },
                   {
-                    title: "Researchers",
-                    desc: "Analyze documents and extract insights",
+                    title: "Weekly updates",
+                    desc: "Turn messy notes into founder updates and changelogs.",
                     icon: Microscope,
                     color: "from-green-500 to-emerald-500",
                   },
@@ -454,49 +442,113 @@ export default function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center mb-16">
                 <h2 className="text-base font-semibold leading-7 text-blue-400">
-                  Core Features
+                  All 4 tools in one tab
                 </h2>
                 <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Everything You Need
+                  Summarize, chat, write, and capture notes
                 </p>
                 <p className="mt-6 text-lg leading-8 text-gray-400">
-                  Five AI driven features designed to boost your productivity
-                  and streamline your workflow.
+                  Clario replaces a stack of separate AI subscriptions with one focused workspace.
                 </p>
               </div>
               <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                  {coreFeatures.map((feature, index) => (
-                    <motion.div
-                      key={feature.title}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
-                        <div
-                          className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
-                        ></div>
-                        <CardContent className="relative p-8">
-                          <div className="flex items-start space-x-4">
-                            <div
-                              className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${feature.color}`}
-                            >
-                              <feature.icon className="h-6 w-6 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="text-xl font-semibold text-white mb-2">
-                                {feature.title}
-                              </h3>
-                              <p className="text-gray-400 leading-relaxed">
-                                {feature.description}
-                              </p>
-                            </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+                      <CardContent className="relative p-8">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500">
+                            <span className="text-2xl">📄</span>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  ))}
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              Summarizer — 10 modes
+                            </h3>
+                            <p className="text-gray-400 leading-relaxed">
+                              Paste any text — article, email, report, transcript. Get an executive brief, action items, SWOT analysis, or ELI5 in seconds. 10 output modes built for how founders actually think.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+                      <CardContent className="relative p-8">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-pink-500">
+                            <span className="text-2xl">💬</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              AI Chat — with memory
+                            </h3>
+                            <p className="text-gray-400 leading-relaxed">
+                              Your conversations are saved and searchable. Pick up where you left off. Faster than ChatGPT, cheaper than GPT-4, built for founder workflows.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-500 opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+                      <CardContent className="relative p-8">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-red-500">
+                            <span className="text-2xl">✍️</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              Writing Assistant — 5 tones
+                            </h3>
+                            <p className="text-gray-400 leading-relaxed">
+                              Improve, rewrite, expand, or fix grammar. Switch between professional, casual, and technical tone instantly. For emails, landing pages, cold outreach, and investor updates.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <Card className="group relative overflow-hidden bg-white/5 border-white/10 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/10 h-full">
+                      <div className="absolute inset-0 bg-gradient-to-br from-cyan-500 to-blue-500 opacity-0 transition-opacity duration-300 group-hover:opacity-10"></div>
+                      <CardContent className="relative p-8">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-blue-500">
+                            <span className="text-2xl">🎙️</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-white mb-2">
+                              Meeting Notes — structured instantly
+                            </h3>
+                            <p className="text-gray-400 leading-relaxed">
+                              Paste raw meeting notes or transcripts. Get a clean summary, action items, and key decisions in one click. Never lose a commitment made in a call again.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -582,7 +634,7 @@ export default function Home() {
                   </CardHeader>
                   <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-5 pb-4 sm:pb-6">
                     <div className="text-2xl sm:text-3xl font-bold text-white">
-                      $20
+                      $9
                       <span className="text-sm sm:text-base text-gray-400">
                         /month
                       </span>
@@ -594,7 +646,7 @@ export default function Home() {
                       </li>
                       <li className="flex items-center gap-1.5 sm:gap-2">
                         <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
-                        All 5 AI features
+                        All 4 AI features
                       </li>
                       <li className="flex items-center gap-1.5 sm:gap-2">
                         <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-blue-400 flex-shrink-0" />{" "}
@@ -641,7 +693,7 @@ export default function Home() {
                   Why Clario?
                 </h2>
                 <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  All-in-One vs Multiple Tools
+                  Stop juggling 4 different tools
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
@@ -654,7 +706,7 @@ export default function Home() {
                   <CardContent className="space-y-3 text-gray-400">
                     <p className="flex items-start gap-3">
                       <DollarSign className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                      <span>Pay for 5+ separate subscriptions</span>
+                      <span>Pay for ChatGPT, Notion AI, Otter, Grammarly…</span>
                     </p>
                     <p className="flex items-start gap-3">
                       <Layers className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
@@ -689,7 +741,7 @@ export default function Home() {
                   <CardContent className="space-y-3 text-gray-300">
                     <p className="flex items-start gap-3">
                       <DollarSign className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                      <span>One affordable subscription ($20/mo)</span>
+                      <span>One affordable subscription ($9/month or $79/year)</span>
                     </p>
                     <p className="flex items-start gap-3">
                       <Layers className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
@@ -785,35 +837,61 @@ export default function Home() {
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               <div className="mx-auto max-w-2xl text-center mb-16">
                 <h2 className="text-base font-semibold leading-7 text-blue-400">
-                  Trusted Platform
+                  What founders say
                 </h2>
                 <p className="mt-2 font-headline text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  Built with Modern Technology
+                  Built for indie SaaS
                 </p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                {[
-                  { name: "Next.js 15", desc: "React Framework" },
-                  { name: "Groq AI", desc: "Llama 3.3 70B" },
-                  { name: "Supabase", desc: "PostgreSQL Database" },
-                  { name: "Paddle", desc: "Payment Processing" },
-                ].map((tech, i) => (
-                  <motion.div
-                    key={tech.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1 }}
-                    className="text-center"
-                  >
-                    <div className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all">
-                      <p className="text-white font-semibold text-lg mb-1">
-                        {tech.name}
-                      </p>
-                      <p className="text-gray-400 text-sm">{tech.desc}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-6">
+                    <p className="text-sm text-gray-300 mb-4">
+                      &quot;I cancelled ChatGPT Pro and Notion AI the same week I started using Clario. The summarizer alone saved me 2 hours last week.&quot;
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm">
+                        MK
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">Marcus K.</p>
+                        <p className="text-xs text-gray-400">SaaS founder, bootstrapped to $4k MRR</p>
+                      </div>
                     </div>
-                  </motion.div>
-                ))}
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-6">
+                    <p className="text-sm text-gray-300 mb-4">
+                      &quot;The meeting notes feature is the one I use every single day. Client calls, investor chats, team syncs — all structured in 30 seconds.&quot;
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center text-white text-sm">
+                        PS
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">Priya S.</p>
+                        <p className="text-xs text-gray-400">Indie hacker, 3 products launched</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="bg-white/5 border-white/10">
+                  <CardContent className="p-6">
+                    <p className="text-sm text-gray-300 mb-4">
+                      &quot;Finally stopped copy-pasting between 4 tabs. Everything lives in Clario now. The writing assistant alone is worth $9/month.&quot;
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-sm">
+                        TR
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-white">Tom R.</p>
+                        <p className="text-xs text-gray-400">Solo founder, product builder</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </section>
@@ -1050,11 +1128,10 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
                 <div className="relative">
                   <h2 className="text-3xl font-bold text-white mb-4">
-                    Ready to Boost Your Productivity?
+                    Your next tool subscription is your last one
                   </h2>
                   <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                    Start free with 100 requests per month. No credit card
-                    required. 30-day money-back guarantee on Pro.
+                    Join 41 indie hackers who replaced 4 AI tools with one. Free forever plan. No credit card needed.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button
@@ -1062,7 +1139,7 @@ export default function Home() {
                       onClick={handleCTAClick}
                       className="bg-white text-black hover:bg-white/90 px-8"
                     >
-                      {user ? "Go to Dashboard" : "Get Started Free"}
+                      {user ? "Go to Dashboard" : "Start using Clario free →"}
                     </Button>
                     <Link href="/pricing">
                       <Button

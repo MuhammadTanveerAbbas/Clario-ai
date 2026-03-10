@@ -15,6 +15,17 @@ interface Message {
   content: string;
 }
 
+interface Conversation {
+  conversationId: string;
+  messages: {
+    role: "user" | "assistant";
+    message?: string;
+    response?: string;
+    content?: string;
+  }[];
+  firstMessage: string;
+}
+
 const formatMessage = (text: string) => {
   return text
     .split('\n')
@@ -60,12 +71,48 @@ export default function ChatPage() {
   const { toast } = useToast();
   const endRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) router.push("/sign-in");
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
+
+  useEffect(() => {
+    if (!user) return;
+    const loadHistory = async () => {
+      try {
+        const res = await fetch("/api/chat/history");
+        if (!res.ok) return;
+        const data = await res.json();
+        const convs: Conversation[] = (data.conversations || []).map((c: any) => ({
+          conversationId: c.conversationId,
+          messages: c.messages,
+          firstMessage: c.firstMessage,
+        }));
+        setConversations(convs);
+        if (convs.length > 0) {
+          const latest = convs[0];
+          setConversationId(latest.conversationId);
+          const restored: Message[] = [];
+          latest.messages.forEach((m: any) => {
+            if (m.message) {
+              restored.push({ role: "user", content: m.message });
+            }
+            if (m.response) {
+              restored.push({ role: "assistant", content: m.response });
+            }
+          });
+          setMessages(restored);
+        }
+      } catch {
+        // ignore
+      }
+    };
+    loadHistory();
+  }, [user]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,18 +130,30 @@ export default function ChatPage() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: input, conversationHistory: messages.slice(-10) }),
+        body: JSON.stringify({
+          message: input,
+          conversationId,
+          history: messages.slice(-10),
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to send message");
 
       const data = await res.json();
+      if (data.conversationId && data.conversationId !== conversationId) {
+        setConversationId(data.conversationId);
+      }
       setMessages(prev => [...prev, { role: "assistant", content: data.response }]);
     } catch (error) {
       toast({ variant: "destructive", title: "Error", description: "Failed to send message" });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNewConversation = () => {
+    setConversationId(null);
+    setMessages([]);
   };
 
   if (authLoading) {
@@ -122,7 +181,40 @@ export default function ChatPage() {
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-hidden">
+          <div className="flex h-full">
+            <aside className="hidden md:block w-64 border-r border-gray-800 bg-black/40 overflow-y-auto p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-sm font-semibold text-gray-300">Conversations</h2>
+                <Button size="sm" variant="outline" className="text-xs" onClick={handleNewConversation}>
+                  New
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {conversations.slice(0, 10).map((conv) => (
+                  <button
+                    key={conv.conversationId}
+                    className={`w-full text-left text-xs p-2 rounded-md border ${
+                      conv.conversationId === conversationId
+                        ? "border-blue-500 bg-blue-500/10 text-white"
+                        : "border-gray-800 bg-gray-900 text-gray-300 hover:border-gray-600"
+                    }`}
+                    onClick={() => {
+                      setConversationId(conv.conversationId);
+                      const restored: Message[] = [];
+                      conv.messages.forEach((m: any) => {
+                        if (m.message) restored.push({ role: "user", content: m.message });
+                        if (m.response) restored.push({ role: "assistant", content: m.response });
+                      });
+                      setMessages(restored);
+                    }}
+                  >
+                    {conv.firstMessage?.slice(0, 50) || "New conversation"}
+                  </button>
+                ))}
+              </div>
+            </aside>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -157,6 +249,8 @@ export default function ChatPage() {
             </div>
           )}
           <div ref={endRef} />
+            </div>
+          </div>
         </div>
 
         <div className="bg-gray-900 border-t border-gray-800 p-4">

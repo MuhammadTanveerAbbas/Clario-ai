@@ -2,9 +2,21 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
 import { sanitizeInput } from '@/lib/security'
-import Groq from 'groq-sdk'
+import { generateWithFallback } from '@/lib/ai-fallback'
+import { z } from 'zod'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
+
+const MeetingNotesSchema = z.object({
+  notes: z.string().min(10).max(50000),
+  title: z.string().min(1).max(200).optional(),
+})
+
+const MeetingOutputSchema = z.object({
+  summary: z.string(),
+  actionItems: z.array(z.string()),
+  keyPoints: z.array(z.string()),
+})
 
 export async function POST(request: Request) {
   try {
@@ -18,13 +30,20 @@ export async function POST(request: Request) {
       return rateLimitCheck.response!
     }
 
-    const { title, rawNotes } = await request.json()
-
-    if (!rawNotes) {
-      return NextResponse.json({ error: 'Raw notes are required' }, { status: 400 })
+    const body = await request.json()
+    const result = MeetingNotesSchema.safeParse({
+      notes: body.rawNotes ?? body.notes,
+      title: body.title,
+    })
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: result.error.issues },
+        { status: 400 }
+      )
     }
 
-    const sanitizedNotes = sanitizeInput(rawNotes)
+    const { title, notes } = result.data
+    const sanitizedNotes = sanitizeInput(notes)
 
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
@@ -43,42 +62,47 @@ export async function POST(request: Request) {
     const currentUsage = profile?.requests_used_this_month || 0
     const limit = tier === 'pro' ? 1000 : 100
 
-    // Unlimited access for admin
-    if (profile?.email !== 'muhammadtanveerabbas.dev@gmail.com' && currentUsage >= limit) {
+    if (profile?.email !== ADMIN_EMAIL && currentUsage >= limit) {
       return NextResponse.json(
         { error: 'Usage limit reached', message: `You've reached your ${tier} plan limit of ${limit} requests per month. Please upgrade to continue.` },
         { status: 403 }
       )
     }
 
-    const completion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a meeting notes assistant. Convert raw meeting notes into structured JSON with: summary (string), actionItems (array), keyPoints (array). Return ONLY the JSON object, no markdown, no code blocks.'
-        },
-        {
-          role: 'user',
-          content: sanitizedNotes
-        }
-      ],
-      model: 'llama-3.3-70b-versatile',
-      temperature: 0.5,
-      max_tokens: 1500,
-    })
+    const systemPrompt =
+      'You are a meeting notes assistant. Convert raw meeting notes into structured JSON with: summary (string), actionItems (array of strings), keyPoints (array of strings). Return ONLY a valid JSON object, no markdown, no code blocks.'
 
-    let content = completion.choices[0]?.message?.content || '{}'
+    const rawContent = await generateWithFallback(
+      sanitizedNotes,
+      systemPrompt,
+      { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.5 }
+    )
 
-    // Extract JSON from markdown code blocks if present
-    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/)
-    if (jsonMatch) {
-      content = jsonMatch[1].trim()
+    let parsed: unknown
+    try {
+      const match = rawContent.match(/```(?:json)?\s*([\s\S]*?)```/)
+      const jsonString = (match ? match[1] : rawContent).trim()
+      parsed = JSON.parse(jsonString)
+    } catch {
+      const fallback = {
+        summary: sanitizedNotes,
+        actionItems: [] as string[],
+        keyPoints: [] as string[],
+      }
+      return NextResponse.json({ structuredNotes: fallback })
     }
 
-    // Remove any leading/trailing whitespace
-    content = content.trim()
+    const validated = MeetingOutputSchema.safeParse(parsed)
+    if (!validated.success) {
+      const fallback = {
+        summary: sanitizedNotes,
+        actionItems: [] as string[],
+        keyPoints: [] as string[],
+      }
+      return NextResponse.json({ structuredNotes: fallback })
+    }
 
-    const structuredNotes = JSON.parse(content)
+    const structuredNotes = validated.data
 
     await supabase.from('meeting_notes').insert({
       user_id: user.id,

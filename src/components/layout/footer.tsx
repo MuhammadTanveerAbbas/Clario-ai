@@ -79,10 +79,10 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/documents"
+                  href="/meeting-notes"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Document Analyzer
+                  Meeting Notes
                 </Link>
               </li>
               <li>
@@ -110,7 +110,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:muhammadtanveerabbas.dev@gmail.com"
+                  href={`mailto:${process.env.ADMIN_EMAIL || 'admin@example.com'}`}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Contact
@@ -151,7 +151,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:muhammadtanveerabbas.dev@gmail.com"
+                  href={`mailto:${process.env.ADMIN_EMAIL || 'admin@example.com'}`}
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   Support

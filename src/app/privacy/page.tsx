@@ -19,8 +19,8 @@ export default function PrivacyPage() {
             </CardHeader>
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">1.1 Account Information:</strong> Email address, password (encrypted), subscription tier (Free or Pro), and payment information (processed securely by Stripe).</p>
-              <p><strong className="text-white">1.2 Usage Data:</strong> AI request counts (summaries, chat messages, writing sessions, meeting notes, quick notes), feature usage patterns, and timestamps.</p>
-              <p><strong className="text-white">1.3 Content Data:</strong> Text submitted for summarization, chat conversations, writing drafts, meeting transcripts, and quick notes you create.</p>
+              <p><strong className="text-white">1.2 Usage Data:</strong> AI request counts (summaries, chat messages, writing sessions, meeting notes), feature usage patterns, and timestamps.</p>
+              <p><strong className="text-white">1.3 Content Data:</strong> Text submitted for summarization, chat conversations, writing drafts, and meeting transcripts you create.</p>
               <p><strong className="text-white">1.4 Technical Data:</strong> IP address, browser type, device information, and session data for security and analytics.</p>
             </CardContent>
           </Card>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
             <CardContent className="text-gray-400 space-y-4">
               <p><strong className="text-white">2.1 Service Delivery:</strong> Process AI requests, provide chat responses, analyze text, deliver writing assistance, and generate meeting notes.</p>
               <p><strong className="text-white">2.2 Usage Tracking:</strong> Monitor monthly request limits (100 for Free, 1000 for Pro), track feature usage, and provide analytics dashboard.</p>
-              <p><strong className="text-white">2.3 Billing:</strong> Process payments for Pro subscriptions ($20/month), manage subscriptions, and handle refunds via Stripe.</p>
+              <p><strong className="text-white">2.3 Billing:</strong> Process payments for Pro subscriptions ($9/month), manage subscriptions, and handle refunds via Stripe.</p>
               <p><strong className="text-white">2.4 Improvements:</strong> Analyze usage patterns to improve AI models and enhance features.</p>
               <p><strong className="text-white">2.5 Communications:</strong> Send service updates, billing notifications, and security alerts.</p>
             </CardContent>

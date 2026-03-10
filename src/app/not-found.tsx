@@ -114,7 +114,7 @@ export default function NotFound() {
             {[
               { label: 'AI Chat', icon: MessageSquare, href: '/chat', color: 'from-blue-500 to-purple-600' },
               { label: 'Summarizer', icon: FileText, href: '/summarizer', color: 'from-green-500 to-blue-600' },
-              { label: 'Documents', icon: Search, href: '/documents', color: 'from-purple-500 to-pink-600' },
+              { label: 'Meeting Notes', icon: Search, href: '/meeting-notes', color: 'from-purple-500 to-pink-600' },
               { label: 'Writing', icon: Sparkles, href: '/writing', color: 'from-orange-500 to-red-600' }
             ].map((item) => (
               <Link key={item.label} href={item.href}>

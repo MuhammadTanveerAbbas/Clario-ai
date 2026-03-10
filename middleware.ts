@@ -5,7 +5,10 @@ import { RATE_LIMIT_CONFIG } from '@/lib/security-config'
 const rateLimitMap = new Map<string, { count: number; resetTime: number; blocked: boolean }>()
 
 function getRateLimitKey(request: NextRequest): string {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'anonymous'
   const path = request.nextUrl.pathname
   return `${ip}:${path}`
 }

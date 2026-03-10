@@ -1,9 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+function getServiceSupabase() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !/^https?:\/\//.test(url)) {
+    throw new Error('Invalid SUPABASE URL. Set NEXT_PUBLIC_SUPABASE_URL to a valid https:// URL.')
+  }
+  if (!serviceKey) {
+    throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY.')
+  }
+  return createClient(url, serviceKey)
+}
 
 export interface AnalyticsInsights {
   avgRequestsPerDay: number
@@ -15,6 +22,7 @@ export interface AnalyticsInsights {
 }
 
 export async function getAnalyticsInsights(userId: string): Promise<AnalyticsInsights> {
+  const supabase = getServiceSupabase()
   const today = new Date()
   const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
   const sixtyDaysAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000)
@@ -75,9 +83,11 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
     meetings: currentMonth?.reduce((sum, d) => sum + (d.meeting_notes_count || 0), 0) || 0,
   }
 
-  const mostUsedFeature = Object.entries(featureCounts).reduce((max, [key, val]) =>
-    val > (featureCounts[max as keyof typeof featureCounts] || 0) ? key : max
-  ) as string
+  type FeatureKey = keyof typeof featureCounts
+  const featureKeys = Object.keys(featureCounts) as FeatureKey[]
+  const mostUsedFeature: FeatureKey = featureKeys.reduce((max, key) =>
+    featureCounts[key] > featureCounts[max] ? key : max
+  , featureKeys[0] ?? 'summaries')
 
   // Calculate trend
   const trendPercentage = previousTotal > 0 
@@ -96,6 +106,7 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
 }
 
 export async function getFeatureBreakdown(userId: string) {
+  const supabase = getServiceSupabase()
   const currentMonth = new Date().toISOString().slice(0, 7)
   
   const { data } = await supabase

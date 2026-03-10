@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -20,17 +20,40 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  const supabase = await createClient()
+  console.log(`[Stripe Webhook] Event: ${event.type}, ID: ${event.id}`)
+
+  const supabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
 
   try {
+    const { data: existing } = await supabase
+      .from('processed_webhook_events')
+      .select('id')
+      .eq('id', event.id)
+      .single()
+
+    if (existing) {
+      return NextResponse.json({ received: true, duplicate: true })
+    }
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const userId = session.metadata?.userId
 
+        if (!session.customer) {
+          console.error('[Stripe] Missing customer ID in event:', event.id)
+          return NextResponse.json({ error: 'Missing customer' }, { status: 400 })
+        }
+
         if (userId) {
+          const priceId = session.line_items?.data?.[0]?.price?.id || session.metadata?.priceId
+          console.log('[Stripe] Checkout completed for user', userId, 'price', priceId)
+
           await supabase
-            .from('users')
+            .from('profiles')
             .update({
               subscription_tier: 'pro',
               subscription_status: 'active',
@@ -46,8 +69,11 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.userId
 
         if (userId) {
+          const priceId = subscription.items.data[0]?.price?.id
+          console.log('[Stripe] Subscription updated for user', userId, 'price', priceId)
+
           await supabase
-            .from('users')
+            .from('profiles')
             .update({
               subscription_status: subscription.status === 'active' ? 'active' : 'canceled',
               stripe_subscription_id: subscription.id,
@@ -62,8 +88,9 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.userId
 
         if (userId) {
+          console.log('[Stripe] Subscription deleted for user', userId)
           await supabase
-            .from('users')
+            .from('profiles')
             .update({
               subscription_tier: 'free',
               subscription_status: 'canceled',
@@ -74,6 +101,10 @@ export async function POST(request: Request) {
       }
     }
 
+    await supabase
+      .from('processed_webhook_events')
+      .insert({ id: event.id, processed_at: new Date().toISOString() })
+
     return NextResponse.json({ received: true })
   } catch (error: any) {
     console.error('Webhook processing error:', error)
@@ -83,3 +114,4 @@ export async function POST(request: Request) {
     )
   }
 }
+

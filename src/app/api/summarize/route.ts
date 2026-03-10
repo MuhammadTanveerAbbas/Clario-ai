@@ -3,9 +3,24 @@ import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
 import { sanitizeInput } from '@/lib/security'
 import { checkUsageLimit } from '@/lib/usage-limits'
-import Groq from 'groq-sdk'
+import { generateWithFallback } from '@/lib/ai-fallback'
+import { z } from 'zod'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY || '' })
+const SummarizeSchema = z.object({
+  text: z.string().min(10, 'Text too short').max(50000, 'Text too long'),
+  mode: z.enum([
+    'action-items',
+    'decisions',
+    'brutal-roast',
+    'executive-brief',
+    'full-breakdown',
+    'key-quotes',
+    'sentiment',
+    'eli5',
+    'swot',
+    'meeting-minutes',
+  ]),
+})
 
 export async function POST(request: Request) {
   try {
@@ -14,18 +29,15 @@ export async function POST(request: Request) {
       return rateLimitCheck.response!
     }
 
-    let body
-    try {
-      body = await request.json()
-    } catch (e) {
-      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    const body = await request.json()
+    const result = SummarizeSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: result.error.issues },
+        { status: 400 }
+      )
     }
-
-    const { text, mode } = body
-
-    if (!text || !mode) {
-      return NextResponse.json({ error: 'Text and mode are required' }, { status: 400 })
-    }
+    const { text, mode } = result.data
 
     const sanitizedText = sanitizeInput(text)
 
@@ -52,7 +64,7 @@ export async function POST(request: Request) {
     const currentUsage = profile?.requests_used_this_month || 0
     
     // Unlimited access for admin
-    if (profile?.email !== 'muhammadtanveerabbas.dev@gmail.com') {
+    if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
 
       if (!usageCheck.allowed) {
@@ -67,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     const modePrompts: Record<string, string> = {
-      'Action Items Only': `Extract all action items in a clean format.
+      'action-items': `Extract all action items in a clean format.
 
 # Action Items
 
@@ -91,7 +103,7 @@ export async function POST(request: Request) {
 
 **Summary:** [X] total • [X] high • [X] medium • [X] low`,
 
-      'Decisions Made': `Extract all key decisions with context.
+      'decisions': `Extract all key decisions with context.
 
 # Key Decisions
 
@@ -118,7 +130,7 @@ export async function POST(request: Request) {
 
 **Total:** [X] • **Strategic:** [X] • **Operational:** [X]`,
 
-      'Brutal Roast': `Provide witty, honest critique with real solutions.
+      'brutal-roast': `Provide witty, honest critique with real solutions.
 
 # The Brutal Truth
 
@@ -154,7 +166,7 @@ export async function POST(request: Request) {
 ## 🌟 Silver Lining
 [What's actually good]`,
 
-      'Executive Brief': `Create concise executive summary.
+      'executive-brief': `Create concise executive summary.
 
 # Executive Brief
 
@@ -196,7 +208,7 @@ export async function POST(request: Request) {
 
 **Decision Required:** [What needs approval]`,
 
-      'Full Breakdown': `Provide comprehensive analysis.
+      'full-breakdown': `Provide comprehensive analysis.
 
 # Complete Analysis
 
@@ -242,7 +254,7 @@ export async function POST(request: Request) {
 **Long-term:**
 1. [Consideration with rationale]`,
 
-      'Key Quotes': `Extract most impactful quotes.
+      'key-quotes': `Extract most impactful quotes.
 
 # Key Quotes
 
@@ -284,7 +296,7 @@ export async function POST(request: Request) {
 
 **Total:** [X] • **Dominant Theme:** [Theme]`,
 
-      'Sentiment Analysis': `Analyze emotional tone and sentiment.
+      'sentiment': `Analyze emotional tone and sentiment.
 
 # Sentiment Analysis
 
@@ -340,7 +352,7 @@ export async function POST(request: Request) {
 ## Recommendations
 [How to respond based on analysis]`,
 
-      'ELI5': `Explain in simplest terms possible.
+      'eli5': `Explain in simplest terms possible.
 
 # Simple Explanation
 
@@ -382,7 +394,7 @@ export async function POST(request: Request) {
 ## Fun Fact
 [Interesting tidbit]`,
 
-      'SWOT Analysis': `Conduct strategic SWOT analysis.
+      'swot': `Conduct strategic SWOT analysis.
 
 # SWOT Analysis
 
@@ -463,7 +475,7 @@ export async function POST(request: Request) {
 | Opportunities | [#] | [Level] |
 | Threats | [#] | [Level] |`,
 
-      'Meeting Minutes': `Create professional meeting minutes.
+      'meeting-minutes': `Create professional meeting minutes.
 
 # Meeting Minutes
 
@@ -549,7 +561,7 @@ export async function POST(request: Request) {
 **Next Meeting:** [Date] at [Time]`,
     }
 
-    const prompt = `${modePrompts[mode] || 'Summarize professionally with clear structure.'}
+    const systemPrompt = `${modePrompts[mode] || 'Summarize professionally with clear structure.'}
 
 FORMATTING RULES:
 - Write words normally without spacing between letters
@@ -557,19 +569,13 @@ FORMATTING RULES:
 - Use **bold** for emphasis
 - Use bullet points (-) and numbered lists (1. 2. 3.)
 - Use > for blockquotes
-- Use --- for section dividers
+- Use --- for section dividers`
 
-Text to summarize:
-${sanitizedText}`
-
-    const model = 'llama-3.3-70b-versatile'
-    const completion = await groq.chat.completions.create({
-      messages: [{ role: 'user', content: prompt }],
-      model,
-      temperature: 0.3,
-      max_tokens: 2000,
-    })
-    const summary = completion.choices[0]?.message?.content || 'Failed to generate summary'
+    const summary = await generateWithFallback(
+      `Text to summarize:\n${sanitizedText}`,
+      systemPrompt,
+      { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.3 }
+    )
 
     const cleanedSummary = summary
       .split('\n')

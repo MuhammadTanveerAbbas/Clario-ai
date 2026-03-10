@@ -367,7 +367,7 @@ export function SummarizerTool() {
         const data = await response.json();
         const tier = data.subscription_tier || 'free';
         const currentUsage = data.requests_used || 0;
-        const usage = checkUsageLimit(tier, undefined, currentUsage);
+        const usage = checkUsageLimit(tier, currentUsage);
         setState((prev) => ({
           ...prev,
           usageRemaining: usage.remaining,

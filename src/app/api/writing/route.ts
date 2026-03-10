@@ -3,6 +3,16 @@ import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
 import { sanitizeInput } from '@/lib/security'
 import { checkUsageLimit } from '@/lib/usage-limits'
+import { generateWithFallback } from '@/lib/ai-fallback'
+import { z } from 'zod'
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
+
+const WritingSchema = z.object({
+  text: z.string().min(10).max(50000),
+  action: z.enum(['improve', 'rewrite', 'expand', 'summarize', 'grammar']),
+  tone: z.enum(['professional', 'casual', 'formal', 'friendly', 'technical']),
+})
 
 export async function POST(request: Request) {
   try {
@@ -17,14 +27,23 @@ export async function POST(request: Request) {
       return rateLimitCheck.response!
     }
 
-    const { content, tone, action } = await request.json()
-
-    if (!content || !tone) {
-      return NextResponse.json({ error: 'Content and tone are required' }, { status: 400 })
+    const body = await request.json()
+    const result = WritingSchema.safeParse({
+      text: body.content ?? body.text,
+      action: body.action,
+      tone: body.tone,
+    })
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: result.error.issues },
+        { status: 400 }
+      )
     }
 
+    const { text, tone, action } = result.data
+
     // Sanitize input
-    const sanitizedContent = sanitizeInput(content)
+    const sanitizedContent = sanitizeInput(text)
 
     if (sanitizedContent.length < 10) {
       return NextResponse.json({ error: 'Content must be at least 10 characters' }, { status: 400 })
@@ -50,10 +69,7 @@ export async function POST(request: Request) {
     const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
     const currentUsage = profile?.requests_used_this_month || 0
     
-    // Unlimited access for admin
-    if (profile?.email === 'muhammadtanveerabbas.dev@gmail.com') {
-      // Continue without checking limits
-    } else {
+    if (profile?.email !== ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
       if (!usageCheck.allowed) {
         return NextResponse.json(
@@ -66,7 +82,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Create prompt based on action and tone
     const actionPrompts = {
       improve: `Improve the following text to make it more ${tone}. Keep the core message but enhance clarity, flow, and impact:`,
       rewrite: `Rewrite the following text in a ${tone} tone while maintaining the original meaning:`,
@@ -75,38 +90,16 @@ export async function POST(request: Request) {
       grammar: `Fix grammar, spelling, and punctuation errors in the following text while maintaining a ${tone} tone:`
     }
 
-    const prompt = actionPrompts[action as keyof typeof actionPrompts] || actionPrompts.improve
+    const systemPrompt =
+      "You are an expert writing assistant for indie hackers and solo founders. Help improve, rewrite, and enhance text based on the user's requirements. Always maintain the original intent while improving clarity and style."
 
-    // Use Groq for writing assistance
-    const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are an expert writing assistant. Help improve, rewrite, and enhance text based on the user\'s requirements. Always maintain the original intent while improving clarity and style.'
-          },
-          {
-            role: 'user',
-            content: `${prompt}\n\n${sanitizedContent}`
-          }
-        ],
-        max_tokens: 1500,
-        temperature: 0.7,
-      }),
+    const prompt = `${actionPrompts[action]} \n\n${sanitizedContent}`
+
+    const improvedText = await generateWithFallback(prompt, systemPrompt, {
+      model: 'llama-3.3-70b-versatile',
+      maxTokens: 3000,
+      temperature: 0.7,
     })
-
-    if (!groqResponse.ok) {
-      throw new Error('Failed to improve text')
-    }
-
-    const groqResult = await groqResponse.json()
-    const improvedText = groqResult.choices[0]?.message?.content || 'Unable to improve text'
 
     // Save to database
     await supabase.from('writing_sessions').insert({

@@ -39,9 +39,8 @@ export default function TermsPage() {
             <CardContent className="text-gray-400 space-y-4">
               <p>
                 Clario provides AI powered tools including Text Summarizer (10
-                modes), AI Chat, Writing Assistant (5 actions), Meeting Notes
-                Generator, and Quick Notes with real-time analytics and usage
-                tracking.
+                modes), AI Chat, Writing Assistant (5 actions), and a Meeting Notes
+                generator with real-time analytics and usage tracking.
               </p>
             </CardContent>
           </Card>
@@ -55,7 +54,7 @@ export default function TermsPage() {
             <CardContent className="text-gray-400 space-y-4">
               <p>
                 <strong className="text-white">3.1 Plans:</strong> Free
-                ($0/month with 100 requests), Pro ($20/month with 1000 requests)
+                ($0/month with 100 requests), Pro ($9/month with 1000 requests)
               </p>
               <p>
                 <strong className="text-white">3.2 Payment Processing:</strong>{" "}

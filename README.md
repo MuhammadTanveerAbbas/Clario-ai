@@ -14,7 +14,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 
 ### Platform Features
 
-- **Authentication**: Email/password and social login (Google, GitHub) via Supabase
+- **Authentication**: Email/password and social login (Google) via Supabase
 - **Subscription Plans**: Free (100 requests/month) and Pro ($20/month with 1000 requests)
 - **Usage Tracking**: Real-time usage monitoring with monthly request limits
 - **Dashboard**: Interactive charts showing usage trends and activity
