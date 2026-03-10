@@ -198,7 +198,7 @@ export default function Home() {
                 style={{ animationDelay: "0.2s" }}
               >
                 Clario replaces ChatGPT, Notion AI, Otter, and your writing assistant in one tab.
-                Summarize, chat, write, and capture meeting notes — all for $9/month.
+                Summarize, chat, write, and capture meeting notes all for $9/month.
               </p>
               <div
                 className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 animate-fade-in-up px-4"
@@ -213,7 +213,7 @@ export default function Home() {
                 >
                   <span className="relative z-10 flex items-center justify-center">
                     <Zap className="mr-2 h-4 w-4 sm:h-5 sm:w-5 text-[#4169E1]" />
-                    {user ? "Go to Dashboard" : "Start free — no credit card →"}
+                    {user ? "Go to Dashboard" : "Start your Productivity"}
                   </span>
                   <div className="absolute inset-0 -z-0 bg-gradient-to-r from-gray-100 to-white opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                 </Button>

@@ -10,7 +10,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
 
 const ChatSchema = z.object({
   message: z.string().min(1).max(10000),
-  conversationId: z.string().uuid().optional(),
+  conversationId: z.string().nullable().optional(),
   history: z
     .array(
       z.object({
@@ -118,8 +118,9 @@ How You Respond:
     return NextResponse.json({ response: aiResponse, conversationId: finalConversationId })
   } catch (error: any) {
     console.error('Chat API error:', error)
+    const message = error?.message || 'Failed to generate response'
     return NextResponse.json(
-      { error: 'Failed to generate response' },
+      { error: message },
       { status: 500 }
     )
   }

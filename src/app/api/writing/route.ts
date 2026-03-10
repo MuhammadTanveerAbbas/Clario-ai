@@ -124,8 +124,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ improvedText })
   } catch (error: any) {
     console.error('Writing assistance error:', error)
+    const message = error?.message || 'Failed to improve text'
     return NextResponse.json(
-      { error: error.message || 'Failed to improve text' },
+      { error: message },
       { status: 500 }
     )
   }

@@ -24,50 +24,59 @@ export default function DashboardPage() {
       router.push("/sign-in");
       return;
     }
-    if (user) loadData();
+    if (user) {
+      loadData();
+      // Poll for updates every 5 seconds
+      const interval = setInterval(loadData, 5000);
+      return () => clearInterval(interval);
+    }
   }, [user, authLoading]);
 
   const loadData = async () => {
-    const supabase = createClient();
-    const [usage, usageStats] = await Promise.all([
-      fetch("/api/usage").then(r => r.json()).catch(() => ({ requests_used: 0, limit: 100 })),
-      supabase.from("usage_stats").select("*").eq("user_id", user!.id).order("date", { ascending: false }),
-    ]);
-    
-    const allStats = usageStats.data || [];
-    const now = new Date();
-    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    const monthlyStats = allStats.filter(d => new Date(d.date) >= firstOfMonth);
-    const monthlyTotal = monthlyStats.reduce((sum, d) => sum + (d.total_requests || 0), 0);
-    
-    const totals = allStats.reduce((acc, d) => ({
-      summaries: acc.summaries + (d.summaries_count || 0),
-      chats: acc.chats + (d.chats_count || 0),
-      meetings: acc.meetings + (d.meeting_notes_count || 0),
-      writing: acc.writing + (d.writing_count || 0),
-    }), { summaries: 0, chats: 0, meetings: 0, writing: 0 });
-    
-    setStats({
-      summaries: totals.summaries,
-      chats: totals.chats,
-      meetings: totals.meetings,
-      writing: totals.writing,
-      used: monthlyTotal,
-      limit: usage.limit || 100,
-    });
+    try {
+      const supabase = createClient();
+      const [usage, usageStats] = await Promise.all([
+        fetch("/api/usage").then(r => r.json()).catch(() => ({ requests_used: 0, limit: 100 })),
+        supabase.from("usage_stats").select("*").eq("user_id", user!.id).order("date", { ascending: false }),
+      ]);
+      
+      const allStats = usageStats.data || [];
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      
+      const monthlyStats = allStats.filter(d => new Date(d.date) >= firstOfMonth);
+      const monthlyTotal = monthlyStats.reduce((sum, d) => sum + (d.total_requests || 0), 0);
+      
+      const totals = allStats.reduce((acc, d) => ({
+        summaries: acc.summaries + (d.summaries_count || 0),
+        chats: acc.chats + (d.chats_count || 0),
+        meetings: acc.meetings + (d.meeting_notes_count || 0),
+        writing: acc.writing + (d.writing_count || 0),
+      }), { summaries: 0, chats: 0, meetings: 0, writing: 0 });
+      
+      setStats({
+        summaries: totals.summaries,
+        chats: totals.chats,
+        meetings: totals.meetings,
+        writing: totals.writing,
+        used: monthlyTotal,
+        limit: usage.limit || 100,
+      });
 
-    setChartData(
-      allStats.slice(0, 7).reverse().map((d: any) => ({
-        date: new Date(d.date).toLocaleDateString("en", { month: "short", day: "numeric" }),
-        summaries: d.summaries_count || 0,
-        chats: d.chats_count || 0,
-        writing: d.writing_count || 0,
-        meetings: d.meeting_notes_count || 0,
-        total: d.total_requests || 0,
-      }))
-    );
-    setLoading(false);
+      setChartData(
+        allStats.slice(0, 7).reverse().map((d: any) => ({
+          date: new Date(d.date).toLocaleDateString("en", { month: "short", day: "numeric" }),
+          summaries: d.summaries_count || 0,
+          chats: d.chats_count || 0,
+          writing: d.writing_count || 0,
+          meetings: d.meeting_notes_count || 0,
+          total: d.total_requests || 0,
+        }))
+      );
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to load dashboard data:", error);
+    }
   };
 
   if (authLoading || loading) {

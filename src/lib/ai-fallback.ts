@@ -1,8 +1,18 @@
 import Groq from 'groq-sdk'
-import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY! })
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
+const groqApiKey = process.env.GROQ_API_KEY
+
+if (!groqApiKey) {
+  throw new Error('GROQ_API_KEY environment variable is not set')
+}
+
+let groq: Groq | null = null
+
+try {
+  groq = new Groq({ apiKey: groqApiKey })
+} catch (e) {
+  console.error('[AI] Failed to initialize Groq:', e)
+}
 
 export async function generateWithFallback(
   prompt: string,
@@ -14,6 +24,10 @@ export async function generateWithFallback(
   } = {}
 ): Promise<string> {
   const { model = 'llama-3.3-70b-versatile', maxTokens = 2048, temperature = 0.7 } = options
+
+  if (!groq) {
+    throw new Error('Groq API not initialized. Check GROQ_API_KEY.')
+  }
 
   try {
     const response = await groq.chat.completions.create({
@@ -27,18 +41,10 @@ export async function generateWithFallback(
     })
     console.log(`[AI] Groq success — model: ${model}`)
     return response.choices[0]?.message?.content || ''
-  } catch (groqError) {
-    console.error('[AI] Groq failed, falling back to Gemini:', groqError)
+  } catch (groqError: any) {
+    console.error('[AI] Groq failed:', groqError?.message || groqError)
+
   }
 
-  try {
-    const geminiModel = gemini.getGenerativeModel({ model: 'gemini-2.0-flash-exp' })
-    const result = await geminiModel.generateContent(`${systemPrompt}\n\n${prompt}`)
-    console.log('[AI] Gemini fallback success')
-    return result.response.text()
-  } catch (geminiError) {
-    console.error('[AI] Both Groq and Gemini failed:', geminiError)
-    throw new Error('AI service temporarily unavailable. Please try again in a moment.')
-  }
+  throw new Error(`Groq API error: ${groqError?.message || 'Unknown error'}`)
 }
-

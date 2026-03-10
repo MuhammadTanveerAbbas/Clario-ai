@@ -626,8 +626,9 @@ FORMATTING RULES:
     return NextResponse.json({ summary: cleanedSummary })
   } catch (error: any) {
     console.error('Summarize API error:', error)
+    const message = error?.message || 'Failed to generate summary'
     return NextResponse.json(
-      { error: error.message || 'Failed to generate summary' },
+      { error: message },
       { status: 500 }
     )
   }

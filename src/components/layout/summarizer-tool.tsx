@@ -159,6 +159,21 @@ const SUMMARY_MODES: readonly SummaryMode[] = [
 const isValidMode = (mode: string): mode is ModeValue =>
   SUMMARY_MODES.some((m) => m.value === mode);
 
+const modeToApiFormat = (mode: ModeValue): string => {
+  const mapping: Record<ModeValue, string> = {
+    'Action Items Only': 'action-items',
+    'Decisions Made': 'decisions',
+    'Brutal Roast': 'brutal-roast',
+    'Executive Brief': 'executive-brief',
+    'Full Breakdown': 'full-breakdown',
+    'Key Quotes': 'key-quotes',
+    'Sentiment Analysis': 'sentiment',
+    'ELI5': 'eli5',
+    'SWOT Analysis': 'swot',
+    'Meeting Minutes': 'meeting-minutes',
+  };
+  return mapping[mode] || mode;
+};
 const getStorageValue = (key: string): string | null => {
   try {
     return localStorage.getItem(key);
@@ -211,7 +226,10 @@ const createSummaryService = (): SummaryService => ({
       const response = await fetch("/api/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
+        body: JSON.stringify({
+          text: request.text,
+          mode: modeToApiFormat(request.mode),
+        }),
         signal: controller.signal,
       });
 

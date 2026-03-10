@@ -124,6 +124,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ structuredNotes })
   } catch (error: any) {
     console.error('Meeting notes API error:', error)
-    return NextResponse.json({ error: error.message || 'Failed to generate notes' }, { status: 500 })
+    const message = error?.message || 'Failed to generate notes'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

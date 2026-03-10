@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { useEffect } from 'react'
 
 export function initPostHog() {
-  if (typeof window !== 'undefined' && !posthog.__loaded) {
+  if (typeof window !== 'undefined' && !posthog.__loaded && process.env.NODE_ENV === 'production') {
     const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://app.posthog.com'
 
@@ -28,7 +28,7 @@ export function initPostHog() {
 }
 
 export function trackEvent(eventName: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && posthog.__loaded) {
+  if (typeof window !== 'undefined' && posthog.__loaded && process.env.NODE_ENV === 'production') {
     posthog.capture(eventName, properties)
   }
 }
@@ -60,21 +60,19 @@ export function trackSubscriptionChange(userId: string, oldTier: string, newTier
 }
 
 export function identifyUser(userId: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && posthog.__loaded) {
+  if (typeof window !== 'undefined' && posthog.__loaded && process.env.NODE_ENV === 'production') {
     posthog.identify(userId, properties)
   }
 }
 
 export function resetUser() {
-  if (typeof window !== 'undefined' && posthog.__loaded) {
+  if (typeof window !== 'undefined' && posthog.__loaded && process.env.NODE_ENV === 'production') {
     posthog.reset()
   }
 }
 
-// Hook to initialize PostHog
 export function usePostHog() {
   useEffect(() => {
     initPostHog()
   }, [])
 }
-
