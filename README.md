@@ -2,7 +2,7 @@
 
 An AI powered SaaS platform built with Next.js, featuring text summarization, AI chat, writing assistance, and meeting notes.
 
-## 🚀 Features
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/rocket.svg" width="20" height="20" alt="rocket"/> Features
 
 ### Core AI Features
 
@@ -21,7 +21,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 - **Settings**: Profile management and password changes
 - **Security**: Row Level Security (RLS), PKCE authentication, secure session management
 
-## 📦 Tech Stack
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/package.svg" width="20" height="20" alt="package"/> Tech Stack
 
 ### Frontend
 
@@ -47,7 +47,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 - **Package Manager**: npm
 - **Testing**: Jest + React Testing Library
 
-## 🛠️ Installation
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/wrench.svg" width="20" height="20" alt="wrench"/> Installation
 
 ### Prerequisites
 
@@ -91,7 +91,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 
 6. **Open** [http://localhost:3000](http://localhost:3000)
 
-## 📚 Documentation
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/book.svg" width="20" height="20" alt="book"/> Documentation
 
 - **[SETUP_GUIDE.md](./SETUP_GUIDE.md)**: Comprehensive setup instructions for all services
 - **[POSTHOG_SETUP.md](./POSTHOG_SETUP.md)**: Step-by-step PostHog analytics setup guide
@@ -99,7 +99,7 @@ An AI powered SaaS platform built with Next.js, featuring text summarization, AI
 - **API Documentation**: See `/src/app/api` for API route implementations
 - **Database Schema**: See `supabase/schema.sql`
 
-## 🏗️ Project Structure
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/building.svg" width="20" height="20" alt="building"/> Project Structure
 
 ```
 Clario/
@@ -137,7 +137,7 @@ Clario/
 └── README.md                   # This file
 ```
 
-## 💰 Pricing
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/dollar-sign.svg" width="20" height="20" alt="pricing"/> Pricing
 
 ### Free Plan - $0/month
 
@@ -154,7 +154,7 @@ Clario/
 
 **What counts as a request?** Each AI operation: summarization, chat message, writing assistance, meeting notes generation, or quick note creation.
 
-## 🔐 Environment Variables
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/lock.svg" width="20" height="20" alt="lock"/> Environment Variables
 
 See `.env.example` for all required environment variables. Key variables include:
 
@@ -171,7 +171,7 @@ See `.env.example` for all required environment variables. Key variables include
 - `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
 - `NEXT_PUBLIC_STRIPE_PRICE_ID` - Stripe price ID for Pro plan
 
-## 🚢 Deployment
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/ship.svg" width="20" height="20" alt="ship"/> Deployment
 
 ### Vercel (Recommended)
 
@@ -195,7 +195,7 @@ Make sure to:
 - Configure database connection
 - Run database migrations
 
-## 🔒 Security Features
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/shield.svg" width="20" height="20" alt="shield"/> Security Features
 
 - Row Level Security (RLS) on all database tables
 - PKCE authentication flow
@@ -206,19 +206,19 @@ Make sure to:
 - Sentry error monitoring
 - Rate limiting on API endpoints
 
-## 📊 Monitoring & Analytics
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/bar-chart-2.svg" width="20" height="20" alt="chart"/> Monitoring & Analytics
 
 - **Sentry**: Error tracking and performance monitoring
 - **PostHog**: Privacy-focused user behavior analytics
 - **Supabase**: Real-time database monitoring
 
-## 💳 Payments
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/credit-card.svg" width="20" height="20" alt="card"/> Payments
 
 - Stripe payment processor for Pro plan subscriptions
 - 30-day money-back guarantee
 - Cancel anytime with no penalties
 
-## 🤝 Contributing
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/users.svg" width="20" height="20" alt="users"/> Contributing
 
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature-name`
@@ -226,11 +226,11 @@ Make sure to:
 4. Push to branch: `git push origin feature-name`
 5. Open a Pull Request
 
-## 📝 License
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/file-text.svg" width="20" height="20" alt="file"/> License
 
 MIT License - see LICENSE file for details.
 
-## 🙏 Acknowledgments
+## <img src="https://cdn.jsdelivr.net/npm/lucide-static@latest/icons/heart.svg" width="20" height="20" alt="heart"/> Acknowledgments
 
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [ShadCN UI](https://ui.shadcn.com/)

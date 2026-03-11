@@ -184,22 +184,7 @@ export function Footer() {
                 All Systems Operational
               </Badge>
             </div>
-            <div className="flex items-center space-x-6 text-xs text-gray-500">
-              <span>Built with Next.js 15</span>
-              <span>•</span>
-              <span>Powered by AI</span>
-              <span>•</span>
-              <span>
-                Made by{" "}
-                <a
-                  href="https://muhammadtanveerabbas.vercel.app/"
-                  target="_blank"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Muhammad Tanveer Abbas
-                </a>
-              </span>
-            </div>
+
           </div>
         </div>
       </div>
