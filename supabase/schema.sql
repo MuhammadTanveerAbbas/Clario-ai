@@ -1,6 +1,6 @@
--- Combined Clario Supabase migrations
--- This file merges: setup.sql, fix-fk.sql, fix-performance.sql,
--- migration-indexes.sql, migration-webhook-idempotency.sql
+-- Clario Database Schema
+-- AI-powered content processing tool for creators
+-- Features: AI Chat + Text Summarizer + Content Remix Studio + Brand Voice Library
 
 -- ================================
 -- 1. Profiles & Usage Stats Setup
@@ -21,8 +21,8 @@ CREATE TABLE IF NOT EXISTS public.usage_stats (
   date DATE DEFAULT CURRENT_DATE NOT NULL,
   summaries_count INTEGER DEFAULT 0,
   chats_count INTEGER DEFAULT 0,
-  writing_count INTEGER DEFAULT 0,
-  meeting_notes_count INTEGER DEFAULT 0,
+  remix_count INTEGER DEFAULT 0,
+  brand_voice_count INTEGER DEFAULT 0,
   total_requests INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -68,27 +68,38 @@ CREATE POLICY "Users can view own messages" ON public.chat_messages FOR SELECT U
 CREATE POLICY "Users can insert own messages" ON public.chat_messages FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
 CREATE POLICY "Users can delete own messages" ON public.chat_messages FOR DELETE USING ((SELECT auth.uid()) = user_id);
 
--- Writing Sessions
-DROP POLICY IF EXISTS "Users can view own sessions" ON public.writing_sessions;
-DROP POLICY IF EXISTS "Users can view own writing" ON public.writing_sessions;
-DROP POLICY IF EXISTS "Users can insert own sessions" ON public.writing_sessions;
-DROP POLICY IF EXISTS "Users can insert own writing" ON public.writing_sessions;
-DROP POLICY IF EXISTS "Users can delete own sessions" ON public.writing_sessions;
-CREATE POLICY "Users can view own writing" ON public.writing_sessions FOR SELECT USING ((SELECT auth.uid()) = user_id);
-CREATE POLICY "Users can insert own writing" ON public.writing_sessions FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
-CREATE POLICY "Users can delete own writing" ON public.writing_sessions FOR DELETE USING ((SELECT auth.uid()) = user_id);
+-- Writing Sessions (deprecated - kept for backward compatibility)
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'writing_sessions') THEN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own sessions" ON public.writing_sessions';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own writing" ON public.writing_sessions';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own sessions" ON public.writing_sessions';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own writing" ON public.writing_sessions';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete own sessions" ON public.writing_sessions';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete own writing" ON public.writing_sessions';
+    EXECUTE 'CREATE POLICY "Users can view own writing" ON public.writing_sessions FOR SELECT USING ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'CREATE POLICY "Users can insert own writing" ON public.writing_sessions FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'CREATE POLICY "Users can delete own writing" ON public.writing_sessions FOR DELETE USING ((SELECT auth.uid()) = user_id)';
+  END IF;
+END $$;
 
--- Meeting Notes
-DROP POLICY IF EXISTS "Users can view own meeting notes" ON public.meeting_notes;
-DROP POLICY IF EXISTS "Users can view own meetings" ON public.meeting_notes;
-DROP POLICY IF EXISTS "Users can insert own meeting notes" ON public.meeting_notes;
-DROP POLICY IF EXISTS "Users can insert own meetings" ON public.meeting_notes;
-DROP POLICY IF EXISTS "Users can update own meeting notes" ON public.meeting_notes;
-DROP POLICY IF EXISTS "Users can delete own meeting notes" ON public.meeting_notes;
-CREATE POLICY "Users can view own meetings" ON public.meeting_notes FOR SELECT USING ((SELECT auth.uid()) = user_id);
-CREATE POLICY "Users can insert own meetings" ON public.meeting_notes FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
-CREATE POLICY "Users can update own meetings" ON public.meeting_notes FOR UPDATE USING ((SELECT auth.uid()) = user_id);
-CREATE POLICY "Users can delete own meetings" ON public.meeting_notes FOR DELETE USING ((SELECT auth.uid()) = user_id);
+-- Meeting Notes (deprecated - kept for backward compatibility)
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'meeting_notes') THEN
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own meeting notes" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can view own meetings" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own meeting notes" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can insert own meetings" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update own meeting notes" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can update own meetings" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete own meeting notes" ON public.meeting_notes';
+    EXECUTE 'DROP POLICY IF EXISTS "Users can delete own meetings" ON public.meeting_notes';
+    EXECUTE 'CREATE POLICY "Users can view own meetings" ON public.meeting_notes FOR SELECT USING ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'CREATE POLICY "Users can insert own meetings" ON public.meeting_notes FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'CREATE POLICY "Users can update own meetings" ON public.meeting_notes FOR UPDATE USING ((SELECT auth.uid()) = user_id)';
+    EXECUTE 'CREATE POLICY "Users can delete own meetings" ON public.meeting_notes FOR DELETE USING ((SELECT auth.uid()) = user_id)';
+  END IF;
+END $$;
 
 -- Usage Stats
 DROP POLICY IF EXISTS "Users can view own usage stats" ON public.usage_stats;
@@ -186,20 +197,20 @@ BEGIN
     WHERE id = p_user_id;
   END IF;
 
-  INSERT INTO public.usage_stats (user_id, date, summaries_count, chats_count, writing_count, meeting_notes_count, total_requests)
+  INSERT INTO public.usage_stats (user_id, date, summaries_count, chats_count, remix_count, brand_voice_count, total_requests)
   VALUES (
     p_user_id, CURRENT_DATE,
     CASE WHEN p_type = 'summary' THEN p_count ELSE 0 END,
     CASE WHEN p_type = 'chat' THEN p_count ELSE 0 END,
-    CASE WHEN p_type = 'writing' THEN p_count ELSE 0 END,
-    CASE WHEN p_type = 'meeting' THEN p_count ELSE 0 END,
+    CASE WHEN p_type = 'remix' THEN p_count ELSE 0 END,
+    CASE WHEN p_type = 'brand_voice' THEN p_count ELSE 0 END,
     p_count
   )
   ON CONFLICT (user_id, date) DO UPDATE SET
     summaries_count = usage_stats.summaries_count + CASE WHEN p_type = 'summary' THEN p_count ELSE 0 END,
     chats_count = usage_stats.chats_count + CASE WHEN p_type = 'chat' THEN p_count ELSE 0 END,
-    writing_count = usage_stats.writing_count + CASE WHEN p_type = 'writing' THEN p_count ELSE 0 END,
-    meeting_notes_count = usage_stats.meeting_notes_count + CASE WHEN p_type = 'meeting' THEN p_count ELSE 0 END,
+    remix_count = usage_stats.remix_count + CASE WHEN p_type = 'remix' THEN p_count ELSE 0 END,
+    brand_voice_count = usage_stats.brand_voice_count + CASE WHEN p_type = 'brand_voice' THEN p_count ELSE 0 END,
     total_requests = usage_stats.total_requests + p_count;
 
   IF NOT v_is_admin THEN
@@ -226,10 +237,17 @@ CREATE INDEX IF NOT EXISTS idx_ai_summaries_created_at ON ai_summaries(created_a
 CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id ON chat_messages(user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_conversation_id ON chat_messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_writing_sessions_user_id ON writing_sessions(user_id);
-CREATE INDEX IF NOT EXISTS idx_writing_sessions_created_at ON writing_sessions(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_meeting_notes_user_id ON meeting_notes(user_id);
-CREATE INDEX IF NOT EXISTS idx_meeting_notes_created_at ON meeting_notes(created_at DESC);
+-- Deprecated indexes (kept for backward compatibility)
+DO $$ BEGIN
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'writing_sessions') THEN
+    CREATE INDEX IF NOT EXISTS idx_writing_sessions_user_id ON writing_sessions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_writing_sessions_created_at ON writing_sessions(created_at DESC);
+  END IF;
+  IF EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'meeting_notes') THEN
+    CREATE INDEX IF NOT EXISTS idx_meeting_notes_user_id ON meeting_notes(user_id);
+    CREATE INDEX IF NOT EXISTS idx_meeting_notes_created_at ON meeting_notes(created_at DESC);
+  END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_usage_stats_user_id ON usage_stats(user_id);
 CREATE INDEX IF NOT EXISTS idx_usage_stats_date ON usage_stats(date DESC);
 CREATE INDEX IF NOT EXISTS idx_usage_stats_user_date ON usage_stats(user_id, date DESC);
@@ -245,7 +263,35 @@ CREATE TABLE IF NOT EXISTS processed_webhook_events (
 ALTER TABLE processed_webhook_events ENABLE ROW LEVEL SECURITY;
 
 -- ================================
--- 6. Final
+-- 6. Brand Voice Library
+-- ================================
+
+CREATE TABLE IF NOT EXISTS public.brand_voices (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  examples TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.brand_voices ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own voices" ON public.brand_voices FOR SELECT USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can insert own voices" ON public.brand_voices FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can update own voices" ON public.brand_voices FOR UPDATE USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "Users can delete own voices" ON public.brand_voices FOR DELETE USING ((SELECT auth.uid()) = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_brand_voices_user_id ON public.brand_voices(user_id);
+CREATE INDEX IF NOT EXISTS idx_brand_voices_is_active ON public.brand_voices(user_id, is_active);
+
+CREATE TRIGGER update_brand_voices_updated_at
+BEFORE UPDATE ON public.brand_voices
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ================================
+-- 7. Final
 -- ================================
 
 NOTIFY pgrst, 'reload schema';

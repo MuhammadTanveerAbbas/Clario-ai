@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
-import { sanitizeInput } from '@/lib/security'
+import { sanitizeAndValidate } from '@/lib/input-validation'
 import { checkUsageLimit } from '@/lib/usage-limits'
 import { generateWithFallback } from '@/lib/ai-fallback'
 import { z } from 'zod'
@@ -39,11 +39,11 @@ export async function POST(request: Request) {
     }
     const { text, mode } = result.data
 
-    const sanitizedText = sanitizeInput(text)
-
-    if (sanitizedText.length < 10) {
-      return NextResponse.json({ error: 'Text must be at least 10 characters' }, { status: 400 })
+    const validation = sanitizeAndValidate(text, 50000)
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
     }
+    const sanitizedText = validation.sanitized
 
     const supabase = await createClient()
     const {

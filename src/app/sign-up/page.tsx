@@ -182,7 +182,7 @@ function SignUpForm() {
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-0.5">
               Clario
             </h1>
-            <p className="text-gray-400 text-xs">AI Powered Productivity Platform</p>
+            <p className="text-gray-400 text-xs">Turn YouTube videos into content</p>
           </div>
         </motion.div>
 
@@ -192,7 +192,7 @@ function SignUpForm() {
               Create Account
             </CardTitle>
             <CardDescription className="text-center text-gray-400 text-xs">
-              Start your productivity journey
+              Join creators who repurpose content 10x faster
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 px-6 pb-6">

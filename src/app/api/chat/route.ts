@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { checkRateLimit } from '@/middleware/rate-limit'
-import { sanitizeInput } from '@/lib/security'
+import { sanitizeAndValidate } from '@/lib/input-validation'
 import { checkUsageLimit } from '@/lib/usage-limits'
 import { generateWithFallback } from '@/lib/ai-fallback'
 import { z } from 'zod'
@@ -39,7 +39,12 @@ export async function POST(request: Request) {
     }
 
     const { message, conversationId, history } = result.data
-    const sanitizedMessage = sanitizeInput(message)
+    
+    const validation = sanitizeAndValidate(message, 10000)
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+    const sanitizedMessage = validation.sanitized
 
     const supabase = await createClient()
     const {
@@ -72,12 +77,22 @@ export async function POST(request: Request) {
       }
     }
 
-    const systemPrompt = `You are Clario, an AI powered productivity assistant for indie hackers and solo founders using the Clario Hub platform.
+    const systemPrompt = `You are Clario, an AI assistant for content creators (YouTubers, podcasters, bloggers, newsletter writers).
 
-How You Respond:
-- Be concise but helpful, focused on founder workflows
-- Ask clarifying questions only when truly necessary
-- When relevant, suggest which of the 4 tools (Summarizer, Chat, Writing, Meeting Notes) would be best next step.`
+Your expertise:
+- Content strategy and ideation
+- Hook writing and engagement tactics
+- Platform-specific advice (YouTube, Twitter, LinkedIn, TikTok)
+- Repurposing content across platforms
+- Analyzing what makes content viral
+- Improving titles, thumbnails, and descriptions
+
+How you respond:
+- Be specific and actionable
+- Give examples when possible
+- Focus on what works NOW (current trends)
+- Suggest Clario's Summarizer for long content analysis
+- Keep it practical, not theoretical`
 
     const limitedHistory = (history || []).slice(-10)
     const historyText = limitedHistory

@@ -142,7 +142,7 @@ function SignInForm() {
             <h1 className="text-xl sm:text-2xl font-bold text-white mb-0.5">
               Clario
             </h1>
-            <p className="text-gray-400 text-xs">AI Powered Productivity Platform</p>
+            <p className="text-gray-400 text-xs">Turn YouTube videos into content</p>
           </div>
         </motion.div>
 
@@ -152,7 +152,7 @@ function SignInForm() {
               Welcome Back
             </CardTitle>
             <CardDescription className="text-center text-gray-400 text-xs">
-              Sign in to your account to continue
+              Sign in to continue creating content
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3 px-6 pb-6">

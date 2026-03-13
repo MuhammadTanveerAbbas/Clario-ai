@@ -6,11 +6,10 @@ import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Check, Zap, Star, Sparkles } from 'lucide-react'
+import { Check, Zap, Star, Sparkles, Youtube, Twitter, Linkedin } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/hooks/use-toast'
-import Link from 'next/link'
 import { useState } from 'react'
 
 const plans = [
@@ -18,18 +17,16 @@ const plans = [
     name: 'Free',
     price: '$0',
     period: 'forever',
-    description: 'Perfect for getting started with AI powered productivity',
+    description: 'Perfect for testing with real content',
     features: [
       '100 AI requests per month',
-      'Text Summarizer (10 modes)',
-      'AI Chat with history',
-      'Writing Assistant (5 actions)',
-      'Meeting Notes Generator',
-      'Export to Markdown/TXT',
-      'Basic analytics dashboard',
+      'YouTube URL → Transcript',
+      '10 summary modes',
+      'AI Chat for creators',
+      '1 Brand Voice',
+      '3 Remix formats',
+      'Export to Markdown',
       'Email support',
-      'Secure data storage',
-      'Mobile responsive',
     ],
     cta: 'Start Free',
     popular: false,
@@ -38,20 +35,21 @@ const plans = [
   },
   {
     name: 'Pro',
-    price: '$9',
+    price: '$19',
     period: 'month',
-    description: 'For indie hackers replacing $60/month of scattered AI tools',
+    description: 'For creators who repurpose content daily',
     features: [
       '1000 AI requests per month',
-      'Text Summarizer (10 modes)',
-      'AI Chat with history',
-      'Writing Assistant (5 actions)',
-      'Meeting Notes Generator',
-      'Export to Markdown/TXT',
-      'Advanced analytics & insights',
-      'Priority email support',
-      'Priority processing speed',
-      'Early access to new features',
+      'YouTube URL → Transcript',
+      '10 summary modes',
+      'AI Chat for creators',
+      '3 Brand Voices',
+      'All 10 Remix formats',
+      'Content Remix Studio',
+      'Export to Markdown',
+      'Priority support',
+      'Priority processing',
+      'Early access to features',
     ],
     cta: 'Upgrade to Pro',
     popular: true,
@@ -107,110 +105,97 @@ export default function PricingPage() {
     <div className="min-h-screen bg-black">
       <Navbar />
       <div className="relative overflow-hidden">
-        {/* Background Effects */}
         <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:16px_16px]"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-black via-black/80 to-black/50"></div>
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 md:py-24">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12 sm:mb-16 md:mb-20"
+            className="text-center mb-12 sm:mb-16"
           >
-            <Badge className="mb-3 sm:mb-4 bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs sm:text-sm">
+            <Badge className="mb-4 bg-blue-500/20 text-blue-400 border-blue-500/30">
               <Sparkles className="h-3 w-3 mr-1" />
-              Simple Pricing
+              Simple Pricing for Creators
             </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-4 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
               Choose Your Plan
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto px-4 leading-relaxed">
-              Start free with 100 requests per month or upgrade to Pro for 1000 requests.
+            <p className="text-lg text-gray-400 max-w-2xl mx-auto">
+              Start free with 100 requests/month. Upgrade when you're ready to scale.
             </p>
           </motion.div>
 
-          {/* Pricing Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-5xl mx-auto mb-12 sm:mb-16 md:mb-20">
+          <div className="grid lg:grid-cols-2 gap-6 max-w-5xl mx-auto mb-16">
             {plans.map((plan, index) => (
               <motion.div
                 key={plan.name}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.15, duration: 0.5 }}
-                className="flex"
+                transition={{ delay: index * 0.15 }}
               >
                 <Card
-                  className={`relative bg-gradient-to-br from-white/5 to-white/[0.02] border w-full flex flex-col transition-all duration-500 hover:scale-[1.02] ${
+                  className={`relative bg-gradient-to-br from-white/5 to-white/[0.02] border w-full flex flex-col transition-all hover:scale-[1.02] ${
                     plan.popular
                       ? 'border-blue-500/50 shadow-2xl shadow-blue-500/20'
                       : 'border-white/10 hover:border-white/20'
                   }`}
                 >
                   {plan.badge && (
-                    <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 z-10">
-                      <Badge className="bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 text-white border-0 px-3 sm:px-4 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-lg">
-                        <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-1 sm:mr-1.5 fill-white" />
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
+                      <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 px-4 py-1.5">
+                        <Star className="h-3 w-3 mr-1.5 fill-white" />
                         {plan.badge}
                       </Badge>
                     </div>
                   )}
-                  <CardHeader className="pb-3 sm:pb-4 pt-6 sm:pt-8 px-4 sm:px-6">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-3 sm:mb-4 shadow-xl`}>
+                  <CardHeader className="pb-4 pt-8">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${plan.gradient} flex items-center justify-center mb-4`}>
                       <Zap className="h-6 w-6 text-white" />
                     </div>
                     <CardTitle className="text-2xl font-bold text-white mb-2">{plan.name}</CardTitle>
                     <div className="mt-3 mb-4">
-                      <span className="text-4xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">{plan.price}</span>
-                      <span className="text-gray-400 text-base ml-2">/{plan.period}</span>
+                      <span className="text-4xl font-bold text-white">{plan.price}</span>
+                      <span className="text-gray-400 ml-2">/{plan.period}</span>
                     </div>
-                    <CardDescription className="text-gray-400 text-sm leading-relaxed">
+                    <CardDescription className="text-gray-400">
                       {plan.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="flex-1 flex flex-col px-4 sm:px-6 pb-4 sm:pb-6">
-                    <ul className="space-y-2 sm:space-y-2.5 flex-1 mb-4 sm:mb-6">
-                      {plan.features.map((feature, i) => (
-                        <motion.li
-                          key={feature}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.15 + i * 0.05 }}
-                          className="flex items-start gap-2 sm:gap-2.5"
-                        >
-                          <div className={`mt-0.5 rounded-full p-1 bg-gradient-to-br ${plan.gradient} flex-shrink-0 shadow-md`}>
+                  <CardContent className="flex-1 flex flex-col">
+                    <ul className="space-y-2.5 flex-1 mb-6">
+                      {plan.features.map((feature) => (
+                        <li key={feature} className="flex items-start gap-2.5">
+                          <div className={`mt-0.5 rounded-full p-1 bg-gradient-to-br ${plan.gradient}`}>
                             <Check className="h-3 w-3 text-white stroke-[3]" />
                           </div>
-                          <span className="text-gray-200 text-sm leading-relaxed">{feature}</span>
-                        </motion.li>
+                          <span className="text-gray-200 text-sm">{feature}</span>
+                        </li>
                       ))}
                     </ul>
-                    <div className="space-y-2">
-                      <Button
-                        size="lg"
-                        className={`w-full text-base font-bold py-5 rounded-xl transition-all duration-300 shadow-xl ${
-                          plan.popular
-                            ? 'bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 text-white hover:scale-105'
-                            : 'bg-white text-black hover:bg-gray-100 hover:scale-105'
-                        }`}
-                        onClick={() => handleSubscribe(plan.tier)}
-                        disabled={loading}
-                      >
-                        {loading && plan.tier === 'pro' ? 'Loading...' : plan.cta}
-                      </Button>
-                      <p className="text-center text-xs text-gray-500">
-                        {plan.tier === 'free' ? 'No credit card required' : '30-day money-back guarantee'}
-                      </p>
-                    </div>
+                    <Button
+                      size="lg"
+                      className={`w-full font-bold py-5 rounded-xl ${
+                        plan.popular
+                          ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:scale-105'
+                          : 'bg-white text-black hover:bg-gray-100 hover:scale-105'
+                      }`}
+                      onClick={() => handleSubscribe(plan.tier)}
+                      disabled={loading}
+                    >
+                      {loading && plan.tier === 'pro' ? 'Loading...' : plan.cta}
+                    </Button>
+                    <p className="text-center text-xs text-gray-500 mt-2">
+                      {plan.tier === 'free' ? 'No credit card required' : '30-day money-back guarantee'}
+                    </p>
                   </CardContent>
                 </Card>
               </motion.div>
             ))}
           </div>
 
-          {/* Features Comparison */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -218,40 +203,39 @@ export default function PricingPage() {
             className="mb-20"
           >
             <h2 className="text-3xl font-bold text-white text-center mb-12">
-              All Plans Include
+              What You Can Create
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4">
-                    <Check className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
+                    <Youtube className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Enterprise Security</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">Row Level Security, rate limiting, and encryption</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">YouTube Content</h3>
+                  <p className="text-sm text-gray-400">Video descriptions, timestamps, show notes</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-4">
-                    <Zap className="h-7 w-7 text-white" />
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4">
+                    <Twitter className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Lightning Fast</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">Powered by Groq and Google Gemini AI</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">Twitter Threads</h3>
+                  <p className="text-sm text-gray-400">10-tweet threads with hooks and CTAs</p>
                 </CardContent>
               </Card>
               <Card className="bg-white/5 border-white/10">
                 <CardContent className="p-6 text-center">
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="h-7 w-7 text-white" />
+                    <Linkedin className="h-7 w-7 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Real-time Analytics</h3>
-                  <p className="text-sm text-gray-400 leading-relaxed">Track usage and performance insights</p>
+                  <h3 className="text-xl font-semibold text-white mb-2">LinkedIn Posts</h3>
+                  <p className="text-sm text-gray-400">Professional posts with insights</p>
                 </CardContent>
               </Card>
             </div>
           </motion.div>
 
-          {/* FAQ Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -259,80 +243,61 @@ export default function PricingPage() {
             className="max-w-3xl mx-auto"
           >
             <h2 className="text-3xl font-bold text-white text-center mb-12">
-              Frequently Asked Questions
+              FAQ
             </h2>
             <div className="space-y-4">
-              <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-colors">
+              <Card className="bg-white/5 border-white/10">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg">What happens if I exceed my request limit?</CardTitle>
+                  <CardTitle className="text-white text-lg">What counts as a request?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-400">
-                    You'll be notified when approaching your limit. Free users can upgrade to Pro for more requests, or wait until next month when limits reset.
+                    Each AI operation: summarization or chat message. Example: Fetching a YouTube transcript + summarizing it = 1 request.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-colors">
+              <Card className="bg-white/5 border-white/10">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg">Can I cancel my Pro plan anytime?</CardTitle>
+                  <CardTitle className="text-white text-lg">Can I cancel anytime?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-400">
-                    Yes! Cancel anytime with no questions asked. You'll keep access until the end of your billing period, then automatically move to the free plan.
+                    Yes! Cancel anytime. You'll keep access until the end of your billing period, then move to the free plan.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-colors">
+              <Card className="bg-white/5 border-white/10">
                 <CardHeader>
-                  <CardTitle className="text-white text-xl">What counts as a request?</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-400 text-base leading-relaxed">
-                    Each AI operation counts as one request: summarization, chat message, writing assistance, or meeting notes generation.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white/5 border-white/10 hover:border-white/20 transition-colors">
-                <CardHeader>
-                  <CardTitle className="text-white text-lg">Is there a money-back guarantee?</CardTitle>
+                  <CardTitle className="text-white text-lg">Is 100 requests enough?</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-400">
-                    Yes, we offer a 30-day money-back guarantee. If you're not satisfied, contact support for a full refund.
+                    100 requests = ~50 YouTube videos processed. Perfect for testing. Heavy users should upgrade to Pro for 1000 requests.
                   </p>
                 </CardContent>
               </Card>
             </div>
           </motion.div>
 
-          {/* CTA Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
             className="mt-20 text-center"
           >
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-white/10 backdrop-blur-sm p-12">
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10"></div>
-              <div className="relative">
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Ready to Get Started?
-                </h2>
-                <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-                  Start with the free plan or upgrade to Pro for 10x more requests.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link href="/sign-up">
-                    <Button className="bg-white text-black hover:bg-white/90 px-8">
-                      Get Started Free
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Card className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border-white/10 p-12">
+              <h2 className="text-3xl font-bold text-white mb-4">
+                Ready to Repurpose Content?
+              </h2>
+              <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
+                Join creators who turn 1 video into 10 pieces of content
+              </p>
+              <Button onClick={() => router.push('/sign-up')} className="bg-white text-black hover:bg-white/90 px-8">
+                Get Started Free
+              </Button>
+            </Card>
           </motion.div>
         </div>
       </div>

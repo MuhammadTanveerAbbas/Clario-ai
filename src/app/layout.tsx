@@ -10,21 +10,22 @@ import { ClientProviders } from "@/components/providers/client-providers";
 export const metadata: Metadata = {
   metadataBase: new URL("https://clario-hub.vercel.app"),
   title: {
-    default: "Clario - AI Productivity Tool",
+    default: "Clario - AI Content Repurposing Tool for Creators",
     template: "%s | Clario",
   },
   description:
-    "Transform meeting transcripts, articles, and documents into clear summaries with AI. 10 summary modes, 50K character limit, PDF export. Free forever, no login required.",
+    "Turn 1 YouTube video into 10 pieces of content. AI-powered summarizer, chat, remix studio, and brand voice library. Built for YouTubers, podcasters, and content creators.",
   keywords: [
-    "AI summarizer",
-    "text summarizer",
-    "meeting minutes",
-    "transcript summarizer",
-    "article summarizer",
-    "free AI tool",
-    "document summarization",
-    "TLDR",
-    "summary generator",
+    "content repurposing",
+    "AI content creator",
+    "YouTube to Twitter",
+    "content remix",
+    "brand voice AI",
+    "video summarizer",
+    "content automation",
+    "creator tools",
+    "AI for creators",
+    "content marketing",
   ],
   authors: [{ name: "Muhammad Tanveer Abbas" }],
   creator: "Muhammad Tanveer Abbas",
@@ -57,17 +58,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://clario-summarizer.vercel.app/",
+    url: "https://clario-hub.vercel.app/",
     siteName: "Clario",
-    title: "Clario - AI Text Summarizer | Free Meeting & Article Summarization",
+    title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
-      "Transform meeting transcripts, articles, and documents into clear summaries with AI. 10 summary modes, 50K character limit, PDF export. Free forever.",
+      "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice. Built for YouTubers and podcasters.",
     images: [
       {
         url: "https://placehold.co/1200x630/000000/FFFFFF/png?text=Clario",
         width: 1200,
         height: 630,
-        alt: "Clario AI Summarizer",
+        alt: "Clario - AI Content Repurposing Tool",
       },
     ],
   },
@@ -75,13 +76,13 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@m_tanveerabbas",
     creator: "@m_tanveerabbas",
-    title: "Clario - AI Text Summarizer | Free Meeting & Article Summarization",
+    title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
-      "Transform meeting transcripts, articles, and documents into clear summaries with AI. 10 summary modes, 50K character limit, PDF export. Free forever.",
+      "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice.",
     images: ["https://placehold.co/1200x630/000000/FFFFFF/png?text=Clario"],
   },
   alternates: {
-    canonical: "https://clario-summarizer.vercel.app",
+    canonical: "https://clario-hub.vercel.app",
   },
 };
 

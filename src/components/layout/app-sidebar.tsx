@@ -9,15 +9,15 @@ import {
   LayoutDashboard,
   MessageSquare,
   FileText,
-  PenTool,
   Settings,
   ChevronLeft,
   ChevronRight,
   Sparkles,
   CreditCard,
   LogOut,
-  ClipboardList,
   X,
+  Mic,
+  Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -25,16 +25,11 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, badge: null },
-  { name: "AI Chat", href: "/chat", icon: MessageSquare, badge: "Popular" },
-  { name: "Summarizer", href: "/summarizer", icon: FileText, badge: "New" },
-  { name: "Writing", href: "/writing", icon: PenTool, badge: "Pro" },
-  {
-    name: "Meeting Notes",
-    href: "/meeting-notes",
-    icon: ClipboardList,
-    badge: "Beta",
-  },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "AI Chat", href: "/chat", icon: MessageSquare },
+  { name: "Summarizer", href: "/summarizer", icon: FileText },
+  { name: "Remix Studio", href: "/remix", icon: Zap },
+  { name: "Brand Voice", href: "/brand-voice", icon: Mic },
 ];
 
 export function AppSidebar() {
@@ -67,17 +62,17 @@ export function AppSidebar() {
         style={{
           transform: mobileOpen ? "translateX(0)" : "translateX(-100%)",
         }}
-        className="fixed left-0 top-0 z-50 h-screen bg-gradient-to-b from-black via-gray-900 to-black backdrop-blur-xl border-r border-white/10 flex flex-col shadow-2xl md:!translate-x-0 overflow-hidden"
+        className="fixed left-0 top-0 z-50 h-screen bg-[#0A0A0A] border-r border-white/[0.08] flex flex-col md:!translate-x-0 overflow-hidden"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 md:p-6 py-2 md:py-4 border-b border-white/10">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08]">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setMobileOpen(false)}
-            className="md:hidden absolute right-2 top-2 text-gray-400 hover:text-white z-10"
+            className="md:hidden absolute right-2 top-2 text-white/40 hover:text-white hover:bg-white/[0.04] z-10"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
           <AnimatePresence mode="wait">
             {!collapsed && (
@@ -87,22 +82,14 @@ export function AppSidebar() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.2 }}
-                className="flex items-center gap-3"
+                className="flex items-center gap-2.5"
               >
-                <div className="relative">
-                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-gradient-to-br from-[#4169E1] via-[#6B8EFF] to-[#8FA5FF] flex items-center justify-center shadow-lg">
-                    <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-green-400 rounded-full border-2 border-black animate-pulse" />
+                <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
+                  <Sparkles className="h-4 w-4 text-black" />
                 </div>
-                <div>
-                  <span className="text-white font-bold text-lg md:text-xl tracking-tight">
-                    Clario
-                  </span>
-                  <div className="text-xs text-gray-400 font-medium">
-                    AI Productivity
-                  </div>
-                </div>
+                <span className="text-white font-semibold text-[15px] tracking-tight">
+                  Clario
+                </span>
               </motion.div>
             )}
             {collapsed && (
@@ -114,11 +101,8 @@ export function AppSidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex justify-center w-full"
               >
-                <div className="relative">
-                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#4169E1] via-[#6B8EFF] to-[#8FA5FF] flex items-center justify-center shadow-lg">
-                    <Sparkles className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-black animate-pulse" />
+                <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
+                  <Sparkles className="h-4 w-4 text-black" />
                 </div>
               </motion.div>
             )}
@@ -126,8 +110,8 @@ export function AppSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 md:p-4 md:overflow-hidden overflow-y-auto space-y-3 md:space-y-2.5">
-          {navigation.map((item, index) => {
+        <nav className="flex-1 p-3 overflow-y-auto space-y-1">
+          {navigation.map((item) => {
             const isActive =
               pathname === item.href || pathname?.startsWith(item.href + "/");
             const Icon = item.icon;
@@ -139,35 +123,15 @@ export function AppSidebar() {
                 onClick={() => setMobileOpen(false)}
                 className="block"
               >
-                <motion.div
-                  whileHover={{ scale: 1.02, x: 4 }}
-                  whileTap={{ scale: 0.98 }}
+                <div
                   className={cn(
-                    "relative flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-xl transition-all duration-300 group overflow-hidden",
+                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150",
                     isActive
-                      ? "bg-gradient-to-r from-[#4169E1]/30 via-[#6B8EFF]/20 to-[#8FA5FF]/10 text-white border border-[#4169E1]/40 shadow-lg shadow-[#4169E1]/20"
-                      : "text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-white/5 hover:to-white/10 border border-transparent hover:border-white/10"
+                      ? "bg-white/[0.08] text-white"
+                      : "text-white/50 hover:text-white hover:bg-white/[0.04]"
                   )}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeBackground"
-                      className="absolute inset-0 bg-gradient-to-r from-[#4169E1]/10 to-transparent"
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                  <Icon
-                    className={cn(
-                      "h-4 w-4 md:h-5 md:w-5 flex-shrink-0 transition-all duration-300 relative z-10",
-                      isActive
-                        ? "text-[#4169E1] drop-shadow-sm"
-                        : "group-hover:text-white group-hover:scale-110"
-                    )}
-                  />
+                  <Icon className="h-4 w-4 flex-shrink-0" />
                   <AnimatePresence>
                     {!collapsed && (
                       <motion.div
@@ -175,84 +139,43 @@ export function AppSidebar() {
                         animate={{ opacity: 1, width: "auto" }}
                         exit={{ opacity: 0, width: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="flex items-center justify-between flex-1 min-w-0 relative z-10"
+                        className="flex items-center justify-between flex-1 min-w-0"
                       >
-                        <span className="text-xs md:text-sm font-medium truncate">
+                        <span className="text-[13px] font-medium truncate">
                           {item.name}
                         </span>
-                        {item.badge && (
-                          <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            className="ml-2 flex-shrink-0"
-                          >
-                            <Badge
-                              className={cn(
-                                "text-[9px] md:text-[10px] px-1.5 py-0.5 font-semibold shadow-sm whitespace-nowrap",
-                                item.badge === "Popular"
-                                  ? "bg-gradient-to-r from-orange-500 to-red-500 text-white border-0"
-                                  : item.badge === "New"
-                                  ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white border-0"
-                                  : item.badge === "Pro"
-                                  ? "bg-gradient-to-r from-purple-500 to-pink-600 text-white border-0"
-                                  : item.badge === "Beta"
-                                  ? "bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-0"
-                                  : "bg-gradient-to-r from-gray-500 to-gray-600 text-white border-0"
-                              )}
-                            >
-                              {item.badge}
-                            </Badge>
-                          </motion.div>
-                        )}
                       </motion.div>
                     )}
                   </AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeIndicator"
-                      className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#4169E1] via-[#6B8EFF] to-[#8FA5FF] rounded-r-full shadow-lg"
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </motion.div>
+                </div>
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-3 md:p-4 border-t border-white/10 space-y-2">
-          {/* Quick Actions */}
+        <div className="p-3 border-t border-white/[0.08] space-y-1">
+          {/* Upgrade */}
           <AnimatePresence>
             {!collapsed && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="space-y-2 mb-3"
+                className="mb-2"
               >
                 <Link href="/pricing" onClick={() => setMobileOpen(false)}>
-                  <motion.div
-                    whileHover={{ scale: 1.02, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 rounded-xl bg-gradient-to-r from-yellow-500/20 via-orange-500/15 to-red-500/10 border border-yellow-500/30 text-yellow-300 hover:from-yellow-500/30 hover:to-orange-500/20 transition-all duration-300 shadow-lg hover:shadow-yellow-500/20"
-                  >
-                    <div className="w-7 h-7 md:w-8 md:h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
-                      <CreditCard className="h-3 w-3 md:h-4 md:w-4 text-white" />
+                  <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.06] transition-all duration-150">
+                    <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
+                      <CreditCard className="h-3.5 w-3.5 text-black" />
                     </div>
-                    <div>
-                      <span className="text-xs md:text-sm font-semibold text-white">
-                        Upgrade Plan
+                    <div className="flex-1 min-w-0">
+                      <span className="text-[13px] font-medium text-white block">
+                        Upgrade
                       </span>
-                      <div className="text-[10px] md:text-xs text-yellow-300/80">
-                        Get more requests
-                      </div>
+                      <div className="text-[11px] text-white/40">Get more requests</div>
                     </div>
-                  </motion.div>
+                  </div>
                 </Link>
               </motion.div>
             )}
@@ -260,22 +183,15 @@ export function AppSidebar() {
 
           {/* Settings */}
           <Link href="/settings" onClick={() => setMobileOpen(false)}>
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <div
               className={cn(
-                "flex items-center gap-2 md:gap-3 px-2 md:px-3 py-2 rounded-lg transition-colors",
+                "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150",
                 pathname === "/settings"
-                  ? "bg-[#4169E1]/20 text-white border border-[#4169E1]/30"
-                  : "text-gray-400 hover:bg-white/5 hover:text-white"
+                  ? "bg-white/[0.08] text-white"
+                  : "text-white/50 hover:text-white hover:bg-white/[0.04]"
               )}
             >
-              <Settings
-                className={cn(
-                  "h-4 w-4 md:h-5 md:w-5 flex-shrink-0",
-                  pathname === "/settings" && "text-[#4169E1]"
-                )}
-              />
+              <Settings className="h-4 w-4 flex-shrink-0" />
               <AnimatePresence>
                 {!collapsed && (
                   <motion.span
@@ -283,13 +199,13 @@ export function AppSidebar() {
                     animate={{ opacity: 1, width: "auto" }}
                     exit={{ opacity: 0, width: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="text-xs md:text-sm font-medium"
+                    className="text-[13px] font-medium"
                   >
                     Settings
                   </motion.span>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
           </Link>
 
           {/* Collapse Button */}
@@ -297,11 +213,11 @@ export function AppSidebar() {
             variant="ghost"
             size="icon"
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden md:flex w-full text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-white/10 hover:to-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 rounded-xl shadow-sm hover:shadow-lg"
+            className="hidden md:flex w-full text-white/40 hover:text-white hover:bg-white/[0.04] border border-white/[0.08] transition-all duration-150 rounded-lg h-9"
           >
             <motion.div
               animate={{ rotate: collapsed ? 0 : 180 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
             >
               {collapsed ? (
                 <ChevronRight className="h-4 w-4" />
