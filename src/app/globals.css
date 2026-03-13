@@ -15,6 +15,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: 'Sansation' !important;
+  }
+
+  * {
+    font-family: 'Sansation' !important;
   }
 
   input:focus {
@@ -98,13 +103,14 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Sansation' !important;
   }
 }
 
 @layer components {
     .summary-prose {
         @apply max-w-none;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-family: 'Sansation' !important;
         line-height: 1.7;
         color: #e5e7eb;
         letter-spacing: 0 !important;

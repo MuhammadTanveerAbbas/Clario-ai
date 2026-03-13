@@ -8,11 +8,16 @@ export default {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontFamily: {
+      sans: ['Sansation'],
+      serif: ['Sansation'],
+      mono: ['Sansation'],
+    },
     extend: {
       fontFamily: {
-        body: ['Sansation', 'sans-serif'],
-        headline: ['Sansation', 'sans-serif'],
-        code: ['monospace'],
+        body: ['Sansation'],
+        headline: ['Sansation'],
+        code: ['Sansation'],
       },
       colors: {
         background: 'hsl(var(--background))',
