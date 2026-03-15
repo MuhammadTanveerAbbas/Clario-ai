@@ -43,7 +43,7 @@ export default function DashboardPage() {
       const supabase = createClient();
       const [usage, usageStats] = await Promise.all([
         fetch("/api/usage").then(r => r.json()).catch(() => ({ requests_used: 0, limit: 100 })),
-        supabase.from("usage_stats").select("*").eq("user_id", user!.id).order("date", { ascending: false }),
+        supabase.from("usage_stats").select("*").eq("user_id", user!.id).order("date", { ascending: false }).catch(() => ({ data: [] })),
       ]);
       
       const allStats = usageStats.data || [];
@@ -80,6 +80,7 @@ export default function DashboardPage() {
       setLoading(false);
     } catch (error) {
       console.error("Failed to load dashboard:", error);
+      setLoading(false);
     }
   };
 

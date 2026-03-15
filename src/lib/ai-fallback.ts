@@ -43,8 +43,6 @@ export async function generateWithFallback(
     return response.choices[0]?.message?.content || ''
   } catch (groqError: any) {
     console.error('[AI] Groq failed:', groqError?.message || groqError)
-
+    throw new Error(`Groq API error: ${groqError?.message || 'Unknown error'}`)
   }
-
-  throw new Error(`Groq API error: ${groqError?.message || 'Unknown error'}`)
 }
