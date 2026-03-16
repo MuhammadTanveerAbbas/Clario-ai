@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;800;900&family=Poppins:wght@700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -15,11 +17,13 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: 'Sansation' !important;
+    font-family: 'Inter', 'Poppins', system-ui, sans-serif !important;
+    font-weight: 700 !important;
   }
 
   * {
-    font-family: 'Sansation' !important;
+    font-family: 'Inter', 'Poppins', system-ui, sans-serif !important;
+    font-weight: 700 !important;
   }
 
   input:focus {
@@ -103,14 +107,16 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Sansation' !important;
+    font-family: 'Inter', 'Poppins', system-ui, sans-serif !important;
+    font-weight: 700 !important;
   }
 }
 
 @layer components {
     .summary-prose {
         @apply max-w-none;
-        font-family: 'Sansation' !important;
+        font-family: 'Inter', 'Poppins', system-ui, sans-serif !important;
+        font-weight: 700 !important;
         line-height: 1.7;
         color: #e5e7eb;
         letter-spacing: 0 !important;
@@ -237,6 +243,8 @@
         text-align: justify;
         line-height: 1.6;
         padding: 16px !important;
+        font-family: 'Inter', 'Poppins', system-ui, sans-serif !important;
+        font-weight: 700 !important;
     }
     
     .summary-prose h4 {
@@ -446,7 +454,8 @@
         @apply px-2 py-1 rounded text-sm;
         background: rgba(65, 105, 225, 0.15);
         color: #a5b4fc;
-        font-family: 'Fira Code', 'Courier New', monospace;
+        font-family: 'Inter', 'Poppins', system-ui, monospace !important;
+        font-weight: 700 !important;
         border: 1px solid rgba(65, 105, 225, 0.2);
     }
     

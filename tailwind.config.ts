@@ -9,15 +9,15 @@ export default {
   ],
   theme: {
     fontFamily: {
-      sans: ['Sansation'],
-      serif: ['Sansation'],
-      mono: ['Sansation'],
+      sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+      serif: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+      mono: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
     },
     extend: {
       fontFamily: {
-        body: ['Sansation'],
-        headline: ['Sansation'],
-        code: ['Sansation'],
+        body: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+        headline: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+        code: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

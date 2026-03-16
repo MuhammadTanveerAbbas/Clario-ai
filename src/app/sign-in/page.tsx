@@ -279,9 +279,6 @@ function SignInForm() {
             </form>
 
             <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/10" />
-              </div>
               <div className="relative flex justify-center text-xs">
                 <span className="bg-white/[0.05] px-3 py-1 text-gray-400 rounded-full">
                   Or continue with

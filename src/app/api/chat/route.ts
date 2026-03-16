@@ -106,7 +106,7 @@ How you respond:
     const aiResponse = await generateWithFallback(prompt, systemPrompt, {
       model: 'llama-3.1-8b-instant',
       maxTokens: 1024,
-      temperature: 0.8,
+      temperature: 0.7,
     })
 
     const finalConversationId = conversationId || `conv-${crypto.randomUUID?.() || Date.now()}`

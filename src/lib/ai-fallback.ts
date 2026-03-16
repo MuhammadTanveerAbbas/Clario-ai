@@ -21,6 +21,7 @@ export async function generateWithFallback(
     model?: string
     maxTokens?: number
     temperature?: number
+    stream?: boolean
   } = {}
 ): Promise<string> {
   const { model = 'llama-3.3-70b-versatile', maxTokens = 2048, temperature = 0.7 } = options
@@ -38,11 +39,13 @@ export async function generateWithFallback(
       ],
       max_tokens: maxTokens,
       temperature,
+      top_p: 0.9,
+      frequency_penalty: 0.1,
+      presence_penalty: 0.1,
     })
-    console.log(`[AI] Groq success — model: ${model}`)
-    return response.choices[0]?.message?.content || ''
+    return response.choices[0]?.message?.content?.trim() || ''
   } catch (groqError: any) {
     console.error('[AI] Groq failed:', groqError?.message || groqError)
-    throw new Error(`Groq API error: ${groqError?.message || 'Unknown error'}`)
+    throw new Error(`AI generation failed: ${groqError?.message || 'Unknown error'}`)
   }
 }

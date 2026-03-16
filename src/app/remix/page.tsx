@@ -90,6 +90,13 @@ export default function RemixPage() {
     });
   };
 
+  const formatText = (text: string) => {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold">$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br />');
+  };
+
   if (authLoading) {
     return (
       <div className="flex min-h-screen bg-[#0A0A0A] items-center justify-center">
@@ -177,7 +184,10 @@ export default function RemixPage() {
                         </Button>
                       </div>
                       <div className="rounded-lg bg-white/[0.04] p-2.5 sm:p-3 max-h-[180px] sm:max-h-[200px] overflow-y-auto">
-                        <p className="text-[12px] sm:text-[13px] text-white/80 whitespace-pre-wrap leading-relaxed">{result}</p>
+                        <div 
+                          className="text-[12px] sm:text-[13px] text-white/80 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: formatText(result) }}
+                        />
                       </div>
                     </div>
                   );

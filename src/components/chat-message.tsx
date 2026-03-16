@@ -62,7 +62,7 @@ export function ChatMessage({ message, onCopy }: ChatMessageProps) {
                       if (inline) {
                         return (
                           <code
-                            className="bg-white/10 text-blue-300 px-1.5 py-0.5 rounded text-sm"
+                            className="bg-white/10 text-blue-300 px-1.5 py-0.5 rounded text-sm font-semibold"
                             {...props}
                           >
                             {children}
@@ -77,6 +77,12 @@ export function ChatMessage({ message, onCopy }: ChatMessageProps) {
                         </pre>
                       )
                     },
+                    strong: ({ node, ...props }: any) => (
+                      <strong className="font-bold text-white" {...props} />
+                    ),
+                    em: ({ node, ...props }: any) => (
+                      <em className="italic text-gray-200" {...props} />
+                    ),
                     a: ({ node, ...props }: any) => (
                       <a
                         className="text-blue-400 hover:text-blue-300 underline"
@@ -86,25 +92,28 @@ export function ChatMessage({ message, onCopy }: ChatMessageProps) {
                       />
                     ),
                     p: ({ node, ...props }: any) => (
-                      <p className="text-white mb-2 last:mb-0 leading-relaxed" {...props} />
+                      <p className="text-white mb-3 last:mb-0 leading-relaxed" {...props} />
                     ),
                     ul: ({ node, ...props }: any) => (
-                      <ul className="list-disc list-inside text-white space-y-1 my-2" {...props} />
+                      <ul className="list-disc list-inside text-white space-y-2 my-2 ml-2" {...props} />
                     ),
                     ol: ({ node, ...props }: any) => (
-                      <ol className="list-decimal list-inside text-white space-y-1 my-2" {...props} />
+                      <ol className="list-decimal list-inside text-white space-y-2 my-2 ml-2" {...props} />
+                    ),
+                    li: ({ node, ...props }: any) => (
+                      <li className="text-white leading-relaxed" {...props} />
                     ),
                     h1: ({ node, ...props }: any) => (
-                      <h1 className="text-xl md:text-2xl font-bold text-white mt-4 mb-2" {...props} />
+                      <h1 className="text-xl md:text-2xl font-bold text-white mt-4 mb-3" {...props} />
                     ),
                     h2: ({ node, ...props }: any) => (
-                      <h2 className="text-lg md:text-xl font-semibold text-white mt-3 mb-2" {...props} />
+                      <h2 className="text-lg md:text-xl font-bold text-white mt-4 mb-2" {...props} />
                     ),
                     h3: ({ node, ...props }: any) => (
-                      <h3 className="text-base md:text-lg font-semibold text-white mt-2 mb-1" {...props} />
+                      <h3 className="text-base md:text-lg font-bold text-white mt-3 mb-2" {...props} />
                     ),
                     blockquote: ({ node, ...props }: any) => (
-                      <blockquote className="border-l-4 border-blue-400 pl-4 italic text-gray-300 my-2" {...props} />
+                      <blockquote className="border-l-4 border-blue-400 pl-4 italic text-gray-300 my-3 bg-white/5 py-2 rounded" {...props} />
                     ),
                   }}
                 >

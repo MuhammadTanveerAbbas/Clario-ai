@@ -574,7 +574,7 @@ FORMATTING RULES:
     const summary = await generateWithFallback(
       `Text to summarize:\n${sanitizedText}`,
       systemPrompt,
-      { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.3 }
+      { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.2 }
     )
 
     const cleanedSummary = summary
