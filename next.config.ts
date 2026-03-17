@@ -87,7 +87,8 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.paddle.com https://js.sentry-cdn.com https://us-assets.i.posthog.com https://array.posthog.com https://www.google-analytics.com/analytics.js",
-              "worker-src 'self' blob:",
+              "worker-src 'self' blob: https://us-assets.i.posthog.com",
+              "child-src 'self' blob:",
               "style-src 'self' 'unsafe-inline'",
               "font-src 'self' data:",
               "img-src 'self' data: https:",

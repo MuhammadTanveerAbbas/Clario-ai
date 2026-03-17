@@ -41,8 +41,8 @@ export default function BrandVoicePage() {
   const loadVoices = async () => {
     try {
       const response = await fetch("/api/brand-voice");
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         setVoices(data.voices || []);
       }
     } catch (error) {
@@ -70,8 +70,10 @@ export default function BrandVoicePage() {
         body: JSON.stringify({ name, examples }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to create voice");
+        throw new Error(data.error || data.message || "Failed to create voice");
       }
 
       toast({
@@ -102,8 +104,10 @@ export default function BrandVoicePage() {
         method: "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to delete voice");
+        throw new Error(data.error || data.message || "Failed to delete voice");
       }
 
       toast({
@@ -129,8 +133,10 @@ export default function BrandVoicePage() {
         body: JSON.stringify({ id }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to activate voice");
+        throw new Error(data.error || data.message || "Failed to activate voice");
       }
 
       toast({

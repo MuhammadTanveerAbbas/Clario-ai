@@ -160,12 +160,11 @@ export function SummarizerTool() {
         body: JSON.stringify({ url: youtubeUrl }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to fetch transcript');
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch transcript');
+      }
       setText(data.transcript);
       setActiveTab("text");
       
@@ -216,12 +215,11 @@ export function SummarizerTool() {
         body: JSON.stringify({ text, mode: modeToApiFormat(mode) }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to generate summary');
-      }
-
       const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || result.message || 'Failed to generate summary');
+      }
       const cleanSummary = sanitizeHtml(result.summary);
 
       saveToHistory({ text, mode, summary: cleanSummary });

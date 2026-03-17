@@ -96,9 +96,11 @@ export default function ChatPage() {
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to send message");
-
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || data.message || "Failed to send message");
+      }
       if (data.conversationId && data.conversationId !== conversationId) {
         setConversationId(data.conversationId);
       }
