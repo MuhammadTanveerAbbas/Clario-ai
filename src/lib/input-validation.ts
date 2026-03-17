@@ -1,10 +1,13 @@
-import DOMPurify from 'isomorphic-dompurify';
-
 export function sanitizeInput(input: string): string {
-  return DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: []
-  });
+  // Remove dangerous patterns without external dependencies
+  return input
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/<embed\b[^>]*>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .trim();
 }
 
 export function validateTextLength(text: string, maxLength: number = 50000): boolean {
