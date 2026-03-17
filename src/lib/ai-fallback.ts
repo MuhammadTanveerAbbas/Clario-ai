@@ -3,15 +3,20 @@ import Groq from 'groq-sdk'
 const groqApiKey = process.env.GROQ_API_KEY
 
 if (!groqApiKey) {
-  throw new Error('GROQ_API_KEY environment variable is not set')
+  console.error('[AI] GROQ_API_KEY environment variable is not set')
 }
 
 let groq: Groq | null = null
 
-try {
-  groq = new Groq({ apiKey: groqApiKey })
-} catch (e) {
-  console.error('[AI] Failed to initialize Groq:', e)
+if (groqApiKey) {
+  try {
+    groq = new Groq({ apiKey: groqApiKey })
+    console.log('[AI] Groq initialized successfully')
+  } catch (e) {
+    console.error('[AI] Failed to initialize Groq:', e)
+  }
+} else {
+  console.error('[AI] Cannot initialize Groq - API key missing')
 }
 
 export async function generateWithFallback(
@@ -26,8 +31,18 @@ export async function generateWithFallback(
 ): Promise<string> {
   const { model = 'llama-3.3-70b-versatile', maxTokens = 2048, temperature = 0.7 } = options
 
+  console.log('[AI] Generating with model:', model);
+
   if (!groq) {
-    throw new Error('Groq API not initialized. Check GROQ_API_KEY.')
+    const error = 'Groq API not initialized. Check GROQ_API_KEY environment variable.';
+    console.error('[AI]', error);
+    throw new Error(error)
+  }
+
+  if (!groqApiKey) {
+    const error = 'GROQ_API_KEY is not set';
+    console.error('[AI]', error);
+    throw new Error(error)
   }
 
   try {
@@ -43,9 +58,32 @@ export async function generateWithFallback(
       frequency_penalty: 0.1,
       presence_penalty: 0.1,
     })
-    return response.choices[0]?.message?.content?.trim() || ''
+    
+    const content = response.choices[0]?.message?.content?.trim() || ''
+    
+    if (!content) {
+      console.error('[AI] Empty response from Groq');
+      throw new Error('Empty response from AI')
+    }
+    
+    console.log('[AI] Generated successfully, length:', content.length);
+    return content
   } catch (groqError: any) {
-    console.error('[AI] Groq failed:', groqError?.message || groqError)
+    console.error('[AI] Groq error:', {
+      message: groqError?.message,
+      status: groqError?.status,
+      error: groqError?.error,
+    });
+    
+    // Provide more specific error messages
+    if (groqError?.status === 401) {
+      throw new Error('Invalid Groq API key')
+    } else if (groqError?.status === 429) {
+      throw new Error('Groq API rate limit exceeded')
+    } else if (groqError?.status === 500) {
+      throw new Error('Groq API server error')
+    }
+    
     throw new Error(`AI generation failed: ${groqError?.message || 'Unknown error'}`)
   }
 }

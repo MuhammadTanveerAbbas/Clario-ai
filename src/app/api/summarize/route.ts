@@ -23,51 +23,83 @@ const SummarizeSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  console.log('[Summarize API] Request received');
+  
   try {
+    // Check rate limit
     const rateLimitCheck = checkRateLimit(request as any, 'api')
     if (!rateLimitCheck.allowed) {
+      console.log('[Summarize API] Rate limit exceeded');
       return rateLimitCheck.response!
     }
 
-    const body = await request.json()
+    // Parse and validate body
+    let body;
+    try {
+      body = await request.json()
+    } catch (e) {
+      console.error('[Summarize API] JSON parse error:', e);
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+
     const result = SummarizeSchema.safeParse(body)
     if (!result.success) {
+      console.error('[Summarize API] Validation error:', result.error.issues);
       return NextResponse.json(
         { error: 'Invalid input', details: result.error.issues },
         { status: 400 }
       )
     }
     const { text, mode } = result.data
+    console.log('[Summarize API] Text length:', text.length, 'Mode:', mode);
 
+    // Sanitize input
     const validation = sanitizeAndValidate(text, 50000)
     if (!validation.valid) {
+      console.error('[Summarize API] Sanitization failed:', validation.error);
       return NextResponse.json({ error: validation.error }, { status: 400 })
     }
     const sanitizedText = validation.sanitized
 
+    // Check authentication
     const supabase = await createClient()
     const {
       data: { user },
+      error: authError
     } = await supabase.auth.getUser()
 
-    if (!user) {
+    if (authError || !user) {
+      console.error('[Summarize API] Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: profile } = await supabase
+    console.log('[Summarize API] User authenticated:', user.id);
+
+    // Get user profile
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('subscription_tier, requests_used_this_month, email')
       .eq('id', user.id)
       .single()
 
+    if (profileError) {
+      console.error('[Summarize API] Profile fetch error:', profileError);
+    }
+
     const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
     const currentUsage = profile?.requests_used_this_month || 0
     
-    // Unlimited access for admin
+    console.log('[Summarize API] Usage:', currentUsage, 'Tier:', tier);
+    
+    // Check usage limits (skip for admin)
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
 
       if (!usageCheck.allowed) {
+        console.log('[Summarize API] Usage limit reached');
         return NextResponse.json(
           {
             error: 'Usage limit reached',
@@ -77,6 +109,17 @@ export async function POST(request: Request) {
         )
       }
     }
+
+    // Check Groq API key
+    if (!process.env.GROQ_API_KEY) {
+      console.error('[Summarize API] GROQ_API_KEY not set');
+      return NextResponse.json(
+        { error: 'AI service not configured' },
+        { status: 500 }
+      )
+    }
+
+    console.log('[Summarize API] Generating summary...');
 
     const modePrompts: Record<string, string> = {
       'action-items': `Extract all action items in a clean format.
@@ -571,11 +614,21 @@ FORMATTING RULES:
 - Use > for blockquotes
 - Use --- for section dividers`
 
-    const summary = await generateWithFallback(
-      `Text to summarize:\n${sanitizedText}`,
-      systemPrompt,
-      { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.2 }
-    )
+    let summary: string;
+    try {
+      summary = await generateWithFallback(
+        `Text to summarize:\n${sanitizedText}`,
+        systemPrompt,
+        { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.2 }
+      )
+      console.log('[Summarize API] Summary generated, length:', summary.length);
+    } catch (aiError: any) {
+      console.error('[Summarize API] AI generation error:', aiError);
+      return NextResponse.json(
+        { error: 'Failed to generate summary', details: aiError.message },
+        { status: 500 }
+      )
+    }
 
     const cleanedSummary = summary
       .split('\n')
@@ -606,13 +659,19 @@ FORMATTING RULES:
       })
       .join('\n')
 
-    await supabase.from('ai_summaries').insert({
+    // Save to database
+    const { error: insertError } = await supabase.from('ai_summaries').insert({
       user_id: user.id,
       summary_text: cleanedSummary,
       original_text: sanitizedText.substring(0, 10000),
       mode,
     })
 
+    if (insertError) {
+      console.error('[Summarize API] Insert error:', insertError);
+    }
+
+    // Track usage
     const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'summary',
@@ -620,15 +679,15 @@ FORMATTING RULES:
     })
 
     if (trackError) {
-      console.error("Failed to track usage:", trackError)
+      console.error('[Summarize API] Track usage error:', trackError);
     }
 
+    console.log('[Summarize API] Success');
     return NextResponse.json({ summary: cleanedSummary })
   } catch (error: any) {
-    console.error('Summarize API error:', error)
-    const message = error?.message || 'Failed to generate summary'
+    console.error('[Summarize API] Unexpected error:', error);
     return NextResponse.json(
-      { error: message },
+      { error: 'Internal server error', details: error?.message || 'Unknown error' },
       { status: 500 }
     )
   }

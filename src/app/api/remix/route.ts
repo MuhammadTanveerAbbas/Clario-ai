@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Groq from 'groq-sdk';
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groqApiKey = process.env.GROQ_API_KEY;
+
+if (!groqApiKey) {
+  console.error('[Remix API] GROQ_API_KEY not set');
+}
+
+const groq = groqApiKey ? new Groq({ apiKey: groqApiKey }) : null;
 
 const REMIX_PROMPTS = {
   twitter: "Convert this content into a 10-tweet Twitter thread. Start with a hook tweet, then break down key points. Use short sentences, emojis, and make it engaging. Number each tweet 1/10, 2/10, etc. Use minimal formatting.",
@@ -18,24 +24,45 @@ const REMIX_PROMPTS = {
 };
 
 export async function POST(request: NextRequest) {
+  console.log('[Remix API] Request received');
+  
   try {
+    if (!groq) {
+      console.error('[Remix API] Groq not initialized');
+      return NextResponse.json({ error: 'AI service not configured' }, { status: 500 });
+    }
+
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      console.error('[Remix API] Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { content } = await request.json();
+    console.log('[Remix API] User authenticated:', user.id);
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.error('[Remix API] JSON parse error:', e);
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+
+    const { content } = body;
 
     if (!content || content.trim().length < 50) {
+      console.log('[Remix API] Content too short');
       return NextResponse.json({ error: 'Content must be at least 50 characters' }, { status: 400 });
     }
+
+    console.log('[Remix API] Content length:', content.length);
 
     const results: Record<string, string> = {};
     const promises = Object.entries(REMIX_PROMPTS).map(async ([format, prompt]) => {
       try {
-        const completion = await groq.chat.completions.create({
+        const completion = await groq!.chat.completions.create({
           model: 'llama-3.1-8b-instant',
           messages: [
             {
@@ -53,23 +80,29 @@ export async function POST(request: NextRequest) {
         });
 
         results[format] = completion.choices[0]?.message?.content?.trim() || 'Failed to generate';
-      } catch (error) {
-        console.error(`Failed to generate ${format}:`, error);
+        console.log(`[Remix API] Generated ${format}`);
+      } catch (error: any) {
+        console.error(`[Remix API] Failed to generate ${format}:`, error?.message);
         results[format] = 'Generation failed';
       }
     });
 
     await Promise.all(promises);
 
-    await supabase.rpc('track_usage', {
+    const { error: trackError } = await supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'remix',
       p_count: 1,
     });
 
+    if (trackError) {
+      console.error('[Remix API] Track usage error:', trackError);
+    }
+
+    console.log('[Remix API] Success');
     return NextResponse.json({ results });
   } catch (error: any) {
-    console.error('Remix error:', error);
+    console.error('[Remix API] Unexpected error:', error);
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

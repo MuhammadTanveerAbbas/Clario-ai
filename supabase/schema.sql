@@ -3,6 +3,10 @@
 -- Features: AI Chat + Text Summarizer + Content Remix Studio + Brand Voice Library
 
 -- ================================
+-- IMPORTANT: Run this entire script in Supabase SQL Editor
+-- ================================
+
+-- ================================
 -- 1. Profiles & Usage Stats Setup
 -- ================================
 
@@ -28,6 +32,10 @@ CREATE TABLE IF NOT EXISTS public.usage_stats (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id, date)
 );
+
+-- Ensure columns exist (for existing databases)
+ALTER TABLE public.usage_stats ADD COLUMN IF NOT EXISTS remix_count INTEGER DEFAULT 0;
+ALTER TABLE public.usage_stats ADD COLUMN IF NOT EXISTS brand_voice_count INTEGER DEFAULT 0;
 
 -- Fix FK: always point usage_stats.user_id -> profiles(id)
 ALTER TABLE public.usage_stats DROP CONSTRAINT IF EXISTS usage_stats_user_id_fkey;
@@ -278,6 +286,10 @@ CREATE TABLE IF NOT EXISTS public.brand_voices (
 
 ALTER TABLE public.brand_voices ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own voices" ON public.brand_voices;
+DROP POLICY IF EXISTS "Users can insert own voices" ON public.brand_voices;
+DROP POLICY IF EXISTS "Users can update own voices" ON public.brand_voices;
+DROP POLICY IF EXISTS "Users can delete own voices" ON public.brand_voices;
 CREATE POLICY "Users can view own voices" ON public.brand_voices FOR SELECT USING ((SELECT auth.uid()) = user_id);
 CREATE POLICY "Users can insert own voices" ON public.brand_voices FOR INSERT WITH CHECK ((SELECT auth.uid()) = user_id);
 CREATE POLICY "Users can update own voices" ON public.brand_voices FOR UPDATE USING ((SELECT auth.uid()) = user_id);
@@ -286,6 +298,7 @@ CREATE POLICY "Users can delete own voices" ON public.brand_voices FOR DELETE US
 CREATE INDEX IF NOT EXISTS idx_brand_voices_user_id ON public.brand_voices(user_id);
 CREATE INDEX IF NOT EXISTS idx_brand_voices_is_active ON public.brand_voices(user_id, is_active);
 
+DROP TRIGGER IF EXISTS update_brand_voices_updated_at ON public.brand_voices;
 CREATE TRIGGER update_brand_voices_updated_at
 BEFORE UPDATE ON public.brand_voices
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
