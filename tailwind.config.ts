@@ -9,15 +9,15 @@ export default {
   ],
   theme: {
     fontFamily: {
-      sans: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
-      serif: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
-      mono: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+      sans: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+      serif: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+      mono: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
     },
     extend: {
       fontFamily: {
-        body: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
-        headline: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
-        code: ['Inter', 'Poppins', 'system-ui', 'sans-serif'],
+        body: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+        headline: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+        code: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
