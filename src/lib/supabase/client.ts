@@ -15,12 +15,13 @@ export function createClient() {
         },
         set(name: string, value: string, options: any) {
           if (typeof document === 'undefined') return
+          const maxAge = options?.maxAge || 60 * 60 * 24 * 365 // 1 year default
           const cookieOptions = [
             `${name}=${encodeURIComponent(value)}`,
             'path=/',
             'SameSite=Lax',
+            `max-age=${maxAge}`,
           ]
-          if (options?.maxAge) cookieOptions.push(`max-age=${options.maxAge}`)
           if (window.location.protocol === 'https:') cookieOptions.push('Secure')
           document.cookie = cookieOptions.join('; ')
         },
