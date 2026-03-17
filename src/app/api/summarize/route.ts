@@ -6,6 +6,9 @@ import { checkUsageLimit } from '@/lib/usage-limits'
 import { generateWithFallback } from '@/lib/ai-fallback'
 import { z } from 'zod'
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 const SummarizeSchema = z.object({
   text: z.string().min(10, 'Text too short').max(50000, 'Text too long'),
   mode: z.enum([

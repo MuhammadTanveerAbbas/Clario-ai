@@ -12,7 +12,6 @@ const inter = Inter({
   weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-inter",
   display: "swap",
-  preload: true,
   adjustFontFallback: true,
 });
 
@@ -21,7 +20,6 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
   display: "swap",
-  preload: true,
   adjustFontFallback: true,
 });
 

@@ -3,6 +3,12 @@ import { stripe } from '@/lib/stripe'
 import Stripe from 'stripe'
 import { createClient as createServiceClient } from '@supabase/supabase-js'
 
+export const dynamic = 'force-dynamic';
+
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable')
+}
+
 export async function POST(request: Request) {
   const body = await request.text()
   const signature = request.headers.get('stripe-signature')!

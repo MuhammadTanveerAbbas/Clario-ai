@@ -3,6 +3,9 @@ import { YoutubeTranscript } from 'youtube-transcript';
 import { createClient } from '@/lib/supabase/server';
 import { checkRateLimit } from '@/middleware/rate-limit';
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 function extractVideoId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,

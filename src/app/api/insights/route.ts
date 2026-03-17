@@ -2,6 +2,13 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Groq from 'groq-sdk'
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
+if (!process.env.GROQ_API_KEY) {
+  throw new Error('Missing GROQ_API_KEY environment variable')
+}
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 })

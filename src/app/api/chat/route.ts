@@ -6,6 +6,9 @@ import { checkUsageLimit } from '@/lib/usage-limits'
 import { generateWithFallback } from '@/lib/ai-fallback'
 import { z } from 'zod'
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@example.com'
 
 const ChatSchema = z.object({

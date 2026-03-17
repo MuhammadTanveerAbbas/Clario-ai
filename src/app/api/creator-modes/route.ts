@@ -5,6 +5,9 @@ import { sanitizeAndValidate } from '@/lib/input-validation';
 import { checkUsageLimit } from '@/lib/usage-limits';
 import { generateWithFallback } from '@/lib/ai-fallback';
 
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 const CREATOR_MODES = {
   'youtube-description': {
     name: 'YouTube Description',
