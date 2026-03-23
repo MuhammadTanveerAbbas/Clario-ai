@@ -37,7 +37,7 @@ export function Navbar() {
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between">
         <div className="flex flex-1 items-center justify-start ml-[3%]">
           <Link href="/" className="flex items-center space-x-2">
-              <StickyNote className="h-6 w-6 text-[#4169E1]" />
+              <StickyNote className="h-6 w-6" style={{ color: "var(--accent)" }} />
               <span className="font-bold text-white sm:inline-block text-lg">Clario</span>
           </Link>
         </div>
@@ -60,7 +60,7 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-[#4169E1] text-white flex items-center justify-center">
+                    <AvatarFallback style={{ background: "var(--accent)", color: "#fff" }} className="flex items-center justify-center">
                       <User className="h-5 w-5" />
                     </AvatarFallback>
                   </Avatar>
@@ -87,7 +87,7 @@ export function Navbar() {
             </DropdownMenu>
           ) : (
             <Link href="/sign-up">
-              <Button className="bg-gradient-to-r from-[#4169E1] to-[#5179F1] text-white hover:from-[#3159D1] hover:to-[#4169E1] font-semibold shadow-lg shadow-[#4169E1]/20 transition-all px-4 sm:px-6 text-sm h-10">
+              <Button style={{ background: "var(--accent)", color: "#fff" }} className="hover:opacity-90 font-semibold shadow-lg transition-all px-4 sm:px-6 text-sm h-10">
                 Create Account
               </Button>
             </Link>
@@ -100,7 +100,7 @@ export function Navbar() {
             <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-                  <Menu className="h-5 w-5 text-[#4169E1]" />
+                  <Menu className="h-5 w-5" style={{ color: "var(--accent)" }} />
                   <span className="sr-only">Open Menu</span>
                 </Button>
               </SheetTrigger>
@@ -115,7 +115,7 @@ export function Navbar() {
                       className="flex items-center space-x-2"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <StickyNote className="h-5 w-5 text-[#4169E1]" />
+                      <StickyNote className="h-5 w-5" style={{ color: "var(--accent)" }} />
                       <span className="font-bold text-white">Clario</span>
                     </Link>
                     <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(false)}>

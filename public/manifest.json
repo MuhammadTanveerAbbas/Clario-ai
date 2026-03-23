@@ -1,11 +1,11 @@
 {
-  "name": "Clario - AI Text Summarizer",
+  "name": "Clario - AI Content Repurposing Tool",
   "short_name": "Clario",
-  "description": "Transform meeting transcripts and articles into clear summaries with AI",
+  "description": "Turn 1 piece of content into 10 formats instantly. AI-powered for YouTubers, podcasters, and bloggers.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#4169E1",
+  "background_color": "#0c0a09",
+  "theme_color": "#f97316",
   "icons": [
     {
       "src": "/favicon.svg",

@@ -8,7 +8,13 @@ export function UniqueLoader() {
         <div className="h-20 w-20 rounded-full border-2 border-white/10"></div>
 
         {/* Spinning rings */}
-        <div className="absolute inset-0 h-20 w-20 animate-spin rounded-full border-2 border-transparent border-t-[#4169E1] shadow-[0_0_20px_rgba(65,105,225,0.5)]"></div>
+        <div 
+          className="absolute inset-0 h-20 w-20 animate-spin rounded-full border-2 border-transparent"
+          style={{ 
+            borderTopColor: "var(--accent)",
+            boxShadow: "0 0 20px rgba(249,115,22,0.5)"
+          }}
+        ></div>
         <div
           className="absolute inset-1 h-18 w-18 animate-spin rounded-full border-2 border-transparent border-t-white/60"
           style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}
@@ -17,11 +23,14 @@ export function UniqueLoader() {
         {/* Center icon */}
         <div className="absolute inset-0 flex items-center justify-center">
           <svg
-            className="h-6 w-6 text-[#4169E1] animate-pulse"
+            className="h-6 w-6 animate-pulse"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            style={{ filter: 'drop-shadow(0 0 8px rgba(65,105,225,0.6))' }}
+            style={{ 
+              color: "var(--accent)",
+              filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.6))' 
+            }}
           >
             <path
               strokeLinecap="round"
@@ -33,7 +42,13 @@ export function UniqueLoader() {
         </div>
 
         {/* Pulsing background effect */}
-        <div className="absolute inset-0 h-20 w-20 rounded-full bg-[#4169E1]/10 animate-ping"></div>
+        <div 
+          className="absolute inset-0 h-20 w-20 rounded-full animate-ping"
+          style={{ 
+            background: "var(--accent)",
+            opacity: 0.1
+          }}
+        ></div>
       </div>
 
       {/* Loading text */}

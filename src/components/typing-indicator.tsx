@@ -8,7 +8,7 @@ export function TypingIndicator() {
   return (
     <div className="flex gap-3 justify-start mb-4">
       <Avatar className="h-8 w-8 md:h-10 md:w-10 flex-shrink-0">
-        <AvatarFallback className="bg-gradient-to-br from-[#4169E1] to-[#6B8EFF]">
+        <AvatarFallback style={{ background: "linear-gradient(to bottom right, var(--accent), var(--accent-m))" }}>
           <Bot className="h-4 w-4 md:h-5 md:w-5 text-white" />
         </AvatarFallback>
       </Avatar>

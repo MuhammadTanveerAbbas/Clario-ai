@@ -366,7 +366,7 @@ export function SummarizerOutput({
   if (isLoading) {
     return (
       <div className="mt-8">
-        <Card className="bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] border-white/10">
+        <Card style={{ background: "var(--card)", borderColor: "var(--border)" }}>
           <CardContent className="p-6 sm:p-10">
             <div className="space-y-4 animate-pulse">
               <div className="h-8 bg-white/5 rounded w-3/4"></div>
@@ -377,7 +377,7 @@ export function SummarizerOutput({
               <div className="h-4 bg-white/5 rounded w-full"></div>
               <div className="h-4 bg-white/5 rounded w-3/4"></div>
             </div>
-            <div className="flex items-center justify-center mt-8 gap-2 text-[#4169E1]">
+            <div className="flex items-center justify-center mt-8 gap-2" style={{ color: "var(--accent)" }}>
               <Loader2 className="h-5 w-5 animate-spin" />
               <span className="text-sm">Generating your summary...</span>
             </div>
@@ -421,7 +421,7 @@ export function SummarizerOutput({
             disabled={history.length === 0}
             className="border-white/20 text-white hover:bg-white/10 min-h-[44px]"
           >
-            <History className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <History className="mr-0 sm:mr-2 h-4 w-4" style={{ color: "var(--accent)" }} />
             <span className="hidden sm:inline">History ({history.length})</span>
           </Button>
           
@@ -431,7 +431,7 @@ export function SummarizerOutput({
             disabled
             className="border-white/20 text-white hover:bg-white/10 min-h-[44px] min-w-[44px] opacity-50 cursor-not-allowed"
           >
-            <ClipboardCopy className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <ClipboardCopy className="mr-0 sm:mr-2 h-4 w-4" style={{ color: "var(--accent)" }} />
             <span className="hidden sm:inline">Copy</span>
           </Button>
           
@@ -445,7 +445,7 @@ export function SummarizerOutput({
             {isLoading ? (
               <Loader2 className="mr-0 sm:mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Sparkles className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+              <Sparkles className="mr-0 sm:mr-2 h-4 w-4" style={{ color: "var(--accent)" }} />
             )}
             <span className="hidden sm:inline">Summarize</span>
           </Button>
@@ -456,7 +456,7 @@ export function SummarizerOutput({
             disabled
             className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
           >
-            <Download className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <Download className="mr-0 sm:mr-2 h-4 w-4" style={{ color: "var(--accent)" }} />
             <span className="hidden sm:inline">Download</span>
           </Button>
 
@@ -466,13 +466,13 @@ export function SummarizerOutput({
             disabled
             className="border-white/20 text-white hover:bg-white/10 min-h-[44px] opacity-50 cursor-not-allowed"
           >
-            <RefreshCw className="mr-0 sm:mr-2 h-4 w-4 text-[#4169E1]" />
+            <RefreshCw className="mr-0 sm:mr-2 h-4 w-4" style={{ color: "var(--accent)" }} />
             <span className="hidden sm:inline">Regenerate</span>
           </Button>
         </div>
 
         <div className="text-center text-gray-400 py-12">
-          <Sparkles className="h-12 w-12 mx-auto mb-4 text-[#4169E1]" />
+          <Sparkles className="h-12 w-12 mx-auto mb-4" style={{ color: "var(--accent)" }} />
           <p className="text-base">Your summary will appear here</p>
           <p className="text-sm mt-2 text-gray-500">
             Enter text and select a summary mode to get started
@@ -486,7 +486,7 @@ export function SummarizerOutput({
   return (
     <div className="mt-8 space-y-4">
       {/* Mode Badge & Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#4169E1]/10 to-purple-500/10 border border-[#4169E1]/20">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border" style={{ background: "linear-gradient(to right, var(--accent-l), var(--accent-l))", borderColor: "var(--accent)" }}>
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg ${modeConfig.bgColor}`}>
             <ModeIcon className={`h-5 w-5 ${modeConfig.color}`} />
@@ -527,7 +527,7 @@ export function SummarizerOutput({
                 Export
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-[#1a1a2e] border-white/20">
+            <DropdownMenuContent style={{ background: "var(--bg2)", borderColor: "var(--border)" }}>
               <DropdownMenuItem onClick={handleDownloadPdf} className="text-white hover:bg-white/10 cursor-pointer">
                 <FileText className="mr-2 h-4 w-4" /> PDF
               </DropdownMenuItem>
@@ -548,7 +548,7 @@ export function SummarizerOutput({
                   Change Mode
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#1a1a2e] border-white/20 max-h-[300px] overflow-y-auto">
+              <DropdownMenuContent style={{ background: "var(--bg2)", borderColor: "var(--border)" }} className="max-h-[300px] overflow-y-auto">
                 {ALL_MODES.filter(m => m !== mode).map((m) => (
                   <DropdownMenuItem key={m} onClick={() => onRegenerate(m)} className="text-white hover:bg-white/10 cursor-pointer">
                     {m}
@@ -561,30 +561,30 @@ export function SummarizerOutput({
       </div>
 
       {/* Summary Content - New Modern Design */}
-      <Card className="bg-gradient-to-br from-[#0f0f1a] via-[#1a1a2e] to-[#0f0f1a] border-[#4169E1]/20 shadow-2xl overflow-hidden">
+      <Card style={{ background: "var(--card)", borderColor: "var(--border)" }} className="shadow-2xl overflow-hidden">
         <CardContent className="p-0">
           <div className="summary-prose-modern p-6 sm:p-10 max-w-none text-gray-100">
             <ReactMarkdown 
               remarkPlugins={[remarkGfm]}
               components={{
-                h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-6 pb-3 border-b border-[#4169E1]/30 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent" {...props} />,
+                h1: ({node, ...props}) => <h1 className="text-3xl font-bold mb-6 pb-3 text-white" style={{ borderBottom: "1px solid var(--border)" }} {...props} />,
                 h2: ({node, ...props}) => <h2 className="text-2xl font-semibold mt-8 mb-4 text-white flex items-center gap-2" {...props} />,
-                h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-6 mb-3 text-blue-200" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-xl font-semibold mt-6 mb-3" style={{ color: "var(--text)" }} {...props} />,
                 h4: ({node, ...props}) => <h4 className="text-lg font-medium mt-4 mb-2 text-blue-300" {...props} />,
                 p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-gray-300" {...props} />,
                 ul: ({node, ...props}) => <ul className="space-y-2 mb-4 ml-6" {...props} />,
                 ol: ({node, ...props}) => <ol className="space-y-2 mb-4 ml-6" {...props} />,
                 li: ({node, ...props}) => <li className="text-gray-300 leading-relaxed" {...props} />,
-                blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-[#4169E1] bg-[#4169E1]/5 pl-4 py-2 my-4 italic text-blue-100" {...props} />,
+                blockquote: ({node, ...props}) => <blockquote className="pl-4 py-2 my-4 italic" style={{ borderLeft: "4px solid var(--accent)", background: "var(--accent-l)", color: "var(--text2)" }} {...props} />,
                 strong: ({node, ...props}) => <strong className="font-semibold text-white" {...props} />,
                 code: ({node, inline, ...props}: any) => 
                   inline ? 
-                    <code className="bg-[#4169E1]/10 text-blue-300 px-1.5 py-0.5 rounded text-sm" {...props} /> : 
-                    <code className="block bg-[#0a0a0a] text-green-300 p-4 rounded-lg my-4 overflow-x-auto" {...props} />,
-                hr: ({node, ...props}) => <hr className="my-6 border-[#4169E1]/20" {...props} />,
+                    <code className="px-1.5 py-0.5 rounded text-sm" style={{ background: "var(--accent-l)", color: "var(--accent)" }} {...props} /> : 
+                    <code className="block p-4 rounded-lg my-4 overflow-x-auto" style={{ background: "var(--bg)", color: "var(--success)" }} {...props} />,
+                hr: ({node, ...props}) => <hr className="my-6" style={{ borderColor: "var(--border)" }} {...props} />,
                 table: ({node, ...props}) => <div className="overflow-x-auto my-4"><table className="w-full border-collapse" {...props} /></div>,
-                th: ({node, ...props}) => <th className="border border-[#4169E1]/30 bg-[#4169E1]/10 px-4 py-2 text-left font-semibold text-white" {...props} />,
-                td: ({node, ...props}) => <td className="border border-[#4169E1]/20 px-4 py-2 text-gray-300" {...props} />,
+                th: ({node, ...props}) => <th className="px-4 py-2 text-left font-semibold text-white" style={{ border: "1px solid var(--border)", background: "var(--bg3)" }} {...props} />,
+                td: ({node, ...props}) => <td className="px-4 py-2" style={{ border: "1px solid var(--border)", color: "var(--text2)" }} {...props} />,
               }}
             >
               {result}

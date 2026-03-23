@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
+import { Inter, Poppins, Fraunces, Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ClientProviders } from "@/components/providers/client-providers";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -21,6 +22,21 @@ const poppins = Poppins({
   variable: "--font-poppins",
   display: "swap",
   adjustFontFallback: true,
+});
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+
+const geist = Geist({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-geist",
+  display: "swap",
 });
 
 
@@ -80,14 +96,6 @@ export const metadata: Metadata = {
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
       "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice. Built for YouTubers and podcasters.",
-    images: [
-      {
-        url: "https://placehold.co/1200x630/000000/FFFFFF/png?text=Clario",
-        width: 1200,
-        height: 630,
-        alt: "Clario - AI Content Repurposing Tool",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -96,7 +104,6 @@ export const metadata: Metadata = {
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
       "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice.",
-    images: ["https://placehold.co/1200x630/000000/FFFFFF/png?text=Clario"],
   },
   alternates: {
     canonical: "https://clario-hub.vercel.app",
@@ -109,14 +116,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${poppins.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`dark ${inter.variable} ${poppins.variable} ${fraunces.variable} ${geist.variable}`}>
       <body className="font-body antialiased">
         <ClientProviders>
           <AuthProvider>
             <SidebarProvider>
-              {children}
-              <Toaster />
-              <ScrollToTop />
+              <ThemeProvider>
+                {children}
+                <Toaster />
+                <ScrollToTop />
+              </ThemeProvider>
             </SidebarProvider>
           </AuthProvider>
         </ClientProviders>

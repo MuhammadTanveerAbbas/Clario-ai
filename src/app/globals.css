@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Geist', system-ui, sans-serif;
+}
+
 /* Hide scrollbar globally while keeping scroll functionality */
 * {
   scrollbar-width: none; /* Firefox */
@@ -105,7 +110,9 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
+    font-family: var(--sans), var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
+    background-color: var(--bg, #0c0a09);
+    color: var(--text, #fafaf9);
     font-weight: 700 !important;
   }
 }
