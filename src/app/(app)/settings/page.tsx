@@ -98,53 +98,51 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
   signOut: () => Promise<void>;
   router: ReturnType<typeof useRouter>;
 }) {
-  const W = sidebarCollapsed ? 60 : 220;
+  const isDark = theme === "dark";
   return (
-    <>
-      {mobileSidebarOpen && (
-        <div onClick={() => setMobileSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.5)", zIndex: 40, display: "none" }} className="mobile-overlay" />
-      )}
-      <aside style={{ width: W, minWidth: W, height: "100vh", background: "var(--sidebar)", borderRight: "1px solid var(--sidebar-b)", display: "flex", flexDirection: "column", position: "sticky", top: 0, transition: "width .2s ease", overflow: "hidden", zIndex: 30, flexShrink: 0 }}>
-        <div style={{ padding: sidebarCollapsed ? "18px 0" : "18px 16px", borderBottom: "1px solid var(--sidebar-b)", display: "flex", alignItems: "center", gap: 10, justifyContent: sidebarCollapsed ? "center" : "flex-start" }}>
-          <div style={{ width: 28, height: 28, borderRadius: 8, background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-          </div>
-          {!sidebarCollapsed && <span style={{ fontFamily: "Fraunces, Georgia, serif", fontSize: "1.05rem", fontWeight: 300, color: "var(--text)", letterSpacing: "-.01em" }}>Clario</span>}
+    <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
+      <div className="sb-logo">
+        <div className="sb-logo-mark">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
-        <nav style={{ flex: 1, padding: sidebarCollapsed ? "12px 0" : "12px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-          {NAV_ITEMS.map(item => {
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
-            return (
-              <Link key={item.href} href={item.href} style={{ display: "flex", alignItems: "center", gap: 10, padding: sidebarCollapsed ? "9px 0" : "9px 10px", borderRadius: 8, justifyContent: sidebarCollapsed ? "center" : "flex-start", background: active ? "var(--accent-l)" : "transparent", color: active ? "var(--accent)" : "var(--text3)", textDecoration: "none", fontSize: ".82rem", transition: "all .15s", position: "relative" }}>
-                <NavIcon type={item.icon} />
-                {!sidebarCollapsed && <span style={{ flex: 1 }}>{item.label}</span>}
-                {!sidebarCollapsed && item.badge && <span style={{ fontSize: ".6rem", background: "var(--accent)", color: "#fff", borderRadius: 4, padding: "1px 5px" }}>{item.badge}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-        <div style={{ padding: sidebarCollapsed ? "12px 0" : "12px 10px", borderTop: "1px solid var(--sidebar-b)", display: "flex", flexDirection: "column", gap: 6 }}>
-          {!sidebarCollapsed && user?.plan !== "pro" && (
-            <Link href="/pricing" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px 10px", borderRadius: 8, background: "var(--accent)", color: "#fff", textDecoration: "none", fontSize: ".78rem", fontWeight: 600 }}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Upgrade to Pro
-            </Link>
-          )}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, justifyContent: sidebarCollapsed ? "center" : "space-between" }}>
-            <button onClick={toggleTheme} style={{ background: "none", border: "1px solid var(--border)", borderRadius: 7, padding: "6px 8px", cursor: "pointer", color: "var(--text3)", display: "flex", alignItems: "center", gap: 5, fontSize: ".75rem" }}>
-              {theme === "dark" ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
-              {!sidebarCollapsed && (theme === "dark" ? "Light" : "Dark")}
-            </button>
-            {!sidebarCollapsed && (
-              <button onClick={() => { signOut(); router.push("/sign-in"); }} style={{ background: "none", border: "1px solid var(--border)", borderRadius: 7, padding: "6px 8px", cursor: "pointer", color: "var(--text3)", fontSize: ".75rem" }}>Out</button>
-            )}
-          </div>
-          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text3)", padding: "4px", display: "flex", alignItems: "center", justifyContent: sidebarCollapsed ? "center" : "flex-end" }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d={sidebarCollapsed ? "M9 18l6-6-6-6" : "M15 18l-6-6 6-6"}/></svg>
+        <span className="sb-logo-text">Clario</span>
+      </div>
+      <nav className="sb-nav">
+        {NAV_ITEMS.map(item => (
+          <Link key={item.href} href={item.href} className={`sb-item${pathname === item.href || pathname.startsWith(item.href + "/") ? " active" : ""}`} title={sidebarCollapsed ? item.label : undefined}>
+            <NavIcon type={item.icon} />
+            <span className="sb-lbl">{item.label}</span>
+            {item.badge && <span className="sb-badge">{item.badge}</span>}
+          </Link>
+        ))}
+      </nav>
+      <div className="sb-bottom">
+        {user?.plan !== "pro" && (
+          <button className="sb-upgrade" onClick={() => router.push("/pricing")}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Upgrade to Pro
           </button>
-        </div>
-      </aside>
-    </>
+        )}
+        <button className="sb-btn" onClick={toggleTheme} title={sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}>
+          {isDark
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          }
+          <span className="sb-btn-lbl">{isDark ? "Light mode" : "Dark mode"}</span>
+        </button>
+        <button className="sb-btn" onClick={async () => { await signOut(); router.push("/sign-in"); }} title={sidebarCollapsed ? "Sign out" : undefined}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span className="sb-btn-lbl">Sign out</span>
+        </button>
+        <button className="sb-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+          {sidebarCollapsed
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          }
+          <span className="sb-btn-lbl">Collapse</span>
+        </button>
+      </div>
+    </aside>
   );
 }
 
@@ -155,7 +153,50 @@ const SHARED_CSS = `
 body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){.sidebar-desktop{display:none!important}.mobile-overlay{display:block!important}}
+.dash-layout{display:flex;min-height:100vh;background:var(--bg)}
+.sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
+.sidebar[data-collapsed="true"]{width:60px}
+.sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
+.sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
+.sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
+.sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
+.sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
+.sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
+.sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
+.sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
+.sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
+.sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
+.sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
+.sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+.sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
+.sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
+.sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
+.sb-btn:hover{background:var(--bg3);color:var(--text2)}
+.sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
+.sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
+.sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
+.sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
+.sb-upgrade:hover{background:#ea6c0a}
+.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
+.topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
+.topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
+.topbar-hamburger{display:none}
+@media(max-width:768px){.topbar-hamburger{display:flex}}
+.main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
+  .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
+  .sidebar[data-mobile-open="true"]{transform:translateX(0)}
+  .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
+  .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
+  .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
+  .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
+}
+.mobile-overlay{display:none}
+@media(max-width:768px){.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}}
 `;
 
 export default function SettingsPage() {
@@ -220,39 +261,37 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "var(--sans)" }}>
+    <div className="dash-layout" style={{ fontFamily: "var(--sans)" }}>
       <style>{SHARED_CSS}</style>
 
-      <div className="sidebar-desktop">
-        <Sidebar
-          user={profile ? { full_name: profile.full_name, plan: profile.plan } : null}
-          pathname={pathname}
-          sidebarCollapsed={sidebarCollapsed}
-          setSidebarCollapsed={setSidebarCollapsed}
-          mobileSidebarOpen={mobileSidebarOpen}
-          setMobileSidebarOpen={setMobileSidebarOpen}
-          theme={theme}
-          toggleTheme={toggleTheme}
-          signOut={signOut}
-          router={router}
-        />
-      </div>
+      {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+      <Sidebar
+        user={profile ? { full_name: profile.full_name, plan: profile.plan } : null}
+        pathname={pathname}
+        sidebarCollapsed={sidebarCollapsed}
+        setSidebarCollapsed={setSidebarCollapsed}
+        mobileSidebarOpen={mobileSidebarOpen}
+        setMobileSidebarOpen={setMobileSidebarOpen}
+        theme={theme}
+        toggleTheme={toggleTheme}
+        signOut={signOut}
+        router={router}
+      />
+
+      <div className="main-area">
         {/* Top bar */}
-        <header style={{ height: 56, borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", padding: "0 24px", gap: 12, background: "var(--bg)", position: "sticky", top: 0, zIndex: 20 }}>
-          <button onClick={() => setMobileSidebarOpen(true)} style={{ display: "none", background: "none", border: "none", cursor: "pointer", color: "var(--text3)", padding: 4 }} className="mobile-menu-btn">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        <header className="topbar">
+          <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
-          <span style={{ fontFamily: "Fraunces, Georgia, serif", fontSize: "1.05rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>Settings</span>
-          {profile && (
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 30, height: 30, borderRadius: "50%", background: "var(--accent)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".75rem", color: "#fff", fontWeight: 600 }}>
-                {(profile.full_name || profile.email || "U")[0].toUpperCase()}
-              </div>
-              {!sidebarCollapsed && <span style={{ fontSize: ".8rem", color: "var(--text3)" }}>{profile.full_name || profile.email}</span>}
-            </div>
-          )}
+          <span style={{ fontFamily: "var(--serif)", fontSize: "1.1rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>Settings</span>
+          <button className="topbar-btn" onClick={toggleTheme} title={theme === "dark" ? "Light mode" : "Dark mode"}>
+            {theme === "dark"
+              ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+              : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            }
+          </button>
         </header>
 
         {/* Main content */}

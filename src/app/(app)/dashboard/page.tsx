@@ -302,22 +302,22 @@ export default function Dashboard() {
 
         .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
         .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 12px}
+        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
         .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
         .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
         .sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
 
         .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;width:0;overflow:hidden}
+        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
+        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
 
         .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
         .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0}
+        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
         .sb-btn:hover{background:var(--bg3);color:var(--text2)}
         .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;width:0;overflow:hidden}
+        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
 
         .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
         .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
@@ -373,9 +373,9 @@ export default function Dashboard() {
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
           .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
           .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;width:auto!important;overflow:visible!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important}
+          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
+          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
+          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
           .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
         }
         .mobile-overlay{display:none}

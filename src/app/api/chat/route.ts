@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     // Get user profile
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
@@ -93,8 +93,8 @@ export async function POST(request: Request) {
       console.error('[Chat API] Profile fetch error:', profileError);
     }
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
     
     console.log('[Chat API] Usage:', currentUsage, 'Tier:', tier);
 
@@ -166,26 +166,36 @@ How you respond:
       )
     }
 
-    const finalConversationId = conversationId || crypto.randomUUID?.()
+    // Resolve or create a chat session
+    let finalConversationId = conversationId
+    if (!finalConversationId) {
+      const { data: session, error: sessionError } = await supabase
+        .from('chat_sessions')
+        .insert({ user_id: user.id, title: sanitizedMessage.slice(0, 80) })
+        .select('id')
+        .single()
+      if (sessionError) {
+        console.error('[Chat API] Session create error:', sessionError);
+      } else {
+        finalConversationId = session.id
+      }
+    }
 
-    // Save to database
-    const { error: insertError } = await supabase.from('chat_messages').insert({
-      user_id: user.id,
-      conversation_id: finalConversationId,
-      message: sanitizedMessage,
-      response: aiResponse,
-      created_at: new Date().toISOString(),
-    })
-
-    if (insertError) {
-      console.error('[Chat API] Insert error:', insertError);
+    // Save user + assistant messages
+    if (finalConversationId) {
+      const { error: insertError } = await supabase.from('chat_messages').insert([
+        { session_id: finalConversationId, user_id: user.id, role: 'user',      content: sanitizedMessage },
+        { session_id: finalConversationId, user_id: user.id, role: 'assistant', content: aiResponse },
+      ])
+      if (insertError) {
+        console.error('[Chat API] Insert error:', insertError);
+      }
     }
 
     // Update usage stats
-    const { error: trackError } = await supabase.rpc('track_usage', {
+    const { error: trackError } = await supabase.rpc('increment_usage', {
       p_user_id: user.id,
       p_type: 'chat',
-      p_count: 1,
     })
 
     if (trackError) {

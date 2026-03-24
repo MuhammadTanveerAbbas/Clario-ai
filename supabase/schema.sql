@@ -3,7 +3,7 @@
 -- ═════════════════════════════════════════════════════════════════════════════
 
 -- ── Extensions ────────────────────────────────────────────────────────────
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
 
 -- ═════════════════════════════════════════════════════════════════════════════
@@ -46,34 +46,34 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Ensure all columns exist for existing tables
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='plan') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='plan') THEN
     ALTER TABLE profiles ADD COLUMN plan TEXT NOT NULL DEFAULT 'free' CHECK (plan IN ('free','pro'));
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='stripe_customer_id') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='stripe_customer_id') THEN
     ALTER TABLE profiles ADD COLUMN stripe_customer_id TEXT UNIQUE;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='stripe_subscription_id') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='stripe_subscription_id') THEN
     ALTER TABLE profiles ADD COLUMN stripe_subscription_id TEXT UNIQUE;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='subscription_status') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='subscription_status') THEN
     ALTER TABLE profiles ADD COLUMN subscription_status TEXT NOT NULL DEFAULT 'inactive' CHECK (subscription_status IN ('active','inactive','past_due','canceled','trialing','unpaid'));
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='billing_cycle') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='billing_cycle') THEN
     ALTER TABLE profiles ADD COLUMN billing_cycle TEXT NOT NULL DEFAULT 'monthly' CHECK (billing_cycle IN ('monthly','annual'));
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='requests_used') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='requests_used') THEN
     ALTER TABLE profiles ADD COLUMN requests_used INTEGER NOT NULL DEFAULT 0 CHECK (requests_used >= 0);
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='requests_reset_at') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='requests_reset_at') THEN
     ALTER TABLE profiles ADD COLUMN requests_reset_at TIMESTAMPTZ NOT NULL DEFAULT date_trunc('month', NOW()) + INTERVAL '1 month';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='onboarding_completed') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='onboarding_completed') THEN
     ALTER TABLE profiles ADD COLUMN onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='onboarding_steps') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='onboarding_steps') THEN
     ALTER TABLE profiles ADD COLUMN onboarding_steps JSONB NOT NULL DEFAULT '{"summarize":false,"remix":false,"brandVoice":false,"chat":false}'::JSONB;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='profiles' AND column_name='theme') THEN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='profiles' AND column_name='theme') THEN
     ALTER TABLE profiles ADD COLUMN theme TEXT NOT NULL DEFAULT 'dark' CHECK (theme IN ('dark','light'));
   END IF;
 END $$;
@@ -120,7 +120,7 @@ CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXEC
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS usage_tracking (
-  id         UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id         UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type       TEXT        NOT NULL CHECK (type IN ('summarize','chat','remix','brand_voice','image_prompt','calendar_event','export_notion','export_gdocs')),
   metadata   JSONB       NOT NULL DEFAULT '{}'::JSONB,
@@ -143,7 +143,7 @@ CREATE POLICY "usage_insert_own" ON usage_tracking FOR INSERT WITH CHECK ((SELEC
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS api_rate_limits (
-  id            UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id            UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   endpoint      TEXT        NOT NULL,
   window_start  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -162,7 +162,7 @@ CREATE POLICY "rate_limits_select_own" ON api_rate_limits FOR SELECT USING ((SEL
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS brand_voices (
-  id          UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id          UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   name        TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
   description TEXT        CHECK (char_length(description) <= 500),
@@ -180,7 +180,7 @@ CREATE INDEX IF NOT EXISTS idx_brand_voices_active  ON brand_voices(user_id, is_
 
 ALTER TABLE brand_voices ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "brand_voices_all_own" ON brand_voices;
-CREATE POLICY "brand_voices_all_own" ON brand_voices FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "brand_voices_all_own" ON brand_voices FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 DROP TRIGGER IF EXISTS brand_voices_updated_at ON brand_voices;
 CREATE TRIGGER brand_voices_updated_at BEFORE UPDATE ON brand_voices FOR EACH ROW EXECUTE FUNCTION update_updated_at();
@@ -190,7 +190,7 @@ CREATE TRIGGER brand_voices_updated_at BEFORE UPDATE ON brand_voices FOR EACH RO
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS summarizer_history (
-  id             UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id             UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id        UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   source_type    TEXT        NOT NULL CHECK (source_type IN ('youtube_url','paste_text')),
   source_url     TEXT        CHECK (source_url ~ '^https?://'),
@@ -207,14 +207,14 @@ CREATE INDEX IF NOT EXISTS idx_summarizer_created_at ON summarizer_history(creat
 
 ALTER TABLE summarizer_history ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "summarizer_all_own" ON summarizer_history;
-CREATE POLICY "summarizer_all_own" ON summarizer_history FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "summarizer_all_own" ON summarizer_history FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- REMIX HISTORY
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS remix_history (
-  id             UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id             UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id        UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   input_text     TEXT        NOT NULL CHECK (char_length(input_text) <= 200000),
   outputs        JSONB       NOT NULL DEFAULT '{}'::JSONB,
@@ -227,14 +227,14 @@ CREATE INDEX IF NOT EXISTS idx_remix_created_at ON remix_history(created_at DESC
 
 ALTER TABLE remix_history ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "remix_all_own" ON remix_history;
-CREATE POLICY "remix_all_own" ON remix_history FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "remix_all_own" ON remix_history FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- CHAT SESSIONS + MESSAGES
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS chat_sessions (
-  id         UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id         UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   title      TEXT        NOT NULL DEFAULT 'New chat' CHECK (char_length(title) <= 200),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -246,13 +246,13 @@ CREATE INDEX IF NOT EXISTS idx_chat_sessions_updated_at ON chat_sessions(user_id
 
 ALTER TABLE chat_sessions ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "chat_sessions_all_own" ON chat_sessions;
-CREATE POLICY "chat_sessions_all_own" ON chat_sessions FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "chat_sessions_all_own" ON chat_sessions FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 DROP TRIGGER IF EXISTS chat_sessions_updated_at ON chat_sessions;
 CREATE TRIGGER chat_sessions_updated_at BEFORE UPDATE ON chat_sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 CREATE TABLE IF NOT EXISTS chat_messages (
-  id         UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id         UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   session_id UUID        NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
   user_id    UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   role       TEXT        NOT NULL CHECK (role IN ('user','assistant','system')),
@@ -265,15 +265,23 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id    ON chat_messages(user_id
 CREATE INDEX IF NOT EXISTS idx_chat_messages_created_at ON chat_messages(session_id, created_at ASC);
 
 ALTER TABLE chat_messages ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "chat_messages_all_own" ON chat_messages;
-CREATE POLICY "chat_messages_all_own" ON chat_messages FOR ALL USING ((SELECT auth.uid()) = user_id);
+DROP POLICY IF EXISTS "chat_messages_select_own" ON chat_messages;
+DROP POLICY IF EXISTS "chat_messages_insert_own" ON chat_messages;
+DROP POLICY IF EXISTS "chat_messages_update_own" ON chat_messages;
+DROP POLICY IF EXISTS "chat_messages_delete_own" ON chat_messages;
+CREATE POLICY "chat_messages_select_own" ON chat_messages FOR SELECT USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "chat_messages_insert_own" ON chat_messages FOR INSERT WITH CHECK (
+  (SELECT auth.uid()) = user_id
+);
+CREATE POLICY "chat_messages_update_own" ON chat_messages FOR UPDATE USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "chat_messages_delete_own" ON chat_messages FOR DELETE USING ((SELECT auth.uid()) = user_id);
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- CALENDAR EVENTS
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS calendar_events (
-  id               UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id               UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id          UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   title            TEXT        NOT NULL CHECK (char_length(title) BETWEEN 1 AND 300),
   description      TEXT        CHECK (char_length(description) <= 2000),
@@ -293,7 +301,7 @@ CREATE INDEX IF NOT EXISTS idx_calendar_status       ON calendar_events(user_id,
 
 ALTER TABLE calendar_events ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "calendar_all_own" ON calendar_events;
-CREATE POLICY "calendar_all_own" ON calendar_events FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "calendar_all_own" ON calendar_events FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 DROP TRIGGER IF EXISTS calendar_events_updated_at ON calendar_events;
 CREATE TRIGGER calendar_events_updated_at BEFORE UPDATE ON calendar_events FOR EACH ROW EXECUTE FUNCTION update_updated_at();
@@ -303,7 +311,7 @@ CREATE TRIGGER calendar_events_updated_at BEFORE UPDATE ON calendar_events FOR E
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS image_prompts (
-  id          UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id          UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   source_text TEXT        NOT NULL CHECK (char_length(source_text) <= 50000),
   style       TEXT        CHECK (char_length(style) <= 100),
@@ -317,14 +325,14 @@ CREATE INDEX IF NOT EXISTS idx_image_prompts_created_at ON image_prompts(user_id
 
 ALTER TABLE image_prompts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "image_prompts_all_own" ON image_prompts;
-CREATE POLICY "image_prompts_all_own" ON image_prompts FOR ALL USING ((SELECT auth.uid()) = user_id);
+CREATE POLICY "image_prompts_all_own" ON image_prompts FOR ALL USING ((SELECT auth.uid()) = user_id) WITH CHECK ((SELECT auth.uid()) = user_id);
 
 -- ═════════════════════════════════════════════════════════════════════════════
 -- SUBSCRIPTIONS
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS subscriptions (
-  id                     UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id                     UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id                UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   stripe_subscription_id TEXT        NOT NULL UNIQUE,
   stripe_customer_id     TEXT        NOT NULL,
@@ -364,7 +372,7 @@ ALTER TABLE processed_webhook_events ENABLE ROW LEVEL SECURITY;
 -- ═════════════════════════════════════════════════════════════════════════════
 
 CREATE TABLE IF NOT EXISTS feedback (
-  id         UUID        NOT NULL DEFAULT uuid_generate_v4() PRIMARY KEY,
+  id         UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID        REFERENCES profiles(id) ON DELETE SET NULL,
   type       TEXT        NOT NULL DEFAULT 'general' CHECK (type IN ('bug','feature','general','billing')),
   message    TEXT        NOT NULL CHECK (char_length(message) BETWEEN 1 AND 5000),
@@ -487,26 +495,25 @@ CREATE TRIGGER enforce_single_active_voice
 -- VIEW: dashboard_stats
 -- ═════════════════════════════════════════════════════════════════════════════
 
-CREATE OR REPLACE VIEW dashboard_stats AS
+DROP VIEW IF EXISTS dashboard_stats CASCADE;
+
+CREATE VIEW dashboard_stats AS
 SELECT
-  p.id                                                                     AS user_id,
+  p.id AS user_id,
   p.plan,
   p.requests_used,
-  CASE WHEN p.plan = 'pro' THEN 1000 ELSE 100 END                         AS requests_limit,
+  CASE WHEN p.plan = 'pro' THEN 1000 ELSE 100 END AS requests_limit,
   ROUND((p.requests_used::NUMERIC / NULLIF(CASE WHEN p.plan = 'pro' THEN 1000 ELSE 100 END, 0)) * 100, 1) AS usage_pct,
-  COUNT(DISTINCT s.id)  FILTER (WHERE s.created_at  > NOW() - INTERVAL '30 days') AS summaries_this_month,
-  COUNT(DISTINCT r.id)  FILTER (WHERE r.created_at  > NOW() - INTERVAL '30 days') AS remixes_this_month,
-  COUNT(DISTINCT cm.id) FILTER (WHERE cm.role = 'user' AND cm.created_at > NOW() - INTERVAL '30 days') AS chats_this_month,
-  COUNT(DISTINCT bv.id)                                                    AS brand_voices_count,
-  COUNT(DISTINCT ce.id) FILTER (WHERE ce.status = 'scheduled')            AS scheduled_posts,
+  COALESCE(COUNT(DISTINCT s.id) FILTER (WHERE s.created_at > NOW() - INTERVAL '30 days'), 0) AS summaries_this_month,
+  COALESCE(COUNT(DISTINCT r.id) FILTER (WHERE r.created_at > NOW() - INTERVAL '30 days'), 0) AS remixes_this_month,
+  COALESCE(COUNT(DISTINCT cm.id) FILTER (WHERE cm.role = 'user' AND cm.created_at > NOW() - INTERVAL '30 days'), 0) AS chats_this_month,
+  COALESCE(COUNT(DISTINCT bv.id), 0) AS brand_voices_count,
+  COALESCE(COUNT(DISTINCT ce.id) FILTER (WHERE ce.status = 'scheduled'), 0) AS scheduled_posts,
   p.requests_reset_at
 FROM profiles p
-LEFT JOIN summarizer_history s ON s.user_id  = p.id
-LEFT JOIN remix_history r      ON r.user_id  = p.id
-LEFT JOIN chat_messages cm     ON cm.user_id = p.id
-LEFT JOIN brand_voices bv      ON bv.user_id = p.id
-LEFT JOIN calendar_events ce   ON ce.user_id = p.id
+LEFT JOIN summarizer_history s ON s.user_id = p.id
+LEFT JOIN remix_history r ON r.user_id = p.id
+LEFT JOIN chat_messages cm ON cm.user_id = p.id
+LEFT JOIN brand_voices bv ON bv.user_id = p.id
+LEFT JOIN calendar_events ce ON ce.user_id = p.id
 GROUP BY p.id, p.plan, p.requests_used, p.requests_reset_at;
-
--- ═════════════════════════════════════════════════════════════════════════════
-NOTIFY pgrst, 'reload schema';

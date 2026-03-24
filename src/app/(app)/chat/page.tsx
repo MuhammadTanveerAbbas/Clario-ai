@@ -8,7 +8,6 @@ import { useSidebar } from "@/contexts/SidebarContext";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-// ── Types ──────────────────────────────────────────────────────────────────
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
@@ -21,7 +20,6 @@ interface BrandVoice {
   name: string;
   tone?: string;
   personality?: string;
-  examples?: string;
   is_active: boolean;
 }
 
@@ -31,19 +29,6 @@ interface Toast {
   message: string;
 }
 
-// ── Shared CSS ─────────────────────────────────────────────────────────────
-const SHARED_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes dotPulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
-`;
-
-// ── Nav Items (same as dashboard) ─────────────────────────────────────────
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
@@ -68,10 +53,6 @@ function NavIcon({ type }: { type: string }) {
   }
 }
 
-function Skeleton({ w = "100%", h = 16, r = 8 }: { w?: string | number; h?: number; r?: number }) {
-  return <div style={{ width: w, height: h, borderRadius: r, background: "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />;
-}
-
 function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -85,7 +66,6 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
   );
 }
 
-// ── Sidebar (shared shell) ─────────────────────────────────────────────────
 function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen, theme, toggleTheme, signOut, router }: {
   user: { full_name?: string; plan?: string } | null;
   pathname: string;
@@ -103,7 +83,9 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
     <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
       <div className="sb-logo">
         <div className="sb-logo-mark">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
         </div>
         <span className="sb-logo-text">Clario</span>
       </div>
@@ -123,7 +105,7 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
             Upgrade to Pro
           </button>
         )}
-        <button className="sb-btn" onClick={toggleTheme}>
+        <button className="sb-btn" onClick={toggleTheme} title={sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}>
           {isDark
             ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
             : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -134,7 +116,7 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span className="sb-btn-lbl">Sign out</span>
         </button>
-        <button className="sb-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
+        <button className="sb-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
           {sidebarCollapsed
             ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
             : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -146,7 +128,6 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
   );
 }
 
-// ── Main Chat Page ─────────────────────────────────────────────────────────
 export default function ChatPage() {
   const pathname = usePathname();
   const router = useRouter();
@@ -228,7 +209,6 @@ export default function ChatPage() {
       const data = await res.json();
       const aiContent: string = data.response || "";
 
-      // Simulate streaming word by word
       setMessages(prev => prev.map(m => m.id === assistantMsg.id ? { ...m, content: "", pending: false } : m));
       const words = aiContent.split(" ");
       for (let i = 0; i < words.length; i++) {
@@ -256,45 +236,56 @@ export default function ChatPage() {
 
   return (
     <>
-      <style>{SHARED_CSS}{`
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        :root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
+        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+        @keyframes dotPulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
+
         .dash-layout{display:flex;min-height:100vh;background:var(--bg)}
         .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
         .sidebar[data-collapsed="true"]{width:60px}
-        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0}
+        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
         .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
         .sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s}
+        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
         .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
         .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
         .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 12px}
+        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
         .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
         .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
         .sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
-        .sb-lbl{opacity:1;transition:opacity .12s;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;width:0;overflow:hidden}
+        .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
+        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
+        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
         .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
         .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0}
+        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
         .sb-btn:hover{background:var(--bg3);color:var(--text2)}
-        .sb-btn-lbl{opacity:1;transition:opacity .12s}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;width:0;overflow:hidden}
-        .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s}
+        .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
+        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
+        .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
         .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
         .sb-upgrade:hover{background:#ea6c0a}
         .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
-        .topbar-btn:hover{background:var(--bg3);color:var(--text2)}
+        .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
+        .topbar-hamburger{display:none}
+        @media(max-width:768px){.topbar-hamburger{display:flex}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         @media(max-width:768px){
-          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
+          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
           .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
           .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;width:auto!important;overflow:visible!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important}
+          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
+          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
+          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
           .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
         }
         .mobile-overlay{display:none}
@@ -311,7 +302,7 @@ export default function ChatPage() {
         .input-row{display:flex;gap:10px;align-items:flex-end}
         .chat-textarea{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-family:var(--sans);font-size:.88rem;color:var(--text);resize:none;min-height:44px;max-height:144px;outline:none;transition:border-color .15s;line-height:1.5}
         .chat-textarea:focus{border-color:var(--accent)}
-        .send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;opacity:1}
+        .send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
         .send-btn:disabled{opacity:.4;cursor:not-allowed}
         .send-btn:not(:disabled):hover{background:#ea6c0a}
         .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;animation:dotPulse 1.4s ease-in-out infinite}
@@ -325,23 +316,34 @@ export default function ChatPage() {
       {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
       <div className="dash-layout">
-        <Sidebar user={userProfile} pathname={pathname} sidebarCollapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} mobileSidebarOpen={mobileSidebarOpen} setMobileSidebarOpen={setMobileSidebarOpen} theme={theme} toggleTheme={toggleTheme} signOut={signOut} router={router} />
+        <Sidebar
+          user={userProfile}
+          pathname={pathname}
+          sidebarCollapsed={sidebarCollapsed}
+          setSidebarCollapsed={setSidebarCollapsed}
+          mobileSidebarOpen={mobileSidebarOpen}
+          setMobileSidebarOpen={setMobileSidebarOpen}
+          theme={theme}
+          toggleTheme={toggleTheme}
+          signOut={signOut}
+          router={router}
+        />
 
         <div className="main-area">
-          {/* Topbar */}
           <div className="topbar">
-            <button className="topbar-btn" style={{ display: "none" }} onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
+            <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
             <span style={{ fontFamily: "var(--serif)", fontSize: "1.1rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>AI Chat</span>
             <button className="topbar-btn" onClick={toggleTheme} title={isDark ? "Light mode" : "Dark mode"}>
-              {isDark ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+              {isDark
+                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
+                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              }
             </button>
           </div>
 
           <div className="chat-layout">
-            {/* Sessions panel */}
             <div className={`sessions-panel${showSessions ? " open" : ""}`}>
               <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: ".68rem", fontWeight: 600, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em" }}>Conversations</span>
@@ -356,7 +358,6 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Chat area */}
             <div className="chat-area">
               <div className="chat-header">
                 <button className="topbar-btn" onClick={() => setShowSessions(!showSessions)} title="Toggle sessions">
@@ -378,8 +379,8 @@ export default function ChatPage() {
                     <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontWeight: 300, color: "var(--text)", marginBottom: 8, textAlign: "center" }}>What are you creating today?</h2>
                     <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Ask anything about your content strategy, get writing feedback, or repurpose ideas.</p>
                     <div className="starter-grid" style={{ width: "100%", maxWidth: 480 }}>
-                      {STARTER_PROMPTS.map(p => (
-                        <button key={p} className="starter-card" onClick={() => sendMessage(p)}>{p}</button>
+                      {STARTER_PROMPTS.map(prompt => (
+                        <button key={prompt} className="starter-card" onClick={() => sendMessage(prompt)}>{prompt}</button>
                       ))}
                     </div>
                   </div>
