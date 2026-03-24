@@ -109,6 +109,7 @@ export default function PricingPage() {
         @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
         @keyframes spin{to{transform:rotate(360deg)}}
         .price-hero{padding:72px 5% 56px;text-align:center;background:var(--w)}
+        @media(max-width:480px){.price-hero{padding:48px 5% 40px}}
         .price-h1{font-family:var(--serif);font-size:clamp(2.2rem,4vw,3.4rem);font-weight:300;letter-spacing:-.03em;line-height:1.1;color:var(--bk);margin-bottom:10px}
         .price-h1 em{font-style:italic;color:var(--o)}
         .price-sub{font-size:.9rem;color:var(--g5);max-width:440px;margin:0 auto 28px;line-height:1.7}

@@ -30,6 +30,7 @@ const AUTH_STYLES = `
   .auth-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
   @media(max-width:820px){.auth-wrap{grid-template-columns:1fr}}
   .auth-left{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 5%;min-height:100vh}
+  @media(max-width:480px){.auth-left{padding:32px 4%}}
   .auth-right{background:var(--bg2);border-left:1px solid var(--border);padding:48px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
   @media(max-width:820px){.auth-right{display:none}}
   .auth-card{width:100%;max-width:400px;animation:fu .5s ease both}

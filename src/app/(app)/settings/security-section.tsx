@@ -109,7 +109,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
             { label: "Two-Factor Authentication", desc: "Add an extra layer of security", action: "Enable", color: "var(--success)" },
             { label: "Login Sessions", desc: "Manage active sessions", action: "View All", color: "var(--text2)" },
           ].map(item => (
-            <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10 }}>
+            <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, gap: 12, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500 }}>{item.label}</div>
                 <div style={{ fontSize: ".78rem", color: "var(--text3)", marginTop: 2 }}>{item.desc}</div>

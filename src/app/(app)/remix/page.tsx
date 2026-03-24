@@ -180,15 +180,20 @@ export default function RemixPage() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
+        .remix-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        @media(max-width:560px){.remix-feature-grid{grid-template-columns:1fr}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         .page-content{flex:1;padding:24px;overflow:auto}
+        @media(max-width:768px){.page-content{padding:16px}}
+        @media(max-width:480px){.page-content{padding:12px}}
         .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden}
         .remix-layout{display:flex;gap:20px;min-height:0}
         .remix-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
         .remix-right{width:280px;flex-shrink:0}
         @media(max-width:900px){.remix-right{display:none}}
         .format-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        @media(max-width:480px){.format-grid{grid-template-columns:1fr}}
         .format-card{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;position:relative}
         .format-card:hover{background:var(--bg3)}
         .output-card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden;animation:fu .3s ease both}
@@ -277,7 +282,7 @@ export default function RemixPage() {
                       </div>
                     )}
                     <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Paste your content here — a video transcript, blog post, newsletter, or any text..." style={{ width: "100%", minHeight: 160, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "vertical", outline: "none", lineHeight: 1.6 }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
                       <div style={{ display: "flex", gap: 12 }}>
                         <button onClick={() => setSelectedFormats(new Set(FORMATS.map(f => f.id)))} style={{ background: "none", border: "none", color: "var(--text3)", fontSize: ".76rem", cursor: "pointer" }}>Select All</button>
                         <button onClick={() => setSelectedFormats(new Set())} style={{ background: "none", border: "none", color: "var(--text3)", fontSize: ".76rem", cursor: "pointer" }}>Deselect All</button>
@@ -334,7 +339,7 @@ export default function RemixPage() {
                       const isCollapsed = collapsed.has(f.id);
                       return (
                         <div key={f.id} className="output-card">
-                          <div style={{ padding: "12px 16px", borderBottom: isCollapsed ? "none" : "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 8 }}>
+                          <div style={{ padding: "12px 16px", borderBottom: isCollapsed ? "none" : "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                             <div style={{ width: 8, height: 8, borderRadius: "50%", background: f.color, flexShrink: 0 }} />
                             <span style={{ fontSize: ".84rem", fontWeight: 500, color: "var(--text2)", flex: 1 }}>{f.label}</span>
                             <button onClick={() => handleCopy(f.id, outputs[f.id])} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>{copiedId === f.id ? "✓" : "Copy"}</button>
@@ -355,7 +360,7 @@ export default function RemixPage() {
                     <div style={{ fontSize: "3rem", marginBottom: 12 }}>🔄</div>
                     <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>One input. Ten formats. Instantly.</h2>
                     <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Paste any content and Clario remixes it into every format you need — simultaneously.</p>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }} className="remix-feature-grid">
                       {[["All 10 formats at once", "Twitter, LinkedIn, newsletters, and 7 more"], ["Sounds like you", "Applies your Brand Voice automatically"], ["Calendar ready", "Add any output directly to your content calendar"]].map(([title, desc]) => (
                         <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>
                           <div style={{ fontSize: ".84rem", fontWeight: 600, color: "var(--text2)", marginBottom: 4 }}>{title}</div>

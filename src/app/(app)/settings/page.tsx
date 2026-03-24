@@ -184,7 +184,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
 .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
 .topbar-hamburger{display:none}
-@media(max-width:768px){.topbar-hamburger{display:flex}}
+@media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
 .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
@@ -295,7 +295,9 @@ export default function SettingsPage() {
         </header>
 
         {/* Main content */}
-        <main style={{ flex: 1, padding: "28px 24px", maxWidth: 860, width: "100%" }}>
+        <main className="settings-main" style={{ flex: 1, padding: "28px 24px", maxWidth: 860, width: "100%" }}>
+          {/* @media responsive handled via inline style below */}
+          <style>{`@media(max-width:768px){.settings-main{padding:16px 14px!important}}@media(max-width:480px){.settings-main{padding:12px!important}}`}</style>
           {loading ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <Skeleton h={40} r={10} />

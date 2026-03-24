@@ -277,7 +277,7 @@ export default function ChatPage() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         @media(max-width:768px){
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
@@ -296,9 +296,11 @@ export default function ChatPage() {
         .chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
         .chat-header{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
         .messages-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
-        .msg-user{align-self:flex-end;background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:75%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-        .msg-assistant{align-self:flex-start;background:var(--card);border:1px solid var(--card-b);border-radius:4px 16px 16px 16px;padding:10px 14px;max-width:80%;font-size:.88rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+        @media(max-width:480px){.messages-area{padding:12px;gap:8px}}
+        .msg-user{align-self:flex-end;background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:85%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+        .msg-assistant{align-self:flex-start;background:var(--card);border:1px solid var(--card-b);border-radius:4px 16px 16px 16px;padding:10px 14px;max-width:88%;font-size:.88rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
         .input-area{border-top:1px solid var(--border);padding:16px;flex-shrink:0;background:var(--bg)}
+        @media(max-width:480px){.input-area{padding:10px}}
         .input-row{display:flex;gap:10px;align-items:flex-end}
         .chat-textarea{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-family:var(--sans);font-size:.88rem;color:var(--text);resize:none;min-height:44px;max-height:144px;outline:none;transition:border-color .15s;line-height:1.5}
         .chat-textarea:focus{border-color:var(--accent)}
@@ -307,7 +309,7 @@ export default function ChatPage() {
         .send-btn:not(:disabled):hover{background:#ea6c0a}
         .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;animation:dotPulse 1.4s ease-in-out infinite}
         .starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
-        @media(max-width:500px){.starter-grid{grid-template-columns:1fr}}
+        @media(max-width:600px){.starter-grid{grid-template-columns:1fr}}
         .starter-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-size:.82rem;color:var(--text2);transition:all .15s;text-align:left}
         .starter-card:hover{border-color:var(--accent);color:var(--accent)}
       `}</style>

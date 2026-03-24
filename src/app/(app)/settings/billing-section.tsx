@@ -42,6 +42,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <style>{`.billing-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}@media(max-width:380px){.billing-stats{grid-template-columns:1fr}}.billing-actions{display:flex;gap:10px;flex-wrap:wrap}.billing-actions button{flex:1;min-width:120px}`}</style>
       {/* Current plan */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, background: isPaid ? "radial-gradient(circle, rgba(245,158,11,.12) 0%, transparent 70%)" : "radial-gradient(circle, rgba(249,115,22,.08) 0%, transparent 70%)", pointerEvents: "none" }} />
@@ -55,7 +56,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
           </span>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
+        <div className="billing-stats">
           <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10 }}>
             <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{plan.requests}</div>
             <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>AI Requests / month</div>
@@ -66,7 +67,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="billing-actions">
           <button
             onClick={() => router.push("/pricing")}
             style={{ flex: 1, padding: "10px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}

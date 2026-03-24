@@ -278,10 +278,12 @@ export default function CalendarPage() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
 
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         .page-content{flex:1;padding:24px;overflow:auto}
+        @media(max-width:768px){.page-content{padding:16px}}
+        @media(max-width:480px){.page-content{padding:12px}}
 
         @media(max-width:768px){
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
@@ -388,13 +390,15 @@ export default function CalendarPage() {
                   <div style={{ textAlign: "center", padding: 60, color: "var(--text3)" }}>Loading...</div>
                 ) : (
                   <>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginBottom: 8 }}>
+                    <div style={{ overflowX: "auto" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, marginBottom: 8, minWidth: 280 }}>
                       {DAYS.map(day => (
                         <div key={day} style={{ fontSize: ".75rem", color: "var(--text3)", textAlign: "center", fontWeight: 500 }}>{day}</div>
                       ))}
                     </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, minWidth: 280 }}>
                       {renderMonthView()}
+                    </div>
                     </div>
                   </>
                 )}

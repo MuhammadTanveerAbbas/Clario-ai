@@ -328,25 +328,28 @@ export default function Dashboard() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
         .avatar-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--accent-l);color:var(--accent);font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
         .avatar-btn:hover{border-color:var(--accent)}
 
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         .page-content{flex:1;padding:24px;overflow:auto;display:flex;flex-direction:column;gap:20px}
+        @media(max-width:768px){.page-content{padding:16px;gap:14px}}
+        @media(max-width:480px){.page-content{padding:12px;gap:12px}}
 
         .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden}
         .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
         @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:500px){.stat-grid{grid-template-columns:1fr}}
+        @media(max-width:480px){.stat-grid{grid-template-columns:1fr}}
         .stat-card{padding:20px;display:flex;flex-direction:column;gap:4px;cursor:pointer;transition:transform .2s,box-shadow .2s;text-decoration:none}
         .stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.12)}
         .stat-label{font-size:.72rem;font-weight:500;color:var(--text3);display:flex;align-items:center;gap:6px;margin-bottom:4px}
-        .stat-value{font-family:var(--serif);font-size:2rem;font-weight:300;letter-spacing:-.04em;color:var(--text);line-height:1}
+        .stat-value{font-family:var(--serif);font-size:clamp(1.4rem,3vw,2rem);font-weight:300;letter-spacing:-.04em;color:var(--text);line-height:1}
         .stat-sub{font-size:.7rem;color:var(--text3);margin-top:4px}
 
         .charts-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
         @media(max-width:900px){.charts-grid{grid-template-columns:1fr}}
+        @media(max-width:768px){.charts-grid{gap:12px}}
         .chart-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;margin-bottom:4px}
         .chart-title{font-size:.82rem;font-weight:600;color:var(--text2)}
         .chart-badge{font-size:.64rem;font-weight:700;background:var(--accent-l);color:var(--accent);padding:2px 9px;border-radius:100px;border:1px solid var(--accent-m)}
@@ -365,6 +368,7 @@ export default function Dashboard() {
 
         .qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
         @media(max-width:700px){.qa-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:400px){.qa-grid{grid-template-columns:1fr}}
         .qa-card{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:16px;border-radius:11px;border:1px solid var(--card-b);background:var(--card);text-decoration:none;color:var(--text2);font-size:.8rem;font-weight:500;transition:all .2s;cursor:pointer}
         .qa-card:hover{border-color:var(--accent);background:var(--accent-l);color:var(--accent);transform:translateY(-2px)}
         .qa-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}

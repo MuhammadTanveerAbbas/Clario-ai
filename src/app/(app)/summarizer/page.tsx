@@ -216,18 +216,22 @@ export default function SummarizerPage() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         .page-content{flex:1;padding:24px;overflow:auto}
+        @media(max-width:768px){.page-content{padding:16px}}
+        @media(max-width:480px){.page-content{padding:12px}}
         .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden}
         .mode-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
         @media(max-width:900px){.mode-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:600px){.mode-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:380px){.mode-grid{grid-template-columns:1fr}}
         .mode-card{background:var(--card);border:1px solid var(--card-b);border-radius:12px;padding:14px;cursor:pointer;transition:all .18s;position:relative}
         .mode-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
         .mode-card.selected{border-color:var(--accent);background:var(--accent-l)}
         .history-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--bg2);border-left:1px solid var(--border);z-index:300;display:flex;flex-direction:column;transition:transform .25s}
         .history-panel.closed{transform:translateX(100%)}
+        @media(max-width:480px){.history-panel{width:100%}}
         @media(max-width:768px){
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
           .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}

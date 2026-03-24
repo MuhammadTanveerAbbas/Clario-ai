@@ -174,14 +174,19 @@ export default function BrandVoicePage() {
         .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}}
+        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
+        .feature-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+        @media(max-width:560px){.feature-grid-3{grid-template-columns:1fr}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
         .page-content{flex:1;padding:24px;overflow:auto}
+        @media(max-width:768px){.page-content{padding:16px}}
+        @media(max-width:480px){.page-content{padding:12px}}
         .voices-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
         @media(max-width:700px){.voices-grid{grid-template-columns:1fr}}
         .voice-card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;padding:20px;animation:fu .4s ease both}
         .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px}
-        .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:520px;padding:24px;animation:fu .25s ease both}
+        .modal{background:var(--bg2);border:1px solid var(--border);border-radius:18px;width:100%;max-width:520px;padding:24px;animation:fu .25s ease both;max-height:90vh;overflow-y:auto}
+        @media(max-width:480px){.modal{padding:16px;border-radius:14px}}
         .field-label{font-size:.78rem;font-weight:600;color:var(--text3);margin-bottom:6px;display:block}
         .field-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;font-family:var(--sans);font-size:.86rem;color:var(--text);outline:none;transition:border-color .15s}
         .field-input:focus{border-color:var(--accent)}
@@ -272,7 +277,7 @@ export default function BrandVoicePage() {
                 <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Your voice, everywhere.</h2>
                 <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Create a Brand Voice and Clario will automatically write in your style across all summaries, remixes, and chats.</p>
                 <button onClick={openCreate} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontFamily: "var(--sans)", fontSize: ".88rem", fontWeight: 600, cursor: "pointer", marginBottom: 32 }}>Create your first voice</button>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }} className="feature-grid-3">
                   {[["Sounds like you", "Clario learns your tone, vocabulary, and personality"], ["Always on", "Activate a voice and it applies to every AI output automatically"], ["Multiple voices", "Create different voices for different brands or projects"]].map(([title, desc]) => (
                     <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>
                       <div style={{ fontSize: ".84rem", fontWeight: 600, color: "var(--text2)", marginBottom: 4 }}>{title}</div>

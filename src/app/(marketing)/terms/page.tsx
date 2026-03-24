@@ -12,6 +12,7 @@ export default function TermsPage() {
         :root{--o:#f97316;--ol:#fff7ed;--bk:#0c0a09;--g7:#44403c;--g5:#78716c;--g4:#a8a29e;--g2:#e7e5e4;--w:#fff;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
         body{font-family:var(--sans);background:var(--w);color:var(--bk);-webkit-font-smoothing:antialiased}
         .legal-wrap{max-width:740px;margin:0 auto;padding:64px 5% 80px}
+        @media(max-width:480px){.legal-wrap{padding:40px 5% 60px}}
         .legal-h1{font-family:var(--serif);font-size:clamp(2rem,3.5vw,3rem);font-weight:300;letter-spacing:-.03em;color:var(--bk);margin-bottom:8px}
         .legal-h1 em{font-style:italic;color:var(--o)}
         .legal-meta{font-size:.78rem;color:var(--g4);margin-bottom:40px}

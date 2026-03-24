@@ -212,6 +212,7 @@ function ComparisonTable() {
 /* ── Main Page ─────────────────────────────────────────────── */
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
@@ -260,8 +261,15 @@ export default function LandingPage() {
         .btn-si:hover{background:var(--g1)}
         .btn-n{background:var(--bk);color:var(--w);padding:9px 20px;border-radius:9px;font-size:.82rem;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);letter-spacing:-.01em;transition:all .2s}
         .btn-n:hover{background:var(--o);transform:translateY(-1px)}
+        .nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--bk)}
+        .mobile-nav{display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+        .mobile-nav.open{display:flex}
+        .mobile-nav a{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--bk);text-decoration:none;letter-spacing:-.02em}
+        .mobile-nav-btns{display:flex;flex-direction:column;gap:10px;width:200px;margin-top:8px}
+        @media(max-width:680px){.nl{display:none}.np{display:none}.nav-hamburger{display:flex}}
         .hero{min-height:100vh;padding:96px 5% 72px;display:grid;grid-template-columns:1fr 1.1fr;gap:52px;align-items:center;max-width:1160px;margin:0 auto}
-        @media(max-width:860px){.hero{grid-template-columns:1fr;text-align:center;padding-top:88px}}
+        @media(max-width:860px){.hero{grid-template-columns:1fr;text-align:center;padding-top:88px;gap:36px}}
+        @media(max-width:480px){.hero{padding:80px 4% 48px;gap:28px}}
         .h-badge{display:inline-flex;align-items:center;gap:7px;background:var(--ol);border:1px solid var(--om);color:var(--o);font-size:.68rem;font-weight:600;padding:4px 11px;border-radius:100px;margin-bottom:18px;letter-spacing:.04em;animation:fu .6s ease both}
         .h-dot{width:6px;height:6px;background:var(--o);border-radius:50%;animation:pulse 1.5s infinite}
         .h-h1{font-family:var(--serif);font-size:clamp(2.4rem,4vw,3.8rem);line-height:1.06;letter-spacing:-.03em;font-weight:300;margin-bottom:9px;color:var(--bk);animation:fu .6s .1s ease both}
@@ -329,14 +337,18 @@ export default function LandingPage() {
         .btn-pp{width:100%;padding:11px;border-radius:9px;font-size:.8rem;font-weight:600;font-family:var(--sans);background:var(--o);color:#fff;border:none;cursor:pointer;transition:all .2s;box-shadow:0 3px 14px rgba(249,115,22,.35);letter-spacing:-.01em}
         .btn-pp:hover{background:#ea6c0a;transform:translateY(-1px)}
         .finale{background:var(--bk);padding:80px 5%;text-align:center;position:relative;overflow:hidden}
+        @media(max-width:480px){.finale{padding:48px 4%}}
         .f-glow{position:absolute;width:440px;height:440px;background:var(--o);border-radius:50%;filter:blur(110px);opacity:.08;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
         .f-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:36px 36px;pointer-events:none}
         footer.lf{border-top:1px solid var(--g2);padding:30px 5%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+        @media(max-width:480px){footer.lf{padding:20px 4%;flex-direction:column;align-items:flex-start}}
         .f-links{display:flex;gap:20px;list-style:none}
         .f-links a{font-size:.75rem;color:var(--g5);text-decoration:none;transition:color .15s}
         .f-links a:hover{color:var(--bk)}
         .f-copy{font-size:.7rem;color:var(--g4)}
         .sec{padding:80px 5%}
+        @media(max-width:768px){.sec{padding:56px 4%}}
+        @media(max-width:480px){.sec{padding:40px 4%}}
         .sec-w{max-width:1060px;margin:0 auto}
         .sec-h{text-align:center;margin-bottom:44px}
         .s-tag{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--o);margin-bottom:10px}
@@ -365,7 +377,25 @@ export default function LandingPage() {
           <button className="btn-si" onClick={() => window.location.href="/sign-in"}>Sign in</button>
           <button className="btn-n" onClick={() => window.location.href="/sign-up"}>Get started free</button>
         </div>
+        <button className="nav-hamburger" onClick={() => setMobileNavOpen(true)} aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
       </nav>
+
+      {/* ── MOBILE NAV ── */}
+      <div className={`mobile-nav${mobileNavOpen ? " open" : ""}`}>
+        <button onClick={() => setMobileNavOpen(false)} style={{ position: "absolute", top: 18, right: "5%", background: "none", border: "none", cursor: "pointer", color: "var(--bk)" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+        <a href="#features" onClick={() => setMobileNavOpen(false)}>Features</a>
+        <a href="#demo" onClick={() => setMobileNavOpen(false)}>Demo</a>
+        <a href="#pricing" onClick={() => setMobileNavOpen(false)}>Pricing</a>
+        <a href="#compare" onClick={() => setMobileNavOpen(false)}>Compare</a>
+        <div className="mobile-nav-btns">
+          <button className="btn-si" style={{ width: "100%", textAlign: "center" }} onClick={() => window.location.href="/sign-in"}>Sign in</button>
+          <button className="btn-n" style={{ width: "100%" }} onClick={() => window.location.href="/sign-up"}>Get started free</button>
+        </div>
+      </div>
 
       {/* ── HERO ── */}
       <section style={{ background: "var(--w)" }}>
