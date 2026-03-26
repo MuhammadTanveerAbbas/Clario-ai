@@ -77,7 +77,7 @@ const MODE_API_MAP: Record<SummarizeMode, string> = {
   "sentiment": "sentiment",
   "full-breakdown": "full-breakdown",
   "brutal-roast": "brutal-roast",
-  "bullet-summary": "action-items", // fallback to action-items for bullet-summary
+  "bullet-summary": "bullet-summary",
 };
 
 export default function SummarizerPage() {
@@ -94,6 +94,7 @@ export default function SummarizerPage() {
   const [selectedMode, setSelectedMode] = useState<SummarizeMode>("executive-brief");
   const [output, setOutput] = useState("");
   const [outputTitle, setOutputTitle] = useState("");
+  const [videoMeta, setVideoMeta] = useState<{ title: string; author: string; thumbnail: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState("Summarizing...");
   const [showHistory, setShowHistory] = useState(false);
@@ -138,24 +139,61 @@ export default function SummarizerPage() {
 
     setLoading(true);
     setOutput("");
-    setLoadingMsg(tab === "youtube" ? "Fetching transcript..." : "Summarizing...");
+    setVideoMeta(null);
 
     try {
       const apiMode = MODE_API_MAP[selectedMode];
-      const body = tab === "text" ? { text, mode: apiMode } : { text: `YouTube URL: ${url}`, mode: apiMode };
-      const res = await fetch("/api/summarize", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      let finalText = text;
+      let finalUrl = "";
+
+      // For YouTube: fetch transcript first, then summarize
+      if (tab === "youtube") {
+        setLoadingMsg("Fetching transcript...");
+        const ytRes = await fetch("/api/youtube", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        const ytData = await ytRes.json();
+        if (!ytRes.ok) {
+          throw new Error(ytData.error || ytData.hint || "Failed to fetch transcript");
+        }
+        finalText = ytData.transcript;
+        finalUrl = ytData.videoUrl || url;
+        if (ytData.title || ytData.author) {
+          setVideoMeta({
+            title: ytData.title || "",
+            author: ytData.author || "",
+            thumbnail: ytData.thumbnail || "",
+          });
+          setOutputTitle(ytData.title || url);
+        } else {
+          setOutputTitle(url);
+        }
+      } else {
+        setOutputTitle("Summary");
+      }
+
+      setLoadingMsg("Generating summary...");
+      const body: Record<string, string> = { text: finalText, mode: apiMode };
+      if (finalUrl) body.youtubeUrl = finalUrl;
+
+      const res = await fetch("/api/summarize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Request failed" }));
         throw new Error(err.error || err.message || "Request failed");
       }
       const data = await res.json();
       const summaryText: string = data.summary || "";
-      setOutputTitle(tab === "youtube" ? url : "Summary");
 
-      // Simulate streaming
+      // Stream output word by word
       const words = summaryText.split(" ");
       for (let i = 0; i < words.length; i++) {
-        await new Promise(r => setTimeout(r, 12));
+        await new Promise(r => setTimeout(r, 8));
         setOutput(words.slice(0, i + 1).join(" "));
       }
       addToast("Summary generated", "success");
@@ -164,6 +202,7 @@ export default function SummarizerPage() {
       addToast(msg, "error");
     } finally {
       setLoading(false);
+      setLoadingMsg("Summarizing...");
     }
   };
 
@@ -363,7 +402,13 @@ export default function SummarizerPage() {
               <div className="card" style={{ animation: "fu .4s ease both" }}>
                 <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                   <span style={{ fontSize: ".72rem", fontWeight: 700, background: MODES.find(m => m.id === selectedMode)?.color || "var(--accent)", color: "#fff", padding: "2px 10px", borderRadius: 100 }}>{MODES.find(m => m.id === selectedMode)?.label}</span>
-                  <span style={{ fontSize: ".84rem", color: "var(--text2)", flex: 1 }}>{outputTitle}</span>
+                  {videoMeta?.title ? (
+                    <span style={{ fontSize: ".84rem", color: "var(--text2)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {videoMeta.title}{videoMeta.author ? ` · ${videoMeta.author}` : ""}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: ".84rem", color: "var(--text2)", flex: 1 }}>{outputTitle}</span>
+                  )}
                   <button onClick={handleCopy} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 7, padding: "5px 12px", fontSize: ".76rem", color: "var(--text2)", cursor: "pointer" }}>{copied ? "✓ Copied" : "Copy"}</button>
                   <button onClick={() => handleDownload("md")} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 7, padding: "5px 12px", fontSize: ".76rem", color: "var(--text2)", cursor: "pointer" }}>.md</button>
                   <button onClick={() => handleDownload("txt")} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 7, padding: "5px 12px", fontSize: ".76rem", color: "var(--text2)", cursor: "pointer" }}>.txt</button>

@@ -164,20 +164,21 @@ export default function Dashboard() {
         if (!uid) { router.push("/sign-in"); return; }
 
         const [profileRes, usageRes, brandVoiceRes] = await Promise.all([
-          supabase.from("profiles").select("*").eq("id", uid).single(),
-          supabase.from("usage_tracking").select("*").eq("user_id", uid).order("created_at", { ascending: false }).limit(30),
+          supabase.from("profiles").select("id, full_name, avatar_url, subscription_tier, requests_used_this_month").eq("id", uid).single(),
+          supabase.from("usage_tracking").select("created_at, type").eq("user_id", uid).order("created_at", { ascending: false }).limit(60),
           supabase.from("brand_voices").select("id").eq("user_id", uid),
         ]);
 
-        if (profileRes.data) {
-          setUser({
-            id: uid,
-            email: authUser.email!,
-            full_name: profileRes.data.full_name,
-            avatar_url: profileRes.data.avatar_url,
-            plan: profileRes.data.plan || "free",
-          });
-        }
+        const profileData = profileRes.data;
+        const tier = profileData?.subscription_tier || "free";
+
+        setUser({
+          id: uid,
+          email: authUser.email!,
+          full_name: profileData?.full_name,
+          avatar_url: profileData?.avatar_url,
+          plan: (tier === "pro" ? "pro" : "free") as "free" | "pro",
+        });
 
         // Build activity from usage records
         const usageData = usageRes.data || [];
@@ -186,33 +187,21 @@ export default function Dashboard() {
           const date = new Date(row.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
           if (!grouped[date]) grouped[date] = { date, requests: 0, summaries: 0, remixes: 0 };
           grouped[date].requests++;
-          if (row.type === "summarize") grouped[date].summaries++;
+          if (row.type === "summary") grouped[date].summaries++;
           if (row.type === "remix") grouped[date].remixes++;
         });
-        const activityArr = Object.values(grouped).slice(-14).reverse();
-        if (activityArr.length < 7) {
-          setActivity([
-            { date: "Mar 10", requests: 3, summaries: 2, remixes: 1 },
-            { date: "Mar 13", requests: 5, summaries: 3, remixes: 2 },
-            { date: "Mar 16", requests: 4, summaries: 2, remixes: 1 },
-            { date: "Mar 17", requests: 8, summaries: 5, remixes: 3 },
-            { date: "Mar 19", requests: 6, summaries: 3, remixes: 2 },
-            { date: "Mar 21", requests: 9, summaries: 6, remixes: 3 },
-            { date: "Mar 23", requests: 7, summaries: 4, remixes: 2 },
-          ]);
-        } else {
-          setActivity(activityArr);
-        }
+        const activityArr = Object.values(grouped).slice(-14);
+        setActivity(activityArr.length > 0 ? activityArr : []);
 
-        const summaries = usageData.filter((r: { type: string }) => r.type === "summarize").length;
+        const summaries = usageData.filter((r: { type: string }) => r.type === "summary").length;
         const chats = usageData.filter((r: { type: string }) => r.type === "chat").length;
         const remixes = usageData.filter((r: { type: string }) => r.type === "remix").length;
         const brand_voices = brandVoiceRes.data?.length ?? 0;
-        const plan = profileRes.data?.plan || "free";
+        const requestsUsed = profileData?.requests_used_this_month || usageData.length;
         setStats({
           summaries, chats, remixes, brand_voices,
-          requests_used: usageData.length,
-          requests_limit: plan === "pro" ? 1000 : 100,
+          requests_used: requestsUsed,
+          requests_limit: tier === "pro" ? 1000 : 100,
         });
 
         // Check onboarding
@@ -220,18 +209,10 @@ export default function Dashboard() {
         setOnboardingSteps(ob);
         setOnboardingDone(ob.summarize && ob.remix && ob.brandVoice && ob.chat);
       } catch {
-        // Fallback mock data
-        setUser({ id: "mock", email: "user@example.com", full_name: "Creator", plan: "free" });
-        setStats({ summaries: 4, chats: 7, remixes: 0, brand_voices: 0, requests_used: 13, requests_limit: 100 });
-        setActivity([
-          { date: "Mar 10", requests: 5, summaries: 3, remixes: 1 },
-          { date: "Mar 13", requests: 8, summaries: 5, remixes: 2 },
-          { date: "Mar 16", requests: 4, summaries: 2, remixes: 1 },
-          { date: "Mar 17", requests: 9, summaries: 6, remixes: 2 },
-          { date: "Mar 19", requests: 6, summaries: 3, remixes: 2 },
-          { date: "Mar 21", requests: 11, summaries: 7, remixes: 3 },
-          { date: "Mar 23", requests: 7, summaries: 4, remixes: 2 },
-        ]);
+        // Show empty state instead of fake mock data
+        setUser({ id: authUser?.id || "unknown", email: authUser?.email || "", plan: "free" });
+        setStats({ summaries: 0, chats: 0, remixes: 0, brand_voices: 0, requests_used: 0, requests_limit: 100 });
+        setActivity([]);
       } finally {
         setLoading(false);
       }

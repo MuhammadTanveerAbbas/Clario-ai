@@ -1,164 +1,232 @@
-# Clario - AI Powered Content Processing Tool
+# Clario — AI Content Platform for Creators
 
-An AI powered tool built with Next.js for content creators. Summarize anything and ask intelligent questions - built for YouTubers, podcasters, bloggers, and newsletter writers.
+An AI-powered SaaS platform for YouTubers, podcasters, bloggers, and newsletter writers. Summarize, remix, and chat with AI — all in one place.
 
 ## Features
 
-### Core AI Features
+### AI Tools
 
-- **Text Summarizer**: 10 different summary modes (Action Items, Decisions Made, Brutal Roast, Executive Brief, Full Breakdown, Key Quotes, Sentiment Analysis, ELI5, SWOT Analysis, Meeting Minutes) powered by Groq Llama 3.3 70B with export to Markdown
-- **AI Chat**: Conversational AI powered by Groq's Llama 3.1 8B with persistent chat history and creator-focused prompts
-- **Content Remix Studio**: Turn 1 piece of content into 10 formats instantly (Twitter threads, LinkedIn posts, Email newsletters, Instagram captions, YouTube descriptions, Blog outlines, Podcast notes, Quote graphics, Short-form scripts, LinkedIn carousels)
-- **Brand Voice Library**: Train AI to write in your unique style - upload writing examples and all AI outputs match your voice
+- **Text Summarizer** — 11 summary modes powered by Groq Llama 3.3 70B:
+  - Executive Brief, Action Items, Bullet Summary, Full Breakdown
+  - SWOT Analysis, Meeting Minutes, Key Quotes, Sentiment Analysis
+  - ELI5, Brutal Roast, Decisions
+  - Export to `.md` or `.txt`
 
-### Platform Features
+- **YouTube Summarizer** — Paste any YouTube URL and get an instant summary
+  - Supports `youtube.com/watch`, `youtu.be`, `youtube.com/shorts`, `youtube.com/live`
+  - Multi-language transcript fallback (en, en-US, en-GB, auto)
+  - Fetches video title, author, and thumbnail via oEmbed
+  - Handles age-restricted, private, and caption-disabled videos gracefully
 
-- **Authentication**: Email/password and social login (Google) via Supabase
-- **Subscription Plans**: Free (100 requests/month) and Pro ($19/month with 1000 requests)
-- **Usage Tracking**: Real-time usage monitoring with monthly request limits
-- **Dashboard**: Interactive charts showing usage trends and activity
-- **Settings**: Profile management and password changes
-- **Security**: Row Level Security (RLS), PKCE authentication, secure session management
+- **AI Chat** — Conversational AI with persistent history
+  - Powered by Groq Llama 3.1 8B (fast, real-time)
+  - Creator-focused system prompt (content strategy, hooks, platform advice)
+  - Brand voice injection support
+  - Session management with rename and clear
+
+- **Content Remix Studio** — Turn 1 piece of content into 10 formats in parallel:
+  - Twitter/X thread, LinkedIn post, Email newsletter
+  - Instagram captions (3 variations), YouTube description
+  - Blog post outline, Podcast show notes
+  - Pull quotes, Short-form video scripts, LinkedIn carousel
+
+- **Brand Voice Library** — Train AI to write in your style
+  - Create, edit, and delete brand voices
+  - Activate one voice at a time — applied across Chat and Remix
+
+### Platform
+
+- **Dashboard** — Real usage stats (summaries, chats, remixes, brand voices), activity charts, onboarding checklist
+- **Authentication** — Email/password and Google OAuth via Supabase (PKCE flow)
+- **Subscription Plans** — Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe
+- **Usage Tracking** — Per-request tracking with monthly reset
+- **Settings** — Profile, security, billing, preferences, privacy sections
 
 ## Tech Stack
 
-### Frontend
-- **Framework**: Next.js 15 (App Router)
-- **UI Library**: React 18 + Tailwind CSS
-- **Components**: ShadCN UI
-- **Animations**: Framer Motion
-- **Charts**: Recharts
-
-### Backend & Services
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **AI Services**: Groq SDK (Llama 3.1 8B for chat, Llama 3.3 70B for summarization)
-- **Monitoring**: Sentry
-- **Analytics**: PostHog
-
-## Installation
-
-### Prerequisites
-- Node.js 18+
-- npm or yarn
-- Accounts for: Supabase, Groq, Sentry (optional), PostHog (optional), Stripe (for payments)
-
-### Quick Start
-
-1. **Clone the repository**:
-   ```bash
-   git clone <repository-url>
-   cd Clario
-   ```
-
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-4. **Set up database**:
-   - Go to your Supabase project SQL Editor
-   - Run the schema from `supabase/schema.sql`
-
-5. **Start development server**:
-   ```bash
-   npm run dev
-   ```
-
-6. **Open** [http://localhost:3000](http://localhost:3000)
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 15 (App Router) |
+| UI | React 18, Tailwind CSS, ShadCN UI |
+| Charts | Recharts |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| AI | Groq SDK — Llama 3.3 70B (summarize), Llama 3.1 8B (chat, remix) |
+| Payments | Stripe |
+| Monitoring | Sentry |
+| Analytics | PostHog |
 
 ## Project Structure
 
 ```
-Clario/
-├── src/
-│   ├── app/                    # Next.js app router pages
-│   │   ├── api/                # API routes
-│   │   │   ├── chat/           # AI Chat API
-│   │   │   ├── summarize/      # Summarizer API
-│   │   │   ├── remix/          # Content Remix API
-│   │   │   ├── brand-voice/    # Brand Voice API
-│   │   │   ├── usage/          # Usage tracking
-│   │   │   └── stripe/         # Payment processing
-│   │   ├── auth/               # Authentication callbacks
-│   │   ├── dashboard/          # Dashboard page
-│   │   ├── chat/               # AI Chat feature
-│   │   ├── summarizer/         # Text Summarizer feature
-│   │   ├── remix/              # Content Remix Studio
-│   │   ├── brand-voice/        # Brand Voice Library
-│   │   ├── settings/           # Settings page
-│   │   ├── pricing/            # Pricing page
-│   │   ├── sign-in/            # Sign in page
-│   │   └── sign-up/            # Sign up page
-│   ├── components/
-│   │   ├── layout/             # Layout components (Sidebar, Navbar)
-│   │   └── ui/                 # ShadCN UI components
-│   ├── contexts/               # React contexts (Auth, Sidebar)
-│   └── lib/                    # Utilities and configurations
-└── supabase/                   # Database schema
+src/
+├── app/
+│   ├── (app)/                  # Authenticated app routes
+│   │   ├── dashboard/          # Dashboard with stats & charts
+│   │   ├── summarizer/         # Text + YouTube summarizer
+│   │   ├── chat/               # AI chat with history
+│   │   ├── remix/              # Content remix studio
+│   │   ├── brand-voice/        # Brand voice management
+│   │   ├── calendar/           # Content calendar
+│   │   └── settings/           # User settings
+│   ├── (auth)/                 # Sign in, sign up, forgot password
+│   ├── (marketing)/            # Landing page, pricing, legal
+│   └── api/
+│       ├── youtube/            # YouTube transcript fetcher
+│       ├── summarize/          # AI summarization
+│       ├── chat/               # AI chat
+│       ├── remix/              # Content remix
+│       ├── brand-voice/        # Brand voice CRUD
+│       ├── usage/              # Usage stats
+│       ├── analytics/          # Analytics data
+│       └── stripe/             # Payment webhooks & checkout
+├── components/
+│   ├── ui/                     # ShadCN UI components
+│   ├── layout/                 # Sidebar, navbar
+│   ├── marketing/              # Marketing nav & footer
+│   └── providers/              # Client providers, PostHog
+├── contexts/                   # AuthContext, SidebarContext
+└── lib/
+    ├── ai-fallback.ts          # Groq AI wrapper with error handling
+    ├── usage-limits.ts         # Tier limits (free: 100, pro: 1000)
+    ├── input-validation.ts     # Input sanitization
+    ├── supabase/               # Supabase client & server helpers
+    └── stripe.ts               # Stripe checkout helpers
 ```
 
-## Pricing
+## Quick Start
 
-### Free Plan - $0/month
-- 100 AI requests per month
-- Chat + Summarizer
-- 10 summary modes
-- 1 Brand Voice
-- 3 Remix formats
-- Email support
+### Prerequisites
+- Node.js 18+
+- pnpm (recommended) or npm
+- Supabase project
+- Groq API key
 
-### Pro Plan - $19/month
-- 1000 AI requests per month
-- Chat + Summarizer
-- 10 summary modes
-- 3 Brand Voices
-- All 10 Remix formats
-- Content Remix Studio
-- Priority support
-- Early access to new features
+### Setup
 
-**What counts as a request?** Each AI operation: summarization or chat message.
+```bash
+# Install dependencies
+pnpm install
 
-## Environment Variables
+# Copy environment variables
+cp .env.example .env.local
 
-See `.env.example` for all required environment variables. Key variables include:
+# Fill in your .env.local, then start dev server
+pnpm dev
+```
 
-- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
-- `GROQ_API_KEY` - Groq API key for AI features
-- `SENTRY_DSN` - Sentry DSN for error tracking
-- `NEXT_PUBLIC_POSTHOG_KEY` - PostHog API key
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
-- `STRIPE_SECRET_KEY` - Stripe secret key
+Open [http://localhost:3000](http://localhost:3000).
+
+### Environment Variables
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# AI
+GROQ_API_KEY=your-groq-api-key
+
+# Payments
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+ADMIN_EMAIL=your-admin@email.com
+
+# Optional
+SENTRY_DSN=your-sentry-dsn
+NEXT_PUBLIC_POSTHOG_KEY=your-posthog-key
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+```
+
+## API Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/youtube` | POST | Fetch YouTube transcript + metadata |
+| `/api/summarize` | POST | Generate AI summary (11 modes) |
+| `/api/chat` | POST | AI chat with history |
+| `/api/remix` | POST | Remix content into 10 formats |
+| `/api/brand-voice` | GET/POST/DELETE | Manage brand voices |
+| `/api/brand-voice/activate` | POST | Activate a brand voice |
+| `/api/chat/history` | GET/DELETE | Chat session history |
+| `/api/usage` | GET | Current usage stats |
+| `/api/analytics` | GET | Usage analytics |
+| `/api/stripe/webhook` | POST | Stripe webhook handler |
+
+### YouTube API
+
+```json
+POST /api/youtube
+{ "url": "https://youtube.com/watch?v=VIDEO_ID" }
+
+// Response
+{
+  "transcript": "Full transcript text...",
+  "videoId": "VIDEO_ID",
+  "videoUrl": "https://youtube.com/watch?v=VIDEO_ID",
+  "title": "Video Title",
+  "author": "Channel Name",
+  "thumbnail": "https://img.youtube.com/vi/VIDEO_ID/hqdefault.jpg",
+  "lang": "en",
+  "charCount": 12345
+}
+```
+
+### Summarize API
+
+```json
+POST /api/summarize
+{
+  "text": "Content to summarize...",
+  "mode": "executive-brief",
+  "youtubeUrl": "https://youtube.com/watch?v=..." // optional
+}
+
+// Modes: executive-brief | action-items | bullet-summary | full-breakdown |
+//        swot | meeting-minutes | key-quotes | sentiment | eli5 | brutal-roast | decisions
+```
+
+## Database Schema
+
+Key tables in Supabase:
+
+- `profiles` — User data, `subscription_tier`, `requests_used_this_month`
+- `ai_summaries` — Saved summaries with mode and original text
+- `chat_sessions` — Conversation metadata
+- `chat_messages` — Individual messages (role, content)
+- `brand_voices` — User brand voices with `is_active` flag
+- `usage_tracking` — Per-request logs (type: `summary` | `chat` | `remix`)
+- `usage_stats` — Aggregated daily stats
+
+Required RPC functions:
+- `track_usage(p_user_id, p_type, p_count)` — Increment usage counter
+
+## Security
+
+- Row Level Security (RLS) on all tables
+- PKCE authentication flow
+- Input sanitization on all AI endpoints
+- IP-based rate limiting (100 req/min for API, 5 req/15min for auth)
+- CSRF protection
+- Secure httpOnly session cookies
 
 ## Deployment
 
-### Vercel (Recommended)
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Add all environment variables
-4. Deploy!
+### Vercel
 
-## Security Features
+```bash
+# Push to GitHub, then import in Vercel
+# Add all environment variables in Vercel dashboard
+# Set NEXT_PUBLIC_APP_URL to your production URL
+```
 
-- Row Level Security (RLS) on all database tables
-- PKCE authentication flow
-- Secure session management
-- Input sanitization
-- CSRF protection
-- Rate limiting on API endpoints
+The `maxDuration` on AI routes is set to 60-90 seconds — make sure your Vercel plan supports this (Pro plan required for >10s functions).
 
 ## License
 
-MIT License
-
----
-
-Built for content creators who need to process information fast.
+MIT

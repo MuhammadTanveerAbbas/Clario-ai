@@ -6,11 +6,11 @@ import { checkUsageLimit } from '@/lib/usage-limits'
 import { generateWithFallback } from '@/lib/ai-fallback'
 import { z } from 'zod'
 
-export const maxDuration = 60;
+export const maxDuration = 90;
 export const dynamic = 'force-dynamic';
 
 const SummarizeSchema = z.object({
-  text: z.string().min(10, 'Text too short').max(50000, 'Text too long'),
+  text: z.string().min(10, 'Text too short').max(60000, 'Text too long'),
   mode: z.enum([
     'action-items',
     'decisions',
@@ -22,676 +22,511 @@ const SummarizeSchema = z.object({
     'eli5',
     'swot',
     'meeting-minutes',
+    'bullet-summary',
   ]),
+  youtubeUrl: z.string().optional(),
 })
 
-export async function POST(request: Request) {
-  console.log('[Summarize API] Request received');
-  
-  try {
-    // Check rate limit
-    const rateLimitCheck = checkRateLimit(request as any, 'api')
-    if (!rateLimitCheck.allowed) {
-      console.log('[Summarize API] Rate limit exceeded');
-      return rateLimitCheck.response!
-    }
+const MODE_PROMPTS: Record<string, string> = {
+  'bullet-summary': `You are a professional content summarizer. Create a clean, scannable bullet-point summary.
 
-    // Parse and validate body
-    let body;
-    try {
-      body = await request.json()
-    } catch (e) {
-      console.error('[Summarize API] JSON parse error:', e);
-      return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
-        { status: 400 }
-      )
-    }
-
-    const result = SummarizeSchema.safeParse(body)
-    if (!result.success) {
-      console.error('[Summarize API] Validation error:', result.error.issues);
-      return NextResponse.json(
-        { error: 'Invalid input', details: result.error.issues },
-        { status: 400 }
-      )
-    }
-    const { text, mode } = result.data
-    console.log('[Summarize API] Text length:', text.length, 'Mode:', mode);
-
-    // Sanitize input
-    const validation = sanitizeAndValidate(text, 50000)
-    if (!validation.valid) {
-      console.error('[Summarize API] Sanitization failed:', validation.error);
-      return NextResponse.json({ error: validation.error }, { status: 400 })
-    }
-    const sanitizedText = validation.sanitized
-
-    // Check authentication
-    const supabase = await createClient()
-    const {
-      data: { user },
-      error: authError
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      console.error('[Summarize API] Auth error:', authError);
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    console.log('[Summarize API] User authenticated:', user.id);
-
-    // Get user profile
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError) {
-      console.error('[Summarize API] Profile fetch error:', profileError);
-    }
-
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
-    
-    console.log('[Summarize API] Usage:', currentUsage, 'Tier:', tier);
-    
-    // Check usage limits (skip for admin)
-    if (profile?.email !== process.env.ADMIN_EMAIL) {
-      const usageCheck = checkUsageLimit(tier, currentUsage)
-
-      if (!usageCheck.allowed) {
-        console.log('[Summarize API] Usage limit reached');
-        return NextResponse.json(
-          {
-            error: 'Usage limit reached',
-            message: `You've reached your ${tier} plan limit of ${usageCheck.limit} requests per month. Please upgrade to continue.`,
-          },
-          { status: 403 }
-        )
-      }
-    }
-
-    // Check Groq API key
-    if (!process.env.GROQ_API_KEY) {
-      console.error('[Summarize API] GROQ_API_KEY not set');
-      return NextResponse.json(
-        { error: 'AI service not configured' },
-        { status: 500 }
-      )
-    }
-
-    console.log('[Summarize API] Generating summary...');
-
-    const modePrompts: Record<string, string> = {
-      'action-items': `Extract all action items in a clean format.
-
-# Action Items
-
-## 🔴 High Priority
-**[Action Title]**
-- Owner: [Person]
-- Due: [Date]
-- Status: Not Started
-
-## 🟡 Medium Priority  
-**[Action Title]**
-- Owner: [Person]
-- Due: [Date]
-
-## 🟢 Low Priority
-**[Action Title]**
-- Owner: [Person]
-- Due: [Date]
-
----
-
-**Summary:** [X] total • [X] high • [X] medium • [X] low`,
-
-      'decisions': `Extract all key decisions with context.
-
-# Key Decisions
-
-## Decision 1: [Title]
-
-**What was decided:**
-[Clear statement]
-
-**Why:**
-[Rationale]
-
-**Impact:**
-[Expected outcomes]
-
-**Stakeholders:**
-[Who's affected]
-
----
-
-## Decision 2: [Title]
-[Repeat structure]
-
----
-
-**Total:** [X] • **Strategic:** [X] • **Operational:** [X]`,
-
-      'brutal-roast': `Provide witty, honest critique with real solutions.
-
-# The Brutal Truth
-
-## 🔥 What Went Wrong
-[Sarcastic but insightful commentary]
-
-**Top Offenders:**
-1. **[Issue]** - [Witty critique]
-2. **[Issue]** - [Witty critique]  
-3. **[Issue]** - [Witty critique]
-
----
-
-## 💡 Reality Check
-**Core Problems:**
-- [Honest assessment]
-- [Honest assessment]
-
----
-
-## ✅ How to Fix This
-
-**Fix 1: [Title]**
-- Problem: [What's wrong]
-- Solution: [Specific fix]
-- Impact: [Expected improvement]
-
-**Fix 2: [Title]**
-[Repeat structure]
-
----
-
-## 🌟 Silver Lining
-[What's actually good]`,
-
-      'executive-brief': `Create concise executive summary.
-
-# Executive Brief
+Format your response exactly like this:
 
 ## Summary
-[2-3 sentences capturing essence]
+
+[2-3 sentence overview of the content]
 
 ---
 
-## Key Highlights
+## Key Points
 
-**Strategic:**
-- [Point with business impact]
-- [Point with business impact]
-
-**Financial:**
-- [Cost/revenue implications]
-
-**Timeline:**
-- [Key dates]
+- **[Point title]**: [Clear explanation in 1-2 sentences]
+- **[Point title]**: [Clear explanation in 1-2 sentences]
+- **[Point title]**: [Clear explanation in 1-2 sentences]
+- **[Point title]**: [Clear explanation in 1-2 sentences]
+- **[Point title]**: [Clear explanation in 1-2 sentences]
 
 ---
 
-## Implications
+## Important Details
 
-**Opportunities:**
-[Value creation potential]
-
-**Risks:**
-[Key concerns]
-
-**Resources Needed:**
-[Requirements]
+- [Specific fact, stat, or detail]
+- [Specific fact, stat, or detail]
+- [Specific fact, stat, or detail]
 
 ---
 
-## Next Steps
-1. [Action] - [Owner] - [Timeline]
-2. [Action] - [Owner] - [Timeline]
+## Bottom Line
 
-**Decision Required:** [What needs approval]`,
+[1-2 sentences on the core takeaway and why it matters]`,
 
-      'full-breakdown': `Provide comprehensive analysis.
+  'action-items': `You are a project manager extracting action items. Be specific and practical.
 
-# Complete Analysis
+Format your response exactly like this:
 
-## Overview
-[3-4 sentence summary]
+## Action Items
 
----
+### 🔴 High Priority
+- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
+- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
 
-## Main Points
+### 🟡 Medium Priority
+- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "This week"]
 
-### 1. [Topic]
-**Key Details:**
-- [Detail]
-- [Detail]
-
-**Why It Matters:**
-[Significance]
+### 🟢 Low Priority / Nice to Have
+- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "When possible"]
 
 ---
 
-### 2. [Topic]
+## Summary
+**Total:** [X] items | **High:** [X] | **Medium:** [X] | **Low:** [X]
+
+**Key Deadline:** [Most urgent item or "None specified"]`,
+
+  'decisions': `You are a decision analyst. Extract and document all decisions clearly.
+
+Format your response exactly like this:
+
+## Decisions Made
+
+### Decision 1: [Title]
+**Decision:** [What was decided — one clear sentence]
+**Rationale:** [Why this decision was made]
+**Impact:** [Who/what is affected and how]
+**Owner:** [Who is responsible]
+
+---
+
+### Decision 2: [Title]
 [Repeat structure]
 
 ---
 
-## Key Takeaways
-1. **[Takeaway]** - [Context]
-2. **[Takeaway]** - [Context]
+## Open Questions
+- [Unresolved question that needs a decision]
+- [Unresolved question that needs a decision]
 
 ---
 
-## Action Items
-- [ ] [Action with details]
-- [ ] [Action with details]
+**Total decisions:** [X] | **Open questions:** [X]`,
+
+  'brutal-roast': `You are a brutally honest critic who gives real, actionable feedback. Be witty but constructive.
+
+Format your response exactly like this:
+
+## 🔥 The Brutal Truth
+
+[2-3 sentences of honest, sharp commentary on the overall content]
+
+---
+
+## What's Actually Wrong
+
+**1. [Problem Title]**
+> [Witty but accurate critique]
+Fix: [Specific, actionable solution]
+
+**2. [Problem Title]**
+> [Witty but accurate critique]
+Fix: [Specific, actionable solution]
+
+**3. [Problem Title]**
+> [Witty but accurate critique]
+Fix: [Specific, actionable solution]
+
+---
+
+## What's Surprisingly Good
+- [Genuine strength]
+- [Genuine strength]
+
+---
+
+## The Verdict
+**Score:** [X/10]
+[One punchy closing sentence]`,
+
+  'executive-brief': `You are a C-suite advisor writing a concise executive brief. Every word must earn its place.
+
+Format your response exactly like this:
+
+## Executive Brief
+
+**Bottom Line:** [One sentence — the single most important thing]
+
+---
+
+## Situation
+[2-3 sentences: what's happening and why it matters now]
+
+## Key Facts
+- [Critical data point or finding]
+- [Critical data point or finding]
+- [Critical data point or finding]
+
+## Risks
+- [Risk and potential impact]
+- [Risk and potential impact]
+
+## Opportunities
+- [Opportunity and potential upside]
+
+---
+
+## Recommended Actions
+1. **[Action]** — [Owner] — [Timeline]
+2. **[Action]** — [Owner] — [Timeline]
+
+**Decision needed:** [What requires approval or a decision]`,
+
+  'full-breakdown': `You are a thorough analyst providing a comprehensive breakdown. Be detailed but organized.
+
+Format your response exactly like this:
+
+## Overview
+[3-4 sentences covering the main topic, context, and significance]
+
+---
+
+## Section-by-Section Analysis
+
+### [Topic/Section 1]
+**What it covers:** [Summary]
+**Key details:**
+- [Detail]
+- [Detail]
+**Why it matters:** [Significance]
+
+### [Topic/Section 2]
+[Repeat structure]
+
+### [Topic/Section 3]
+[Repeat structure]
+
+---
+
+## Key Themes
+1. **[Theme]** — [Explanation]
+2. **[Theme]** — [Explanation]
+3. **[Theme]** — [Explanation]
+
+---
+
+## Strengths & Weaknesses
+**Strengths:** [What works well]
+**Weaknesses:** [What's missing or unclear]
 
 ---
 
 ## Recommendations
+- [Actionable recommendation]
+- [Actionable recommendation]`,
 
-**Immediate:**
-1. [Action with rationale]
+  'key-quotes': `You are a quote curator finding the most impactful, shareable statements.
 
-**Long-term:**
-1. [Consideration with rationale]`,
+Format your response exactly like this:
 
-      'key-quotes': `Extract most impactful quotes.
+## Key Quotes
 
-# Key Quotes
+### Most Impactful
+> "[The single most powerful quote from the content]"
 
-## Most Impactful
-
-> "[The most powerful quote]"
-
-**Context:** [When/where]
-**Why It Matters:** [Significance]
-**Speaker:** [Who]
+**Why it matters:** [1-2 sentences on significance]
+**Best use:** [Where to share this — Twitter, presentation, etc.]
 
 ---
 
-## Notable Quotes
+### Notable Quotes
 
-### Quote 2
-> "[Important quote]"
-- Context: [Background]
-- Theme: [Topic]
+> "[Quote 2]"
+**Theme:** [Topic] | **Speaker:** [If known]
 
 ---
 
-### Quote 3
-> "[Important quote]"
-- Context: [Background]
-- Theme: [Topic]
+> "[Quote 3]"
+**Theme:** [Topic] | **Speaker:** [If known]
 
 ---
 
-## By Theme
-
-**Leadership:**
-> "[Quote]"
-
-**Strategy:**
-> "[Quote]"
+> "[Quote 4]"
+**Theme:** [Topic] | **Speaker:** [If known]
 
 ---
 
-**Total:** [X] • **Dominant Theme:** [Theme]`,
+> "[Quote 5]"
+**Theme:** [Topic] | **Speaker:** [If known]
 
-      'sentiment': `Analyze emotional tone and sentiment.
+---
 
-# Sentiment Analysis
+## Themes Covered
+[List the main themes represented in these quotes]`,
 
-## Overall Sentiment
+  'sentiment': `You are a sentiment analyst. Analyze the emotional tone with precision.
 
-**Rating:** [Positive/Negative/Neutral/Mixed]
-**Confidence:** [X/10]
-**Intensity:** [Low/Medium/High]
+Format your response exactly like this:
 
-[2-3 sentence summary]
+## Sentiment Analysis
+
+**Overall:** [Positive / Negative / Neutral / Mixed]
+**Confidence:** [High / Medium / Low]
+**Dominant Emotion:** [e.g., Optimistic, Frustrated, Excited, Cautious]
 
 ---
 
 ## Emotional Breakdown
 
-**Positive (X%):**
-- [Emotion]: [Examples]
-- [Emotion]: [Examples]
-
-**Negative (X%):**
-- [Emotion]: [Examples]
-- [Emotion]: [Examples]
-
-**Neutral (X%):**
-- [Element]: [Examples]
+| Sentiment | Percentage | Key Signals |
+|-----------|-----------|-------------|
+| Positive | [X]% | [Examples] |
+| Negative | [X]% | [Examples] |
+| Neutral | [X]% | [Examples] |
 
 ---
 
-## Tone Analysis
-
-**Primary Tone:** [Type]
-
-**Characteristics:**
-- Formality: [Level]
-- Urgency: [Level]
-- Confidence: [Level]
-
-**Language Patterns:**
-[Notable patterns]
+## Tone Profile
+- **Formality:** [Formal / Semi-formal / Casual]
+- **Urgency:** [High / Medium / Low]
+- **Confidence:** [High / Medium / Low]
+- **Audience:** [Who this seems written for]
 
 ---
 
-## Key Insights
-
-**Emotional Drivers:**
-[What's driving emotions]
-
-**Underlying Concerns:**
-[Implicit worries]
+## Notable Patterns
+[2-3 observations about language patterns, word choices, or emotional shifts]
 
 ---
 
-## Recommendations
-[How to respond based on analysis]`,
+## Insights
+**What's driving the tone:** [Analysis]
+**Underlying concerns:** [What's implied but not stated]
+**Recommendation:** [How to respond or engage with this content]`,
 
-      'eli5': `Explain in simplest terms possible.
+  'eli5': `You are a teacher who explains complex things simply. Use plain language, analogies, and examples.
 
-# Simple Explanation
+Format your response exactly like this:
 
-## The Big Idea
-[Explain using simple words and short sentences]
+## Simple Explanation
+
+**The Big Idea:**
+[Explain the main concept in 2-3 simple sentences, like you're talking to a curious 10-year-old]
+
+---
+
+## Think of It Like This
+[A relatable real-world analogy that makes the concept click]
+
+---
+
+## The Main Points (Simple Version)
+
+**1. [Point]**
+[1-2 sentences in plain English]
+
+**2. [Point]**
+[1-2 sentences in plain English]
+
+**3. [Point]**
+[1-2 sentences in plain English]
 
 ---
 
 ## Why Should You Care?
-[Why this matters simply]
+[1-2 sentences on why this matters in everyday life]
 
 ---
 
-## Real-Life Example
+## One-Sentence Summary
+[The simplest possible summary of everything]`,
 
-**Imagine this:**
-[Relatable analogy]
+  'swot': `You are a strategic analyst conducting a thorough SWOT analysis.
 
-**Here's how it works:**
-1. [Simple step]
-2. [Simple step]
-3. [Simple step]
+Format your response exactly like this:
 
----
+## SWOT Analysis
 
-## The Important Parts
+### 💪 Strengths
+- **[Strength]**: [Why it's an advantage and evidence from the content]
+- **[Strength]**: [Why it's an advantage and evidence from the content]
+- **[Strength]**: [Why it's an advantage and evidence from the content]
 
-**Thing 1:** [One sentence]
-**Thing 2:** [One sentence]
-**Thing 3:** [One sentence]
+### ⚠️ Weaknesses
+- **[Weakness]**: [What the gap is and its impact]
+- **[Weakness]**: [What the gap is and its impact]
+- **[Weakness]**: [What the gap is and its impact]
 
----
+### 🚀 Opportunities
+- **[Opportunity]**: [What could be gained and how to capture it]
+- **[Opportunity]**: [What could be gained and how to capture it]
+- **[Opportunity]**: [What could be gained and how to capture it]
 
-## In One Sentence
-[Super simple summary]
-
----
-
-## Fun Fact
-[Interesting tidbit]`,
-
-      'swot': `Conduct strategic SWOT analysis.
-
-# SWOT Analysis
-
-## Strengths
-
-**1. [Strength Title]**
-- What: [Description]
-- Evidence: [Proof]
-- Impact: [Value created]
-
-**2. [Strength Title]**
-[Repeat]
-
-**Key Capabilities:**
-- [Capability]
-- [Capability]
+### 🛡️ Threats
+- **[Threat]**: [Risk level and mitigation strategy]
+- **[Threat]**: [Risk level and mitigation strategy]
+- **[Threat]**: [Risk level and mitigation strategy]
 
 ---
 
-## Weaknesses
+## Strategic Priorities
+1. **Leverage:** [Top strength + opportunity combination]
+2. **Fix:** [Most critical weakness to address]
+3. **Watch:** [Most serious threat to monitor]`,
 
-**1. [Weakness Title]**
-- What: [Description]
-- Impact: [Risk]
-- Fix: [How to address]
+  'meeting-minutes': `You are a professional meeting secretary. Create formal, actionable meeting minutes.
 
-**2. [Weakness Title]**
-[Repeat]
+Format your response exactly like this:
 
----
-
-## Opportunities
-
-**1. [Opportunity Title]**
-- What: [Description]
-- Potential: [What could be gained]
-- Requirements: [What's needed]
-- Timeline: [When to act]
-
-**2. [Opportunity Title]**
-[Repeat]
-
----
-
-## Threats
-
-**1. [Threat Title]**
-- What: [Description]
-- Likelihood: [High/Medium/Low]
-- Impact: [Potential damage]
-- Response: [How to defend]
-
-**2. [Threat Title]**
-[Repeat]
-
----
-
-## Strategic Recommendations
-
-**Leverage Strengths:**
-1. [How to use strength]
-
-**Address Weaknesses:**
-1. [How to fix weakness]
-
-**Capture Opportunities:**
-1. [How to seize opportunity]
-
-**Mitigate Threats:**
-1. [How to defend]
-
----
-
-| Category | Count | Priority |
-|----------|-------|----------|
-| Strengths | [#] | [Level] |
-| Weaknesses | [#] | [Level] |
-| Opportunities | [#] | [Level] |
-| Threats | [#] | [Level] |`,
-
-      'meeting-minutes': `Create professional meeting minutes.
-
-# Meeting Minutes
-
-## Meeting Info
+## Meeting Minutes
 
 **Date:** [Date or "Not specified"]
-**Time:** [Time or "Not specified"]
-**Type:** [Regular/Special/Emergency]
+**Duration:** [Duration or "Not specified"]
+**Type:** [Meeting type]
 
-**Attendees:**
-- [Name] - [Role]
-- [Name] - [Role]
-
-**Chair:** [Name]
+**Attendees:** [Names/roles if mentioned, otherwise "Not specified"]
+**Facilitator:** [Name or "Not specified"]
 
 ---
 
-## Objectives
-1. [Objective]
-2. [Objective]
+## Agenda & Discussion
 
----
-
-## Agenda Items
-
-### 1. [Item Title]
-
-**Discussion:**
-[Summary]
-
-**Key Points:**
+### Item 1: [Topic]
+**Discussion summary:** [What was discussed]
+**Key points raised:**
 - [Point]
 - [Point]
+**Outcome:** [What was concluded]
 
-**Decision:**
-[What was decided]
-
-**Actions:**
-- [ ] [Task] - Owner: [Name] - Due: [Date]
-- [ ] [Task] - Owner: [Name] - Due: [Date]
-
----
-
-### 2. [Item Title]
+### Item 2: [Topic]
 [Repeat structure]
 
 ---
 
-## Key Decisions
-
-**1. [Decision]**
-- Context: [Why needed]
-- Decision: [What was decided]
-- Rationale: [Why]
-- Approved By: [Name]
+## Decisions Made
+1. **[Decision]** — Approved by: [Name or "Group"]
+2. **[Decision]** — Approved by: [Name or "Group"]
 
 ---
 
-## Action Items Summary
-
-**High Priority:**
-- [ ] [Task] - [Owner] - [Due Date]
-
-**Medium Priority:**
-- [ ] [Task] - [Owner] - [Due Date]
-
----
-
-## Issues & Concerns
-
-**Open Issues:**
-1. [Issue] - Owner: [Name]
-
-**Risks:**
-- [Risk and mitigation]
+## Action Items
+| Task | Owner | Due Date | Priority |
+|------|-------|----------|----------|
+| [Task] | [Name] | [Date] | High |
+| [Task] | [Name] | [Date] | Medium |
 
 ---
 
 ## Next Steps
-1. [Next step]
-2. [Next step]
+- [Next step]
+- [Next step]
 
-**Next Meeting:** [Date] at [Time]`,
+**Next meeting:** [Date/time or "TBD"]`,
+}
+
+export async function POST(request: Request) {
+  console.log('[Summarize API] Request received');
+
+  try {
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response!
     }
 
-    const systemPrompt = `${modePrompts[mode] || 'Summarize professionally with clear structure.'}
+    let body: unknown;
+    try {
+      body = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
 
-FORMATTING RULES:
-- Write words normally without spacing between letters
-- Use ## for main headers, ### for subheaders
-- Use **bold** for emphasis
-- Use bullet points (-) and numbered lists (1. 2. 3.)
-- Use > for blockquotes
-- Use --- for section dividers`
+    const result = SummarizeSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json({ error: 'Invalid input', details: result.error.issues }, { status: 400 })
+    }
+
+    const { text, mode, youtubeUrl } = result.data
+
+    const validation = sanitizeAndValidate(text, 60000)
+    if (!validation.valid) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+    const sanitizedText = validation.sanitized
+
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('subscription_tier, requests_used_this_month, email')
+      .eq('id', user.id)
+      .single()
+
+    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used_this_month || 0
+
+    if (profile?.email !== process.env.ADMIN_EMAIL) {
+      const usageCheck = checkUsageLimit(tier, currentUsage)
+      if (!usageCheck.allowed) {
+        return NextResponse.json({
+          error: 'Usage limit reached',
+          message: `You've used all ${usageCheck.limit} requests on your ${tier} plan. Upgrade to continue.`,
+        }, { status: 403 })
+      }
+    }
+
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json({ error: 'AI service not configured' }, { status: 500 })
+    }
+
+    const modePrompt = MODE_PROMPTS[mode] || MODE_PROMPTS['bullet-summary']
+
+    const systemPrompt = `${modePrompt}
+
+CRITICAL RULES:
+- Write all words normally — never add spaces between letters of a word
+- Use proper markdown: ## for headers, **bold**, - for bullets, > for quotes, --- for dividers
+- Be specific and use actual content from the text, not generic placeholders
+- Keep formatting clean and consistent throughout`
+
+    const contextNote = youtubeUrl ? `\n\n[Source: ${youtubeUrl}]` : ''
+    const userPrompt = `Analyze and summarize the following content:${contextNote}\n\n---\n\n${sanitizedText}`
 
     let summary: string;
     try {
-      summary = await generateWithFallback(
-        `Text to summarize:\n${sanitizedText}`,
-        systemPrompt,
-        { model: 'llama-3.3-70b-versatile', maxTokens: 2048, temperature: 0.2 }
-      )
-      console.log('[Summarize API] Summary generated, length:', summary.length);
+      summary = await generateWithFallback(userPrompt, systemPrompt, {
+        model: 'llama-3.3-70b-versatile',
+        maxTokens: 3000,
+        temperature: 0.15,
+      })
     } catch (aiError: any) {
-      console.error('[Summarize API] AI generation error:', aiError);
-      return NextResponse.json(
-        { error: 'Failed to generate summary', details: aiError.message },
-        { status: 500 }
-      )
+      console.error('[Summarize API] AI error:', aiError.message);
+      return NextResponse.json({ error: aiError.message || 'Failed to generate summary' }, { status: 500 })
     }
 
-    const cleanedSummary = summary
-      .split('\n')
-      .map(line => {
-        if (line.trim().startsWith('```')) {
-          return line
-        }
-
-        let cleaned = line
-
-        cleaned = cleaned.replace(/([A-Z])\s+([a-z]+)/g, (match, first, rest) => {
-          const exceptions = ['a', 'an', 'am', 'is', 'it', 'or', 'of', 'to', 'in', 'on', 'at', 'by', 'as', 'if', 'we', 'us', 'be', 'do', 'go', 'no', 'so', 'up']
-          if (exceptions.includes(rest.toLowerCase()) && rest.length <= 2) {
-            return match
-          }
-          return first + rest
-        })
-
-        cleaned = cleaned.replace(/([a-zA-Z])( [a-zA-Z]){2,}/g, (match) => {
-          return match.replace(/\s+/g, '')
-        })
-
-        cleaned = cleaned.replace(/\b([A-Z])( [A-Z])+\b/g, (match) => {
-          return match.replace(/\s+/g, '')
-        })
-
-        return cleaned
-      })
-      .join('\n')
-
-    // Save to database
-    const { error: insertError } = await supabase.from('ai_summaries').insert({
+    // Save to database (non-blocking)
+    supabase.from('ai_summaries').insert({
       user_id: user.id,
-      summary_text: cleanedSummary,
+      summary_text: summary,
       original_text: sanitizedText.substring(0, 10000),
       mode,
+    }).then(({ error }) => {
+      if (error) console.error('[Summarize API] DB insert error:', error.message)
     })
 
-    if (insertError) {
-      console.error('[Summarize API] Insert error:', insertError);
-    }
-
-    // Track usage
-    const { error: trackError } = await supabase.rpc('track_usage', {
+    // Track usage (non-blocking)
+    supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'summary',
       p_count: 1,
+    }).then(({ error }) => {
+      if (error) console.error('[Summarize API] Track usage error:', error.message)
     })
 
-    if (trackError) {
-      console.error('[Summarize API] Track usage error:', trackError);
-    }
+    return NextResponse.json({ summary })
 
-    console.log('[Summarize API] Success');
-    return NextResponse.json({ summary: cleanedSummary })
   } catch (error: any) {
     console.error('[Summarize API] Unexpected error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error', details: error?.message || 'Unknown error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
