@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
               cookiesToSet.forEach(({ name, value, options }) =>
                 cookieStore.set(name, value, options)
               )
-            } catch (error) {
-              // Ignore cookie errors
+            } catch {
+              // Cookie writes fail in middleware during static rendering — safe to ignore
             }
           },
         },

@@ -273,7 +273,6 @@ export default function RemixPage() {
 
             <div className="remix-layout">
               <div className="remix-left">
-                {/* Input card */}
                 <div className="card" style={{ animation: "fu .4s .05s ease both" }}>
                   <div style={{ padding: 16 }}>
                     {activeBrandVoice && (
@@ -297,7 +296,6 @@ export default function RemixPage() {
                   </div>
                 </div>
 
-                {/* Format selector */}
                 <div style={{ animation: "fu .4s .1s ease both" }}>
                   <p style={{ fontSize: ".78rem", fontWeight: 600, color: "var(--text3)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Formats</p>
                   <div className="format-grid">
@@ -316,7 +314,6 @@ export default function RemixPage() {
                   </div>
                 </div>
 
-                {/* Outputs */}
                 {loading && !hasOutputs && (
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {FORMATS.filter(f => selectedFormats.has(f.id)).map(f => (
@@ -354,7 +351,6 @@ export default function RemixPage() {
                   </div>
                 )}
 
-                {/* Empty state */}
                 {!hasOutputs && !loading && (
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", animation: "fu .4s .15s ease both" }}>
                     <div style={{ fontSize: "3rem", marginBottom: 12 }}>🔄</div>
@@ -372,7 +368,6 @@ export default function RemixPage() {
                 )}
               </div>
 
-              {/* Right history panel */}
               <div className="remix-right">
                 <div className="card" style={{ position: "sticky", top: 80 }}>
                   <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--card-b)" }}>

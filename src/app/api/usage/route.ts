@@ -20,7 +20,7 @@ export async function GET() {
       .single()
 
     if (profileError) {
-      // Profile doesn't exist, create it
+      // Profile doesn't exist yet — create it with defaults for new users
       const { error: insertError } = await supabase
         .from('profiles')
         .insert({ 
@@ -42,12 +42,11 @@ export async function GET() {
       })
     }
 
-    // Check if we need to reset monthly counter
     const now = new Date()
     const periodEnd = new Date(profile.current_period_end)
     
     if (now > periodEnd) {
-      // Reset counter for new month
+      // Billing period has rolled over — reset the monthly counter
       await supabase
         .from('profiles')
         .update({

@@ -1,14 +1,6 @@
 "use client";
-// ─────────────────────────────────────────────────────────────────────────────
-// Clario Landing Page  —  src/app/(marketing)/page.tsx
-// Fonts: Fraunces (display) + Geist (body)
-// Accent: #f97316 orange
-// Sections: Nav → Hero → Marquee → Stats → Bento Features →
-//           Live Demo → Comparison Table → Pricing → CTA → Footer
-// ─────────────────────────────────────────────────────────────────────────────
 import { useState, useEffect, useRef } from "react";
 
-/* ── Typing Effect ─────────────────────────────────────────── */
 function TypingEffect() {
   const phrases = ["Twitter thread","LinkedIn post","email newsletter","YouTube description","podcast show notes","blog outline","Instagram caption"];
   const [idx, setIdx] = useState(0);
@@ -25,7 +17,6 @@ function TypingEffect() {
   return <span>{text}<span style={{ color: "#f97316", animation: "blink .85s infinite" }}>|</span></span>;
 }
 
-/* ── useInView ─────────────────────────────────────────────── */
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
@@ -37,7 +28,6 @@ function useInView(threshold = 0.15) {
   return { ref, inView };
 }
 
-/* ── Animated Counter ──────────────────────────────────────── */
 function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   const [val, setVal] = useState(0);
   const { ref, inView } = useInView(0.3);
@@ -50,7 +40,6 @@ function Counter({ to, suffix = "" }: { to: number; suffix?: string }) {
   return <span ref={ref}>{val.toLocaleString()}{suffix}</span>;
 }
 
-/* ── Hero Product Mockup ───────────────────────────────────── */
 function HeroMockup() {
   const [tab, setTab] = useState(0);
   const [prog, setProg] = useState(0);
@@ -65,15 +54,12 @@ function HeroMockup() {
   const tabs = ["Summarizer","Remix","Chat","Brand Voice"];
   return (
     <div style={{ background: "#fff", borderRadius: 18, border: "1px solid #e7e5e4", boxShadow: "0 28px 72px rgba(0,0,0,.11)", overflow: "hidden", width: "100%", maxWidth: 600, fontFamily: "Geist, system-ui, sans-serif" }}>
-      {/* Chrome */}
       <div style={{ background: "#fafaf9", borderBottom: "1px solid #e7e5e4", padding: "10px 14px", display: "flex", alignItems: "center", gap: 9 }}>
         <div style={{ display: "flex", gap: 5 }}>{["#ff5f57","#ffbd2e","#28c840"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}</div>
         <div style={{ flex: 1, background: "#eeede8", borderRadius: 5, padding: "3px 10px", fontSize: 11, color: "#a8a29e", textAlign: "center" }}>app.clario.ai/summarizer</div>
         <div style={{ width: 44 }} />
       </div>
-      {/* Body */}
       <div style={{ display: "flex", minHeight: 340 }}>
-        {/* Sidebar icons */}
         <div style={{ width: 46, background: "#fafaf9", borderRight: "1px solid #f0efee", padding: "10px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
           {[0,1,2,3].map(i => (
             <button key={i} onClick={() => setTab(i)} style={{ width: 32, height: 32, borderRadius: 8, border: "none", cursor: "pointer", background: tab === i ? "#fff7ed" : "transparent", color: tab === i ? "#f97316" : "#a8a29e", display: "flex", alignItems: "center", justifyContent: "center", transition: "all .18s" }}>
@@ -86,7 +72,6 @@ function HeroMockup() {
             </button>
           ))}
         </div>
-        {/* Main */}
         <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 10, overflow: "hidden" }}>
           <div style={{ display: "flex", gap: 2, background: "#f2f1ef", borderRadius: 8, padding: 3 }}>
             {tabs.map((t, i) => (
@@ -155,7 +140,6 @@ function HeroMockup() {
   );
 }
 
-/* ── Comparison Table ──────────────────────────────────────── */
 function ComparisonTable() {
   const { ref, inView } = useInView(0.1);
   const features = [
@@ -209,7 +193,6 @@ function ComparisonTable() {
   );
 }
 
-/* ── Main Page ─────────────────────────────────────────────── */
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -357,7 +340,6 @@ export default function LandingPage() {
         .s-sub{font-size:.86rem;color:var(--g5);line-height:1.7;max-width:440px;margin:0 auto}
       `}</style>
 
-      {/* ── NAV ── */}
       <nav className={`ln${scrolled ? " up" : ""}`}>
         <a href="/" className="logo-w">
           <div className="lm">
@@ -382,7 +364,6 @@ export default function LandingPage() {
         </button>
       </nav>
 
-      {/* ── MOBILE NAV ── */}
       <div className={`mobile-nav${mobileNavOpen ? " open" : ""}`}>
         <button onClick={() => setMobileNavOpen(false)} style={{ position: "absolute", top: 18, right: "5%", background: "none", border: "none", cursor: "pointer", color: "var(--bk)" }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -397,7 +378,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── HERO ── */}
       <section style={{ background: "var(--w)" }}>
         <div className="hero">
           <div>
@@ -429,7 +409,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── MARQUEE ── */}
       <div className="mq-w">
         <div className="mq-t">
           {[...Array(2)].map((_, ri) =>
@@ -440,7 +419,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── STATS ── */}
       <section style={{ padding: "64px 5%" }}>
         <div className="stats-g">
           {[{n:2400,s:"+",l:"Active creators"},{n:1000000,s:"+",l:"AI requests served"},{n:10,s:"×",l:"More content output"},{n:4,s:"hrs",l:"Saved per week"}].map(s => (
@@ -452,7 +430,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── BENTO FEATURES ── */}
       <section className="sec" id="features">
         <div className="sec-w">
           <div style={{ marginBottom: 44 }}>
@@ -532,7 +509,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── LIVE DEMO ── */}
       <section className="sec" id="demo" style={{ background: "var(--g0)", borderTop: "1px solid var(--g2)", borderBottom: "1px solid var(--g2)" }}>
         <div className="sec-w">
           <div className="sec-h">
@@ -595,7 +571,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── COMPARISON TABLE ── */}
       <section className="sec" id="compare">
         <div className="sec-w">
           <div className="sec-h">
@@ -607,7 +582,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
       <section className="sec" id="pricing" style={{ background: "var(--g0)", borderTop: "1px solid var(--g2)" }}>
         <div className="sec-w">
           <div className="sec-h">
@@ -646,7 +620,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── CTA FINALE ── */}
       <div className="finale">
         <div className="f-glow" /><div className="f-grid" />
         <div style={{ position: "relative", zIndex: 1 }}>
@@ -662,7 +635,6 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── FOOTER ── */}
       <footer className="lf">
         <a href="/" className="logo-w">
           <div className="lm" style={{ width: 22, height: 22, borderRadius: 6 }}>

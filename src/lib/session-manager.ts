@@ -1,25 +1,17 @@
-/**
- * Session Manager
- * Optimizes session handling with caching and performance improvements
- */
-
 import { createClient } from '@/lib/supabase/server'
 
-// In-memory cache for session validation (short-lived)
 const sessionCache = new Map<string, { user: any; timestamp: number }>()
-const CACHE_TTL = 60 * 1000 // 1 minute cache
+const CACHE_TTL = 60 * 1000
 
 export async function getSessionUser() {
   const supabase = await createClient()
   
   try {
     const { data: { user }, error } = await supabase.auth.getUser()
-    
     if (error) {
       console.error('Session error:', error)
       return null
     }
-    
     return user
   } catch (error) {
     console.error('Failed to get session user:', error)
@@ -27,18 +19,19 @@ export async function getSessionUser() {
   }
 }
 
+/**
+ * Returns the authenticated user for a given token, using a short-lived
+ * in-memory cache to avoid redundant Supabase round-trips on hot paths.
+ */
 export async function validateSession(token?: string) {
   if (!token) return null
   
-  // Check cache first
   const cached = sessionCache.get(token)
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.user
   }
   
-  // Fetch fresh session
   const user = await getSessionUser()
-  
   if (user && token) {
     sessionCache.set(token, { user, timestamp: Date.now() })
   }
@@ -54,7 +47,7 @@ export function clearSessionCache(token?: string) {
   }
 }
 
-// Cleanup old cache entries periodically
+// Evict stale cache entries on the same interval as TTL
 setInterval(() => {
   const now = Date.now()
   for (const [key, value] of sessionCache.entries()) {

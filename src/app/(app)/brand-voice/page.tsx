@@ -330,7 +330,6 @@ export default function BrandVoicePage() {
         </div>
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}>
           <div className="modal">

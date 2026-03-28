@@ -46,8 +46,6 @@ How you respond:
 Tone: Knowledgeable but conversational. Like a smart friend who happens to be a content expert.`
 
 export async function POST(request: Request) {
-  console.log('[Chat API] Request received');
-
   try {
     const rateLimitCheck = checkRateLimit(request as any, 'api')
     if (!rateLimitCheck.allowed) {
@@ -80,7 +78,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Use consistent column names matching the profiles table
     const { data: profile } = await supabase
       .from('profiles')
       .select('subscription_tier, requests_used_this_month, email')
@@ -104,12 +101,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'AI service not configured' }, { status: 500 })
     }
 
-    // Build system prompt with optional brand voice
+    // Inject active brand voice into the system prompt when provided
     const systemPrompt = brandVoice
       ? `${SYSTEM_PROMPT}\n\n---\nACTIVE BRAND VOICE:\n${brandVoice}\nApply this brand voice style to your responses.`
       : SYSTEM_PROMPT
 
-    // Build conversation context from history (last 12 messages for better context)
+    // Cap history at 12 messages to stay within context limits
     const limitedHistory = (history || []).slice(-12)
     const historyText = limitedHistory
       .map(m => `${m.role === 'user' ? 'User' : 'Clario'}: ${m.content}`)
@@ -131,7 +128,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: aiError.message || 'Failed to generate response' }, { status: 500 })
     }
 
-    // Resolve or create chat session
     let finalConversationId = conversationId
     if (!finalConversationId) {
       const { data: session, error: sessionError } = await supabase
@@ -146,7 +142,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Save messages (non-blocking)
+    // Fire-and-forget: message persistence and usage tracking don't block the response
     if (finalConversationId) {
       supabase.from('chat_messages').insert([
         { session_id: finalConversationId, user_id: user.id, role: 'user', content: sanitizedMessage },
@@ -156,14 +152,13 @@ export async function POST(request: Request) {
       })
     }
 
-    // Track usage (non-blocking) — use track_usage to match summarize/remix
     supabase.rpc('track_usage', {
       p_user_id: user.id,
       p_type: 'chat',
       p_count: 1,
     }).then(({ error }) => {
       if (error) {
-        // Fallback to increment_usage if track_usage doesn't exist
+        // Fallback for deployments using the older increment_usage RPC
         supabase.rpc('increment_usage', { p_user_id: user.id, p_type: 'chat' })
           .then(({ error: e2 }) => { if (e2) console.error('[Chat API] Track usage error:', e2.message) })
       }

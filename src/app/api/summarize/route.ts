@@ -422,8 +422,6 @@ Format your response exactly like this:
 }
 
 export async function POST(request: Request) {
-  console.log('[Summarize API] Request received');
-
   try {
     const rateLimitCheck = checkRateLimit(request as any, 'api')
     if (!rateLimitCheck.allowed) {

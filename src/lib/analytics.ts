@@ -27,7 +27,6 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
   const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
   const sixtyDaysAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000)
 
-  // Get current month data
   const { data: currentMonth } = await supabase
     .from('usage_stats')
     .select('*')
@@ -35,7 +34,6 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
     .gte('date', thirtyDaysAgo.toISOString().split('T')[0])
     .order('date', { ascending: false })
 
-  // Get previous month data for comparison
   const { data: previousMonth } = await supabase
     .from('usage_stats')
     .select('*')
@@ -47,15 +45,13 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
   const currentTotal = currentMonth?.reduce((sum, d) => sum + (d.total_requests || 0), 0) || 0
   const previousTotal = previousMonth?.reduce((sum, d) => sum + (d.total_requests || 0), 0) || 0
 
-  // Calculate average requests per day
   const avgRequestsPerDay = currentMonth?.length ? Math.round(currentTotal / currentMonth.length) : 0
 
-  // Find peak day
   const peakDay = currentMonth?.reduce((max, curr) => 
     (curr.total_requests || 0) > (max.total_requests || 0) ? curr : max
   )?.date || null
 
-  // Calculate streak (consecutive days with activity)
+  // Walk backwards from today counting consecutive days with activity
   let streak = 0
   if (currentMonth && currentMonth.length > 0) {
     const sortedDates = currentMonth.map(d => new Date(d.date)).sort((a, b) => b.getTime() - a.getTime())
@@ -75,7 +71,6 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
     }
   }
 
-  // Find most used feature
   const featureCounts = {
     summaries: currentMonth?.reduce((sum, d) => sum + (d.summaries_count || 0), 0) || 0,
     chats: currentMonth?.reduce((sum, d) => sum + (d.chats_count || 0), 0) || 0,
@@ -89,7 +84,7 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
     featureCounts[key] > featureCounts[max] ? key : max
   , featureKeys[0] ?? 'summaries')
 
-  // Calculate trend
+  // >5% change = trending, <-5% = declining, otherwise stable
   const trendPercentage = previousTotal > 0 
     ? Math.round(((currentTotal - previousTotal) / previousTotal) * 100)
     : 0

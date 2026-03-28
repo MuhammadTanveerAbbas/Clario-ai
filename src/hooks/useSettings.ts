@@ -32,7 +32,6 @@ export function useSettings({
     const { toast } = useToast()
     const supabase = createClient()
 
-    // Load profile data from database
     const loadProfile = useCallback(async () => {
         if (!userId) return
 
@@ -44,6 +43,7 @@ export function useSettings({
                 .eq('id', userId)
                 .single()
 
+            // PGRST116 = row not found; treat as a new user with defaults
             if (error && error.code !== 'PGRST116') throw error
 
             if (data) {
@@ -61,7 +61,6 @@ export function useSettings({
         }
     }, [userId, userEmail, userName, supabase])
 
-    // Load profile on mount
     useEffect(() => {
         loadProfile()
     }, [loadProfile])

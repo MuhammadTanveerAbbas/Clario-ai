@@ -66,7 +66,6 @@ const MODES: { id: SummarizeMode; label: string; color: string; desc: string }[]
   { id: "bullet-summary", label: "Bullet Summary", color: "#6b7280", desc: "Clean scannable bullet points" },
 ];
 
-// Map UI mode IDs to API mode IDs
 const MODE_API_MAP: Record<SummarizeMode, string> = {
   "executive-brief": "executive-brief",
   "action-items": "action-items",
@@ -146,7 +145,6 @@ export default function SummarizerPage() {
       let finalText = text;
       let finalUrl = "";
 
-      // For YouTube: fetch transcript first, then summarize
       if (tab === "youtube") {
         setLoadingMsg("Fetching transcript...");
         const ytRes = await fetch("/api/youtube", {
@@ -190,7 +188,6 @@ export default function SummarizerPage() {
       const data = await res.json();
       const summaryText: string = data.summary || "";
 
-      // Stream output word by word
       const words = summaryText.split(" ");
       for (let i = 0; i < words.length; i++) {
         await new Promise(r => setTimeout(r, 8));
@@ -289,7 +286,6 @@ export default function SummarizerPage() {
       {showHistory && <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.4)", zIndex: 299 }} onClick={() => setShowHistory(false)} />}
 
       <div className="dash-layout">
-        {/* Sidebar */}
         <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
           <div className="sb-logo">
             <div className="sb-logo-mark"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
@@ -345,13 +341,11 @@ export default function SummarizerPage() {
           </div>
 
           <div className="page-content" style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            {/* Header */}
             <div style={{ animation: "fu .4s ease both" }}>
               <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", marginBottom: 6 }}>Text Summarizer</h1>
               <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>Summarize anything in 10 different ways. Paste text or drop a YouTube URL.</p>
             </div>
 
-            {/* Input card */}
             <div className="card" style={{ animation: "fu .4s .05s ease both" }}>
               <div style={{ display: "flex", borderBottom: "1px solid var(--card-b)", padding: "12px 16px", gap: 8 }}>
                 {(["text", "youtube"] as const).map(t => (
@@ -382,7 +376,6 @@ export default function SummarizerPage() {
               </div>
             </div>
 
-            {/* Mode selector */}
             <div style={{ animation: "fu .4s .1s ease both" }}>
               <p style={{ fontSize: ".78rem", fontWeight: 600, color: "var(--text3)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Summary Mode</p>
               <div className="mode-grid">
@@ -397,7 +390,6 @@ export default function SummarizerPage() {
               </div>
             </div>
 
-            {/* Output */}
             {(output || loading) && (
               <div className="card" style={{ animation: "fu .4s ease both" }}>
                 <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
@@ -426,7 +418,6 @@ export default function SummarizerPage() {
               </div>
             )}
 
-            {/* Empty state */}
             {!output && !loading && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", animation: "fu .4s .15s ease both" }}>
                 <div style={{ fontSize: "3rem", marginBottom: 12 }}>📄</div>
@@ -446,7 +437,6 @@ export default function SummarizerPage() {
         </div>
       </div>
 
-      {/* History panel */}
       <div className={`history-panel${showHistory ? "" : " closed"}`}>
         <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontFamily: "var(--serif)", fontSize: "1rem", fontWeight: 300, color: "var(--text)" }}>Recent Summaries</span>

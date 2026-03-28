@@ -280,7 +280,6 @@ export default function SettingsPage() {
       />
 
       <div className="main-area">
-        {/* Top bar */}
         <header className="topbar">
           <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -294,9 +293,7 @@ export default function SettingsPage() {
           </button>
         </header>
 
-        {/* Main content */}
         <main className="settings-main" style={{ flex: 1, padding: "28px 24px", maxWidth: 860, width: "100%" }}>
-          {/* @media responsive handled via inline style below */}
           <style>{`@media(max-width:768px){.settings-main{padding:16px 14px!important}}@media(max-width:480px){.settings-main{padding:12px!important}}`}</style>
           {loading ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -306,13 +303,11 @@ export default function SettingsPage() {
             </div>
           ) : (
             <div style={{ animation: "fu .3s ease both" }}>
-              {/* Page header */}
               <div style={{ marginBottom: 28 }}>
                 <h1 style={{ fontFamily: "Fraunces, Georgia, serif", fontSize: "1.6rem", fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Account Settings</h1>
                 <p style={{ fontSize: ".85rem", color: "var(--text3)" }}>Manage your profile, security, and preferences</p>
               </div>
 
-              {/* Tab nav */}
               <div style={{ display: "flex", gap: 4, marginBottom: 28, borderBottom: "1px solid var(--border)", paddingBottom: 0, overflowX: "auto" }}>
                 {TABS.map(tab => (
                   <button
@@ -334,7 +329,6 @@ export default function SettingsPage() {
                 ))}
               </div>
 
-              {/* Tab content */}
               <div style={{ animation: "fu .25s ease both" }} key={activeTab}>
                 {activeTab === "profile" && profile && (
                   <ProfileSection

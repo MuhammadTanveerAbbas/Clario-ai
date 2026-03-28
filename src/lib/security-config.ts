@@ -1,20 +1,15 @@
-/**
- * Security Configuration
- * Centralized security settings for cookies, sessions, and headers
- */
-
 export const COOKIE_CONFIG = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
-  maxAge: 60 * 60 * 24 * 365, // 1 year
+  maxAge: 60 * 60 * 24 * 365,
   path: '/',
   domain: process.env.NODE_ENV === 'production' ? process.env.NEXT_PUBLIC_DOMAIN : undefined,
 }
 
 export const SESSION_CONFIG = {
-  maxAge: 60 * 60 * 24 * 365, // 1 year
-  refreshThreshold: 60 * 60 * 24, // 1 day before expiry
+  maxAge: 60 * 60 * 24 * 365,
+  refreshThreshold: 60 * 60 * 24,
   autoRefresh: true,
   flowType: 'pkce' as const,
 }
@@ -26,6 +21,7 @@ export const SECURITY_HEADERS = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
+  // CSP allows Paddle (payments), Sentry (monitoring), PostHog (analytics), and Groq/Gemini (AI)
   'Content-Security-Policy': [
     "default-src 'self'",
     "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.paddle.com https://js.sentry-cdn.com https://us-assets.i.posthog.com",
@@ -44,17 +40,14 @@ export const SECURITY_HEADERS = {
 }
 
 export const RATE_LIMIT_CONFIG = {
-  // API rate limits per minute
   api: {
     default: 60,
     auth: 5,
     ai: 20,
   },
-  // Session validation cache TTL
-  sessionCacheTTL: 60 * 1000, // 1 minute
-  // IP-based blocking
+  sessionCacheTTL: 60 * 1000,
   maxFailedAttempts: 5,
-  blockDuration: 15 * 60 * 1000, // 15 minutes
+  blockDuration: 15 * 60 * 1000,
 }
 
 export const CSRF_CONFIG = {

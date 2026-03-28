@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-// Honeypot field - hidden from users but visible to bots
+/** Invisible honeypot field — bots fill it in, humans never see it. */
 export function HoneypotField() {
   return (
     <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}>
@@ -21,7 +21,6 @@ export function HoneypotField() {
   )
 }
 
-// Rate limiting check for forms
 export function useFormRateLimit(maxSubmissions: number = 3, windowMs: number = 60000) {
   const [submissions, setSubmissions] = useState<number[]>([])
 
@@ -40,9 +39,8 @@ export function useFormRateLimit(maxSubmissions: number = 3, windowMs: number = 
   return { canSubmit }
 }
 
-// Email verification check
+/** Blocks known disposable email domains to reduce throwaway signups. */
 export function validateEmailDomain(email: string): boolean {
-  // Block common disposable email domains
   const disposableDomains = [
     'tempmail.com',
     'guerrillamail.com',

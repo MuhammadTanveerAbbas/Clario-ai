@@ -58,7 +58,6 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* Change password */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Change Password</div>
@@ -98,7 +97,6 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
         </form>
       </div>
 
-      {/* Account security */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Account Security</div>

@@ -1,14 +1,4 @@
 "use client";
-// ─────────────────────────────────────────────────────────────────────────────
-// Clario Dashboard  —  src/app/(app)/dashboard/page.tsx
-// • Collapsible sidebar + top bar (via SidebarContext)
-// • Dark / Light theme toggle (via ThemeProvider)
-// • Usage analytics with Recharts
-// • Onboarding checklist for new users
-// • Toast notifications
-// • Skeleton loading states
-// • Stat cards: Summaries, Chats, Remixes, Brand Voices
-// ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
@@ -22,7 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
 
-// ── Types ──────────────────────────────────────────────────────────────────
+
 interface UserProfile {
   id: string;
   email: string;
@@ -53,7 +43,6 @@ interface Toast {
   message: string;
 }
 
-// ── Sidebar Nav Items ──────────────────────────────────────────────────────
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
@@ -78,7 +67,6 @@ function NavIcon({ type }: { type: string }) {
   }
 }
 
-// ── Skeleton ───────────────────────────────────────────────────────────────
 function Skeleton({ w = "100%", h = 16, r = 8 }: { w?: string | number; h?: number; r?: number }) {
   return (
     <div style={{
@@ -90,7 +78,6 @@ function Skeleton({ w = "100%", h = 16, r = 8 }: { w?: string | number; h?: numb
   );
 }
 
-// ── Toast Component ────────────────────────────────────────────────────────
 function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000, display: "flex", flexDirection: "column", gap: 8 }}>
@@ -112,7 +99,6 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
   );
 }
 
-// ── Main Dashboard ─────────────────────────────────────────────────────────
 export default function Dashboard() {
   const pathname = usePathname();
   const router = useRouter();
@@ -379,7 +365,6 @@ export default function Dashboard() {
       {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
       <div className="dash-layout">
-        {/* ── SIDEBAR ── */}
         <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
           <div className="sb-logo">
             <div className="sb-logo-mark">
@@ -443,9 +428,7 @@ export default function Dashboard() {
           </div>
         </aside>
 
-        {/* ── MAIN ── */}
         <div className="main-area">
-          {/* Top bar */}
           <div className="topbar">
             <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -469,9 +452,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Page content */}
           <div className="page-content">
-            {/* Onboarding checklist */}
             {!onboardingDone && !loading && (
               <div className="card" style={{ padding: "18px 20px" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
@@ -500,7 +481,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Stat cards */}
             <div className="stat-grid">
               {loading ? [...Array(4)].map((_, i) => (
                 <div key={i} className="card stat-card"><Skeleton h={14} w="60%" /><Skeleton h={36} w="40%" r={6} /><Skeleton h={12} w="50%" /></div>
@@ -513,7 +493,6 @@ export default function Dashboard() {
               ))}
             </div>
 
-            {/* Charts */}
             <div className="charts-grid">
               <div className="card">
                 <div className="chart-head">
@@ -586,7 +565,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Quick actions */}
             <div>
               <div style={{ fontSize: ".75rem", fontWeight: 600, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 10 }}>Quick Actions</div>
               <div className="qa-grid">
@@ -607,7 +585,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Pro upsell for free users */}
             {user?.plan === "free" && (
               <div className="card" style={{ padding: "20px", background: "linear-gradient(135deg, var(--accent-l) 0%, var(--bg3) 100%)", borderColor: "var(--accent-m)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
                 <div>

@@ -1,8 +1,3 @@
-/**
- * Secure Cookie Manager
- * Handles cookie operations with enhanced security
- */
-
 import { COOKIE_CONFIG } from './security-config'
 
 export interface CookieOptions {
@@ -19,7 +14,8 @@ export class CookieManager {
   private static readonly HOST_PREFIX = '__Host-'
 
   /**
-   * Set a secure cookie with proper prefixes
+   * Builds a Set-Cookie header string with the appropriate security prefix.
+   * Uses `__Host-` when no domain is set (stricter), `__Secure-` otherwise.
    */
   static setSecureCookie(
     name: string,
@@ -44,9 +40,7 @@ export class CookieManager {
     return parts.join('; ')
   }
 
-  /**
-   * Parse cookies from request headers
-   */
+  /** Parses a raw Cookie header string into a key-value map. */
   static parseCookies(cookieHeader: string | null): Record<string, string> {
     if (!cookieHeader) return {}
 
@@ -59,9 +53,7 @@ export class CookieManager {
     }, {} as Record<string, string>)
   }
 
-  /**
-   * Delete a cookie by setting expired date
-   */
+  /** Expires a cookie immediately by setting Max-Age=0. */
   static deleteCookie(name: string, options: CookieOptions = {}): string {
     const mergedOptions = { ...COOKIE_CONFIG, ...options, maxAge: 0 }
     const prefix = mergedOptions.domain ? this.SECURE_PREFIX : this.HOST_PREFIX
@@ -79,11 +71,8 @@ export class CookieManager {
     return parts.join('; ')
   }
 
-  /**
-   * Validate cookie value for security
-   */
+  /** Rejects values containing XSS vectors before they're stored in a cookie. */
   static validateCookieValue(value: string): boolean {
-    // Check for suspicious patterns
     const suspiciousPatterns = [
       /<script/i,
       /javascript:/i,
@@ -95,9 +84,6 @@ export class CookieManager {
     return !suspiciousPatterns.some(pattern => pattern.test(value))
   }
 
-  /**
-   * Sanitize cookie value
-   */
   static sanitizeCookieValue(value: string): string {
     return value
       .replace(/[<>'"]/g, '')

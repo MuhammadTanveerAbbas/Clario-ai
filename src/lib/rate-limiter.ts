@@ -1,7 +1,3 @@
-/**
- * Simple in-memory rate limiter
- */
-
 interface RateLimitEntry {
   count: number;
   resetAt: number;

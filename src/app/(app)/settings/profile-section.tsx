@@ -39,8 +39,7 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {/* Avatar + name row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), #fb923c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", color: "#fff", fontWeight: 600, flexShrink: 0 }}>
           {initials}
         </div>
@@ -50,7 +49,6 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
         </div>
       </div>
 
-      {/* Form card */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Profile Information</div>

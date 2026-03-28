@@ -32,7 +32,7 @@ export function rateLimit(
 
   store[key].count++
 
-  // Clean up old entries
+  // Evict expired windows to prevent unbounded memory growth
   Object.keys(store).forEach((k) => {
     if (store[k].resetTime < now) {
       delete store[k]

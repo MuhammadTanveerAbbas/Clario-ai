@@ -43,7 +43,6 @@ export function BillingSection({ profile }: BillingSectionProps) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <style>{`.billing-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}@media(max-width:380px){.billing-stats{grid-template-columns:1fr}}.billing-actions{display:flex;gap:10px;flex-wrap:wrap}.billing-actions button{flex:1;min-width:120px}`}</style>
-      {/* Current plan */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, background: isPaid ? "radial-gradient(circle, rgba(245,158,11,.12) 0%, transparent 70%)" : "radial-gradient(circle, rgba(249,115,22,.08) 0%, transparent 70%)", pointerEvents: "none" }} />
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20, gap: 12 }}>
@@ -86,7 +85,6 @@ export function BillingSection({ profile }: BillingSectionProps) {
         </div>
       </div>
 
-      {/* Billing info */}
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Billing & Usage</div>

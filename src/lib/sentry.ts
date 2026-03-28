@@ -5,8 +5,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   environment: process.env.NODE_ENV || 'development',
   enabled: process.env.NODE_ENV === 'production',
-  beforeSend(event, hint) {
-    // Don't send events in development
+  beforeSend(event) {
     if (process.env.NODE_ENV === 'development') {
       return null
     }

@@ -78,7 +78,6 @@ export function AppNavbar() {
       >
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-2.5 group">
               <Image 
                 src="/favicon.svg" 
@@ -92,7 +91,6 @@ export function AppNavbar() {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-1">
               {navigation.map((item) => {
                 const isActive =
@@ -128,9 +126,7 @@ export function AppNavbar() {
               })}
             </div>
 
-            {/* Right Section */}
             <div className="flex items-center gap-3">
-              {/* Upgrade Button - Desktop */}
               <Link href="/pricing" className="hidden lg:block">
                 <Button
                   size="sm"
@@ -141,7 +137,6 @@ export function AppNavbar() {
                 </Button>
               </Link>
 
-              {/* Settings - Desktop */}
               <Link href="/settings" className="hidden md:block">
                 <Button
                   variant="ghost"
@@ -155,7 +150,6 @@ export function AppNavbar() {
                 </Button>
               </Link>
 
-              {/* User Menu - Desktop */}
               <div className="hidden md:block relative">
                 <Button
                   variant="ghost"
@@ -204,7 +198,6 @@ export function AppNavbar() {
                 )}
               </div>
 
-              {/* Mobile Menu Button */}
               <Button
                 variant="ghost"
                 size="icon"
@@ -221,7 +214,6 @@ export function AppNavbar() {
           </div>
         </div>
         
-        {/* Decorative Line */}
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent opacity-50"></div>
         <motion.div 
           className="absolute bottom-0 left-0 w-32 h-[2px] bg-gradient-to-r from-[#4169E1]/0 via-[#4169E1] to-[#4169E1]/0 blur-sm"
@@ -236,7 +228,6 @@ export function AppNavbar() {
         />
       </motion.nav>
 
-      {/* Mobile Menu */}
       {mobileOpen && (
         <>
           <div
@@ -251,7 +242,6 @@ export function AppNavbar() {
             className="fixed right-0 top-0 bottom-0 w-[280px] bg-black border-l border-white/[0.08] z-50 md:hidden overflow-y-auto"
           >
             <div className="p-6 space-y-6">
-              {/* User Info */}
               <div className="flex items-center gap-3 pb-6 border-b border-white/[0.08]">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={userAvatar} alt="User" />
@@ -267,7 +257,6 @@ export function AppNavbar() {
                 </div>
               </div>
 
-              {/* Navigation */}
               <div className="space-y-1">
                 {navigation.map((item) => {
                   const isActive =
@@ -296,7 +285,6 @@ export function AppNavbar() {
                 })}
               </div>
 
-              {/* Settings */}
               <Link href="/settings" onClick={() => setMobileOpen(false)}>
                 <div
                   className={cn(
@@ -311,7 +299,6 @@ export function AppNavbar() {
                 </div>
               </Link>
 
-              {/* Upgrade */}
               <Link href="/pricing" onClick={() => setMobileOpen(false)}>
                 <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#4169E1] text-white hover:bg-[#3159D1] transition-all">
                   <CreditCard className="h-5 w-5" />
@@ -319,7 +306,6 @@ export function AppNavbar() {
                 </div>
               </Link>
 
-              {/* Sign Out */}
               <button
                 onClick={() => {
                   handleSignOut();

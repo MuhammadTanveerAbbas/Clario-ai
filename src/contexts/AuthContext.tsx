@@ -21,13 +21,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient()
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
       
-      // Identify user in PostHog
       if (session?.user) {
         posthog.identify(session.user.id, {
           email: session.user.email,
@@ -35,7 +33,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -43,7 +40,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null)
       setLoading(false)
 
-      // Track auth events in PostHog
       if (event === 'SIGNED_IN' && session?.user) {
         posthog.identify(session.user.id, {
           email: session.user.email,
@@ -54,9 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         posthog.reset()
       }
 
-      // Auto-refresh session
+      // Proactively refresh the session every 30 minutes to prevent expiry mid-session
       if (session) {
-        // Refresh session every 30 minutes
         const refreshInterval = setInterval(async () => {
           const { data: { session: newSession } } = await supabase.auth.refreshSession()
           if (newSession) {

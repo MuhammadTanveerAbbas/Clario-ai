@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 
 /**
- * Safely parse JSON from request with proper error handling
+ * Safely parses the request body as JSON.
+ * Returns a typed result object instead of throwing, so callers can handle
+ * malformed payloads without try/catch boilerplate.
  */
 export async function parseRequestJSON<T = any>(request: Request): Promise<{
   success: boolean
@@ -35,7 +37,8 @@ export async function parseRequestJSON<T = any>(request: Request): Promise<{
 }
 
 /**
- * Validate required fields in request body
+ * Checks that all required fields are present and truthy on a request body.
+ * Returns a 400 response listing missing fields if validation fails.
  */
 export function validateRequiredFields(
   data: any,

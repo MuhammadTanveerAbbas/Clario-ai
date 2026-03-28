@@ -302,7 +302,6 @@ export default function CalendarPage() {
       {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
       <div className="dash-layout">
-        {/* Sidebar */}
         <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
           <div className="sb-logo">
             <div className="sb-logo-mark">
@@ -349,7 +348,6 @@ export default function CalendarPage() {
           </div>
         </aside>
 
-        {/* Main */}
         <div className="main-area">
           <div className="topbar">
             <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
@@ -369,7 +367,6 @@ export default function CalendarPage() {
               <div style={{ textAlign: "center", padding: 60, color: "var(--text2)" }}>Please sign in to view your calendar</div>
             ) : (
               <>
-                {/* Calendar header */}
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
                   <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", margin: 0 }}>
                     {MONTHS[month]} {year}
@@ -420,7 +417,6 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      {/* Modal */}
       {modalOpen && (
         <div onClick={() => setModalOpen(false)}
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}>

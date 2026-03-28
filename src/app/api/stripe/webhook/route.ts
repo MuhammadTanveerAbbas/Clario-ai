@@ -26,14 +26,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
-  console.log(`[Stripe Webhook] Event: ${event.type}, ID: ${event.id}`)
-
   const supabase = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
   try {
+    // Idempotency check — Stripe may deliver the same event more than once
     const { data: existing } = await supabase
       .from('processed_webhook_events')
       .select('id')
@@ -55,9 +54,6 @@ export async function POST(request: Request) {
         }
 
         if (userId) {
-          const priceId = session.line_items?.data?.[0]?.price?.id || session.metadata?.priceId
-          console.log('[Stripe] Checkout completed for user', userId, 'price', priceId)
-
           await supabase
             .from('profiles')
             .update({
@@ -75,9 +71,6 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.userId
 
         if (userId) {
-          const priceId = subscription.items.data[0]?.price?.id
-          console.log('[Stripe] Subscription updated for user', userId, 'price', priceId)
-
           await supabase
             .from('profiles')
             .update({
@@ -94,7 +87,6 @@ export async function POST(request: Request) {
         const userId = subscription.metadata?.userId
 
         if (userId) {
-          console.log('[Stripe] Subscription deleted for user', userId)
           await supabase
             .from('profiles')
             .update({

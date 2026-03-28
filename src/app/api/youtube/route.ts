@@ -6,7 +6,7 @@ import { checkRateLimit } from '@/middleware/rate-limit';
 export const maxDuration = 120;
 export const dynamic = 'force-dynamic';
 
-// Comprehensive URL pattern matching
+/** Extracts an 11-character YouTube video ID from any supported URL format or bare ID. */
 function extractVideoId(input: string): string | null {
   const trimmed = input.trim();
 
@@ -28,7 +28,7 @@ function extractVideoId(input: string): string | null {
   return null;
 }
 
-// Fetch video metadata via oEmbed (no API key needed)
+/** Fetches video title, author, and thumbnail via oEmbed — no API key required. */
 async function fetchVideoMetadata(videoId: string): Promise<{ title: string; author: string; thumbnail: string } | null> {
   try {
     const res = await fetch(
@@ -47,10 +47,9 @@ async function fetchVideoMetadata(videoId: string): Promise<{ title: string; aut
   }
 }
 
-// Clean and normalize transcript text
 function cleanTranscript(text: string): string {
   return text
-    .replace(/\[.*?\]/g, '') // remove [Music], [Applause] etc
+    .replace(/\[.*?\]/g, '') // strip [Music], [Applause], etc.
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
@@ -60,11 +59,13 @@ function cleanTranscript(text: string): string {
     .trim();
 }
 
-// Try fetching transcript with multiple language fallbacks
+/**
+ * Attempts to fetch a transcript in preferred English variants before falling
+ * back to YouTube's auto-detected language. Throws 'NO_TRANSCRIPT' if none found.
+ */
 async function fetchTranscriptWithFallback(videoId: string): Promise<{ text: string; lang: string }> {
   const langPriority = ['en', 'en-US', 'en-GB', 'a.en'];
 
-  // Try preferred languages first
   for (const lang of langPriority) {
     try {
       const transcript = await YoutubeTranscript.fetchTranscript(videoId, { lang });
@@ -73,11 +74,10 @@ async function fetchTranscriptWithFallback(videoId: string): Promise<{ text: str
         return { text: cleanTranscript(text), lang };
       }
     } catch {
-      // try next
+      // try next language
     }
   }
 
-  // Fallback: try without language preference
   const transcript = await YoutubeTranscript.fetchTranscript(videoId);
   if (!transcript?.length) throw new Error('NO_TRANSCRIPT');
   const text = transcript.map(item => item.text).join(' ');
@@ -85,8 +85,6 @@ async function fetchTranscriptWithFallback(videoId: string): Promise<{ text: str
 }
 
 export async function POST(request: Request) {
-  console.log('[YouTube API] Request received');
-
   try {
     const rateLimitCheck = checkRateLimit(request as any, 'api');
     if (!rateLimitCheck.allowed) {
@@ -118,9 +116,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    console.log('[YouTube API] Fetching transcript for:', videoId);
-
-    // Fetch metadata and transcript in parallel
+    // Fetch metadata and transcript in parallel to minimize latency
     const [metadataResult, transcriptResult] = await Promise.allSettled([
       fetchVideoMetadata(videoId),
       fetchTranscriptWithFallback(videoId),
@@ -160,8 +156,6 @@ export async function POST(request: Request) {
         hint: 'This video may have auto-generated captions that are incomplete.',
       }, { status: 404 });
     }
-
-    console.log(`[YouTube API] Success — ${transcript.length} chars, lang: ${lang}`);
 
     return NextResponse.json({
       transcript,

@@ -1,5 +1,4 @@
 export function sanitizeInput(input: string): string {
-  // Remove dangerous patterns without external dependencies
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')

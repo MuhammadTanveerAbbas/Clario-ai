@@ -345,8 +345,6 @@ Body: [2-3 sentences expanding on it]
 }
 
 export async function POST(request: NextRequest) {
-  console.log('[Remix API] Request received');
-
   try {
     const rateLimitCheck = checkRateLimit(request as any, 'api');
     if (!rateLimitCheck.allowed) {
@@ -373,7 +371,6 @@ export async function POST(request: NextRequest) {
 
     const { content, formats, brandVoice } = parsed.data;
 
-    // Check usage limits
     const { data: profile } = await supabase
       .from('profiles')
       .select('subscription_tier, requests_used_this_month, email')
@@ -397,7 +394,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'AI service not configured' }, { status: 500 });
     }
 
-    // Determine which formats to generate
     const formatsToGenerate = formats?.length
       ? formats.filter(f => REMIX_PROMPTS[f])
       : Object.keys(REMIX_PROMPTS);
@@ -414,7 +410,6 @@ Rules:
 - Write words normally without spacing between letters
 - Make each format feel native to its platform`
 
-    // Generate all formats in parallel
     const results: Record<string, string> = {};
     await Promise.all(
       formatsToGenerate.map(async (format) => {
