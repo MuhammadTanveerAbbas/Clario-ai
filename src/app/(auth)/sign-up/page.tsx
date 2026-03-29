@@ -118,7 +118,7 @@ function AuthRightPanel({ headline, sub, features }: { headline: string; sub: st
             </div>
           ))}
         </div>
-        <p style={{ fontSize: ".76rem", color: "#78716c" }}><strong style={{ color: "#d6d3d1" }}>2,400+ creators</strong> saving 4+ hrs/week</p>
+        <p style={{ fontSize: ".76rem", color: "#78716c" }}><strong style={{ color: "#d6d3d1" }}>Loved by creators</strong> saving hours every week</p>
       </div>
     </div>
   );

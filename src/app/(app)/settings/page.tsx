@@ -19,7 +19,9 @@ interface UserProfile {
   avatar_url?: string;
   plan: "free" | "pro";
   subscription_tier?: "free" | "pro" | "enterprise";
-  subscription_status?: "active" | "inactive";
+  subscription_status?: "active" | "inactive" | "canceled";
+  current_period_end?: string;
+  stripe_customer_id?: string;
 }
 
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
@@ -232,10 +234,12 @@ export default function SettingsPage() {
         setProfile({
           id: authUser.id,
           email: authUser.email || "",
-          full_name: data?.name || data?.full_name || authUser.user_metadata?.name || "",
-          plan: data?.plan || "free",
+          full_name: data?.full_name || data?.name || authUser.user_metadata?.name || authUser.user_metadata?.full_name || "",
+          plan: (data?.subscription_tier === "pro" ? "pro" : "free") as "free" | "pro",
           subscription_tier: data?.subscription_tier || "free",
           subscription_status: data?.subscription_status || "inactive",
+          current_period_end: data?.current_period_end,
+          stripe_customer_id: data?.stripe_customer_id,
         });
       } catch {
         addToast("error", "Failed to load profile.");
@@ -341,7 +345,12 @@ export default function SettingsPage() {
                   <SecuritySection userEmail={profile?.email} onSignOut={handleSignOut} />
                 )}
                 {activeTab === "billing" && (
-                  <BillingSection profile={profile ? { subscription_tier: profile.subscription_tier || "free", subscription_status: profile.subscription_status || "inactive" } : undefined} />
+                  <BillingSection profile={profile ? {
+                    subscription_tier: profile.subscription_tier || "free",
+                    subscription_status: (profile.subscription_status || "inactive") as "active" | "inactive" | "canceled",
+                    current_period_end: profile.current_period_end,
+                    stripe_customer_id: profile.stripe_customer_id,
+                  } : undefined} />
                 )}
                 {activeTab === "preferences" && (
                   <PreferencesSection preferences={preferences} onPreferencesChange={handlePreferencesChange} />

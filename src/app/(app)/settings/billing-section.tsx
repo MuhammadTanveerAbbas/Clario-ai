@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 interface BillingData {
   subscription_tier: "free" | "pro" | "enterprise";
-  subscription_status: "active" | "inactive";
+  subscription_status: "active" | "inactive" | "canceled";
+  current_period_end?: string;
+  stripe_customer_id?: string;
 }
 
 interface BillingSectionProps {
@@ -21,22 +23,37 @@ const PLAN_LIMITS = {
 
 export function BillingSection({ profile }: BillingSectionProps) {
   const [loading, setLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
   const tier = (profile?.subscription_tier || "free") as "free" | "pro" | "enterprise";
   const plan = PLAN_LIMITS[tier];
   const isPaid = tier !== "free";
+  const isActive = profile?.subscription_status === "active";
 
-  const handleCancel = async () => {
-    if (!confirm("Are you sure you want to cancel your subscription?")) return;
-    setLoading(true);
+  const nextBillingDate = profile?.current_period_end
+    ? new Date(profile.current_period_end).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : isPaid ? "Contact support" : "—";
+
+  const handleManageBilling = async () => {
+    setPortalLoading(true);
     try {
-      toast({ title: "Subscription cancellation", description: "Please contact support to cancel your subscription." });
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message || "Failed to cancel subscription." });
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({ variant: "destructive", title: "Error", description: data.error || "Failed to open billing portal." });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Error", description: "Failed to open billing portal." });
     } finally {
-      setLoading(false);
+      setPortalLoading(false);
     }
   };
 
@@ -57,29 +74,32 @@ export function BillingSection({ profile }: BillingSectionProps) {
 
         <div className="billing-stats">
           <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10 }}>
-            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{plan.requests}</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{plan.requests.toLocaleString()}</div>
             <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>AI Requests / month</div>
           </div>
           <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10 }}>
-            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: isPaid ? "var(--success)" : "var(--text3)", marginBottom: 4 }}>{isPaid ? "Active" : "Free"}</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: isActive ? "var(--success)" : "var(--text3)", marginBottom: 4 }}>
+              {isPaid ? (isActive ? "Active" : "Canceled") : "Free"}
+            </div>
             <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>Status</div>
           </div>
         </div>
 
         <div className="billing-actions">
-          <button
-            onClick={() => router.push("/pricing")}
-            style={{ flex: 1, padding: "10px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
-          >
-            {isPaid ? "Change Plan" : "Upgrade to Pro"}
-          </button>
-          {isPaid && (
+          {!isPaid ? (
             <button
-              onClick={handleCancel}
-              disabled={loading}
-              style={{ padding: "10px 16px", background: "none", border: "1px solid rgba(248,113,113,.3)", borderRadius: 9, color: "var(--error)", fontSize: ".84rem", cursor: "pointer", fontFamily: "inherit", opacity: loading ? 0.6 : 1 }}
+              onClick={() => router.push("/pricing")}
+              style={{ flex: 1, padding: "10px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
             >
-              Cancel
+              Upgrade to Pro
+            </button>
+          ) : (
+            <button
+              onClick={handleManageBilling}
+              disabled={portalLoading}
+              style={{ flex: 1, padding: "10px 16px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: portalLoading ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: portalLoading ? 0.7 : 1 }}
+            >
+              {portalLoading ? "Opening..." : "Manage Billing"}
             </button>
           )}
         </div>
@@ -87,14 +107,14 @@ export function BillingSection({ profile }: BillingSectionProps) {
 
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Billing & Usage</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Monitor your usage and billing information</div>
+          <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Billing Details</div>
+          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Your subscription and billing information</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {[
-            { label: "Next billing date", value: "N/A" },
-            { label: "Payment method", value: "None on file" },
-            { label: "Subscription status", value: isPaid ? "Active" : "Free tier", highlight: isPaid },
+            { label: "Next billing date", value: nextBillingDate },
+            { label: "Subscription status", value: isPaid ? (isActive ? "Active" : "Canceled") : "Free tier", highlight: isActive && isPaid },
+            { label: "Plan", value: plan.label },
           ].map(row => (
             <div key={row.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 14px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 9 }}>
               <span style={{ fontSize: ".83rem", color: "var(--text2)" }}>{row.label}</span>
@@ -102,6 +122,11 @@ export function BillingSection({ profile }: BillingSectionProps) {
             </div>
           ))}
         </div>
+        {isPaid && (
+          <p style={{ fontSize: ".75rem", color: "var(--text3)", marginTop: 12 }}>
+            To update your payment method or cancel, use the Manage Billing button above.
+          </p>
+        )}
       </div>
     </div>
   );

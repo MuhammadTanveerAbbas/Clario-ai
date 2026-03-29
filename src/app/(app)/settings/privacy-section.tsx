@@ -14,18 +14,19 @@ export function PrivacySection() {
     if (!user) return;
     setExporting(true);
     try {
-      const [summaries, chats, remixes, voices, events] = await Promise.all([
+      const [summaries, chatMessages, chatSessions, voices] = await Promise.all([
         supabase.from("ai_summaries").select("*").eq("user_id", user.id),
         supabase.from("chat_messages").select("*").eq("user_id", user.id),
-        supabase.from("remix_history").select("*").eq("user_id", user.id),
+        supabase.from("chat_sessions").select("*").eq("user_id", user.id),
         supabase.from("brand_voices").select("*").eq("user_id", user.id),
-        supabase.from("calendar_events").select("*").eq("user_id", user.id),
       ]);
       const exportData = {
-        exported_at: new Date().toISOString(), user_id: user.id,
-        summaries: summaries.data || [], chats: chats.data || [],
-        remixes: remixes.data || [], brand_voices: voices.data || [],
-        calendar_events: events.data || [],
+        exported_at: new Date().toISOString(),
+        user_id: user.id,
+        summaries: summaries.data || [],
+        chat_messages: chatMessages.data || [],
+        chat_sessions: chatSessions.data || [],
+        brand_voices: voices.data || [],
       };
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
@@ -54,16 +55,15 @@ export function PrivacySection() {
         supabase.from("ai_summaries").delete().eq("user_id", user.id),
         supabase.from("chat_messages").delete().eq("user_id", user.id),
         supabase.from("chat_sessions").delete().eq("user_id", user.id),
-        supabase.from("remix_history").delete().eq("user_id", user.id),
         supabase.from("brand_voices").delete().eq("user_id", user.id),
-        supabase.from("calendar_events").delete().eq("user_id", user.id),
         supabase.from("usage_tracking").delete().eq("user_id", user.id),
+        supabase.from("calendar_events").delete().eq("user_id", user.id),
       ]);
       await supabase.from("profiles").delete().eq("id", user.id);
       await supabase.auth.signOut();
-      window.location.href = "/?deleted=true";
+      window.location.href = "/";
     } catch {
-      alert("Failed to delete account. Please contact support.");
+      alert("Failed to delete account. Please contact support at support@clario.ai.");
     } finally {
       setDeleting(false);
     }

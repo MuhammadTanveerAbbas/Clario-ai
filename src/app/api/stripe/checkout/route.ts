@@ -18,9 +18,6 @@ export async function POST(request: Request) {
     const { priceId } = await request.json()
 
     const effectivePriceId = priceId || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID
-    // NOTE: When changing pricing to $9/month, be sure to update
-    // STRIPE_PRICE_ID / NEXT_PUBLIC_STRIPE_PRICE_ID in your environment
-    // to the correct Pro plan price ID in Stripe.
 
     if (!effectivePriceId) {
       return NextResponse.json({ error: 'Price ID required' }, { status: 400 })

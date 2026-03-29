@@ -54,12 +54,24 @@ export async function POST(request: Request) {
         }
 
         if (userId) {
+          // Fetch subscription to get period end
+          let periodEnd: string | undefined
+          if (session.subscription) {
+            try {
+              const sub = await stripe.subscriptions.retrieve(session.subscription as string)
+              periodEnd = new Date((sub as any).current_period_end * 1000).toISOString()
+            } catch {
+              // non-critical
+            }
+          }
+
           await supabase
             .from('profiles')
             .update({
               subscription_tier: 'pro',
               subscription_status: 'active',
               stripe_customer_id: session.customer as string,
+              ...(periodEnd ? { current_period_end: periodEnd } : {}),
             })
             .eq('id', userId)
         }
@@ -76,8 +88,19 @@ export async function POST(request: Request) {
             .update({
               subscription_status: subscription.status === 'active' ? 'active' : 'canceled',
               stripe_subscription_id: subscription.id,
+              current_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
             })
             .eq('id', userId)
+        } else if (subscription.customer) {
+          // Fallback: look up by stripe_customer_id
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_status: subscription.status === 'active' ? 'active' : 'canceled',
+              stripe_subscription_id: subscription.id,
+              current_period_end: new Date((subscription as any).current_period_end * 1000).toISOString(),
+            })
+            .eq('stripe_customer_id', subscription.customer as string)
         }
         break
       }
@@ -94,6 +117,14 @@ export async function POST(request: Request) {
               subscription_status: 'canceled',
             })
             .eq('id', userId)
+        } else if (subscription.customer) {
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_tier: 'free',
+              subscription_status: 'canceled',
+            })
+            .eq('stripe_customer_id', subscription.customer as string)
         }
         break
       }

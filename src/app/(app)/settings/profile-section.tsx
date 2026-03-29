@@ -23,7 +23,7 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
     setLoading(true);
     try {
       if (!userId) throw new Error("User ID not found");
-      const { error } = await supabase.from("profiles").update({ name }).eq("id", userId);
+      const { error } = await supabase.from("profiles").update({ full_name: name }).eq("id", userId);
       if (error) throw error;
       await supabase.auth.updateUser({ data: { name } });
       await onProfileUpdate(name);

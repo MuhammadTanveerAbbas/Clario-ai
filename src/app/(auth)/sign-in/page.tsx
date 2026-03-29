@@ -117,7 +117,7 @@ function AuthRightPanel({ headline, sub, features }: { headline: string; sub: st
             </div>
           ))}
         </div>
-        <p style={{ fontSize: ".76rem", color: "#78716c" }}><strong style={{ color: "#d6d3d1" }}>2,400+ creators</strong> saving 4+ hrs/week</p>
+        <p style={{ fontSize: ".76rem", color: "#78716c" }}><strong style={{ color: "#d6d3d1" }}>Loved by creators</strong> saving hours every week</p>
       </div>
     </div>
   );
@@ -245,7 +245,7 @@ function SignInForm() {
         <div className="auth-right">
           <AuthRightPanel
             headline="Your content, multiplied."
-            sub="Join 2,400+ creators saving 4+ hours every week with Clario's AI toolkit."
+            sub="Clario's AI toolkit helps creators save hours every week."
             features={[
               "Summarize any YouTube video in seconds",
               "Turn 1 post into 10 formats instantly",

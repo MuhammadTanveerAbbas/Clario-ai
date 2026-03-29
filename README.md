@@ -9,8 +9,6 @@
 
 An AI-powered SaaS platform for content creators — summarize, remix, and chat with AI across YouTube, podcasts, blogs, and newsletters.
 
-**Live Demo:** [https://clario-hub.vercel.app](https://clario-hub.vercel.app)
-
 ---
 
 ## Features
@@ -20,6 +18,7 @@ An AI-powered SaaS platform for content creators — summarize, remix, and chat 
 - **AI Chat** — Conversational AI with persistent session history, brand voice injection, and creator-focused system prompt.
 - **Content Remix Studio** — Turn one piece of content into 10 formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, LinkedIn carousel.
 - **Brand Voice Library** — Create and manage custom brand voices. Activate one at a time — applied across Chat and Remix.
+- **Content Calendar** — Schedule and track content across platforms with a full month view.
 - **Dashboard** — Real-time usage stats, activity charts, and onboarding checklist.
 - **Subscription Tiers** — Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe.
 
@@ -37,11 +36,10 @@ An AI-powered SaaS platform for content creators — summarize, remix, and chat 
 | Database | Supabase (PostgreSQL) |
 | Auth | Supabase Auth (PKCE flow) |
 | AI | Groq SDK — Llama 3.3 70B (summarize/remix), Llama 3.1 8B (chat) |
-| Payments | Stripe |
+| Payments | Stripe (Checkout + Billing Portal) |
 | Error Monitoring | Sentry |
 | Analytics | PostHog |
 | Forms | React Hook Form + Zod |
-| PDF Export | jsPDF |
 
 ---
 
@@ -50,10 +48,10 @@ An AI-powered SaaS platform for content creators — summarize, remix, and chat 
 ### Prerequisites
 
 - Node.js 18+
-- pnpm
+- pnpm (`npm install -g pnpm`)
 - Supabase project
 - Groq API key
-- Stripe account (for payments)
+- Stripe account
 
 ### Setup
 
@@ -68,7 +66,7 @@ pnpm install
 # Copy environment variables
 cp .env.example .env.local
 
-# Fill in .env.local with your credentials, then start the dev server
+# Fill in .env.local with your credentials (see below), then start the dev server
 pnpm dev
 ```
 
@@ -78,7 +76,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in the values below.
+Copy `.env.example` to `.env.local` and fill in the values.
 
 | Variable | Required | Description |
 |---|---|---|
@@ -90,7 +88,9 @@ Copy `.env.example` to `.env.local` and fill in the values below.
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Stripe publishable key |
 | `STRIPE_SECRET_KEY` | Yes | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Yes | Stripe webhook signing secret |
-| `NEXT_PUBLIC_STRIPE_PRICE_ID` | Yes | Stripe price ID for the Pro plan |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID` | Yes | Stripe price ID for the Pro monthly plan |
+| `STRIPE_PRICE_PRO_MONTHLY` | Yes | Stripe price ID for Pro monthly (same as above) |
+| `STRIPE_PRICE_PRO_ANNUAL` | No | Stripe price ID for Pro annual plan |
 | `ADMIN_EMAIL` | Yes | Admin email — bypasses usage limits |
 | `SENTRY_DSN` | No | Sentry DSN for server-side error tracking |
 | `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN for client-side error tracking |
@@ -104,15 +104,208 @@ Copy `.env.example` to `.env.local` and fill in the values below.
 
 ---
 
-## Folder Structure
+## Database Schema
+
+Run these migrations in your Supabase SQL editor.
+
+### Core Tables
+
+```sql
+-- User profiles (auto-created on sign-up via trigger)
+create table profiles (
+  id uuid references auth.users on delete cascade primary key,
+  email text,
+  full_name text,
+  avatar_url text,
+  subscription_tier text default 'free' check (subscription_tier in ('free', 'pro')),
+  subscription_status text default 'inactive',
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  requests_used_this_month integer default 0,
+  current_period_start timestamptz default now(),
+  current_period_end timestamptz default (now() + interval '1 month'),
+  created_at timestamptz default now()
+);
+
+-- AI summaries
+create table ai_summaries (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  summary_text text,
+  original_text text,
+  mode text,
+  youtube_url text,
+  created_at timestamptz default now()
+);
+
+-- Chat sessions
+create table chat_sessions (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  title text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+-- Chat messages
+create table chat_messages (
+  id uuid default gen_random_uuid() primary key,
+  session_id uuid references chat_sessions(id) on delete cascade,
+  user_id uuid references profiles(id) on delete cascade,
+  role text check (role in ('user', 'assistant')),
+  content text,
+  created_at timestamptz default now()
+);
+
+-- Brand voices
+create table brand_voices (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  name text not null,
+  examples text,
+  is_active boolean default false,
+  created_at timestamptz default now()
+);
+
+-- Usage tracking (per-request log)
+create table usage_tracking (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  type text check (type in ('summary', 'chat', 'remix', 'creator_mode')),
+  created_at timestamptz default now()
+);
+
+-- Usage stats (aggregated daily)
+create table usage_stats (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  date date not null,
+  total_requests integer default 0,
+  summaries_count integer default 0,
+  chats_count integer default 0,
+  writing_count integer default 0,
+  meeting_notes_count integer default 0,
+  unique(user_id, date)
+);
+
+-- Stripe webhook idempotency
+create table processed_webhook_events (
+  id text primary key,
+  processed_at timestamptz default now()
+);
+
+-- Feedback
+create table feedback (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete set null,
+  email text,
+  feedback text,
+  created_at timestamptz default now()
+);
+
+-- Content calendar
+create table calendar_events (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references profiles(id) on delete cascade,
+  title text not null,
+  scheduled_at timestamptz not null,
+  platform text,
+  content_text text,
+  color text,
+  status text default 'draft',
+  created_at timestamptz default now()
+);
+```
+
+### RLS Policies
+
+```sql
+-- Enable RLS on all tables
+alter table profiles enable row level security;
+alter table ai_summaries enable row level security;
+alter table chat_sessions enable row level security;
+alter table chat_messages enable row level security;
+alter table brand_voices enable row level security;
+alter table usage_tracking enable row level security;
+alter table usage_stats enable row level security;
+alter table feedback enable row level security;
+alter table calendar_events enable row level security;
+
+-- Profiles: users can only read/update their own
+create policy "Users can view own profile" on profiles for select using (auth.uid() = id);
+create policy "Users can update own profile" on profiles for update using (auth.uid() = id);
+
+-- All other tables: users can only access their own rows
+create policy "Users own their summaries" on ai_summaries for all using (auth.uid() = user_id);
+create policy "Users own their sessions" on chat_sessions for all using (auth.uid() = user_id);
+create policy "Users own their messages" on chat_messages for all using (auth.uid() = user_id);
+create policy "Users own their brand voices" on brand_voices for all using (auth.uid() = user_id);
+create policy "Users own their usage" on usage_tracking for all using (auth.uid() = user_id);
+create policy "Users own their stats" on usage_stats for all using (auth.uid() = user_id);
+create policy "Users own their feedback" on feedback for all using (auth.uid() = user_id);
+create policy "Users own their calendar events" on calendar_events for all using (auth.uid() = user_id);
+```
+
+### Required RPC Functions
+
+```sql
+-- Track usage and increment monthly counter
+create or replace function track_usage(p_user_id uuid, p_type text, p_count integer default 1)
+returns void language plpgsql security definer as $$
+begin
+  -- Insert into usage_tracking log
+  insert into usage_tracking (user_id, type) values (p_user_id, p_type);
+
+  -- Increment monthly counter on profile
+  update profiles
+  set requests_used_this_month = requests_used_this_month + p_count
+  where id = p_user_id;
+end;
+$$;
+
+-- Auto-create profile on sign-up
+create or replace function handle_new_user()
+returns trigger language plpgsql security definer as $$
+begin
+  insert into profiles (id, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure handle_new_user();
+```
+
+---
+
+## Architecture Overview
 
 ```
 src/
 ├── app/
-│   ├── (app)/              # Authenticated routes (dashboard, chat, summarizer, remix, brand-voice, settings)
+│   ├── (app)/              # Authenticated routes (dashboard, chat, summarizer, remix, brand-voice, calendar, settings)
 │   ├── (auth)/             # Auth routes (sign-in, sign-up, forgot-password)
 │   ├── (marketing)/        # Public routes (landing, pricing, privacy, terms)
-│   ├── api/                # API routes (summarize, chat, remix, brand-voice, usage, youtube, stripe)
+│   ├── api/                # API routes
+│   │   ├── analytics/      # Usage analytics
+│   │   ├── brand-voice/    # Brand voice CRUD + activate
+│   │   ├── chat/           # AI chat + history
+│   │   ├── creator-modes/  # Creator-specific content modes
+│   │   ├── feedback/       # User feedback
+│   │   ├── insights/       # Cross-content insights
+│   │   ├── remix/          # Content remix (10 formats)
+│   │   ├── stripe/         # Checkout, portal, webhook
+│   │   ├── summarize/      # Text summarizer + export
+│   │   ├── usage/          # Usage stats
+│   │   └── youtube/        # YouTube transcript fetcher
 │   └── auth/callback/      # OAuth callback handler
 ├── components/
 │   ├── ui/                 # ShadCN UI primitives
@@ -127,29 +320,18 @@ src/
 │   ├── usage-limits.ts     # Tier-based request limits
 │   ├── security-config.ts  # CSP, cookie, session, and rate limit config
 │   ├── input-validation.ts # Input sanitization
-│   └── stripe.ts           # Stripe checkout helpers
+│   └── stripe.ts           # Stripe checkout + portal helpers
 └── middleware/
     └── rate-limit.ts       # IP-based rate limiting middleware
 ```
 
----
+### Data Flow
 
-## Database Schema
-
-Key Supabase tables:
-
-| Table | Description |
-|---|---|
-| `profiles` | User data, `subscription_tier`, `requests_used_this_month` |
-| `ai_summaries` | Saved summaries with mode and source text |
-| `chat_sessions` | Conversation metadata |
-| `chat_messages` | Individual messages (role, content) |
-| `brand_voices` | User brand voices with `is_active` flag |
-| `usage_tracking` | Per-request logs (`summary`, `chat`, `remix`) |
-| `usage_stats` | Aggregated daily stats |
-| `processed_webhook_events` | Stripe webhook idempotency log |
-
-Required RPC: `track_usage(p_user_id, p_type, p_count)`
+1. User authenticates via Supabase Auth (PKCE flow)
+2. Middleware validates session on every request
+3. API routes check auth, rate limits, and usage limits before calling Groq
+4. AI responses are returned to the client; usage is tracked fire-and-forget
+5. Stripe webhooks update subscription status in Supabase profiles table
 
 ---
 
@@ -159,21 +341,39 @@ Required RPC: `track_usage(p_user_id, p_type, p_count)`
 - PKCE authentication flow
 - Input sanitization on all AI endpoints
 - IP-based rate limiting (100 req/min API, 5 req/15min auth)
-- CSRF token validation
-- Secure `httpOnly` session cookies with `__Host-` prefix
-- Strict Content Security Policy
+- Strict Content Security Policy headers
+- Webhook signature verification (Stripe)
+- `httpOnly` session cookies with `SameSite=Lax`
+- Debug endpoint disabled in production
 
 ---
 
 ## Deployment
 
-### Vercel
+### Vercel (Recommended)
 
 1. Push to GitHub and import the repo in Vercel
 2. Add all environment variables in the Vercel dashboard
-3. Set `NEXT_PUBLIC_APP_URL` to your production domain
+3. Set `NEXT_PUBLIC_APP_URL` to your production domain (e.g. `https://yourdomain.com`)
+4. Deploy
 
 > AI routes use `maxDuration` of 60–120 seconds. Vercel Pro plan required for functions exceeding 10s.
+
+### Stripe Webhook Setup
+
+1. In the Stripe dashboard, create a webhook endpoint pointing to `https://yourdomain.com/api/stripe/webhook`
+2. Subscribe to these events:
+   - `checkout.session.completed`
+   - `customer.subscription.updated`
+   - `customer.subscription.deleted`
+3. Copy the webhook signing secret to `STRIPE_WEBHOOK_SECRET`
+
+### Supabase Auth Setup
+
+1. In Supabase dashboard → Authentication → URL Configuration:
+   - Set **Site URL** to your production domain
+   - Add `https://yourdomain.com/auth/callback` to **Redirect URLs**
+2. To enable Google OAuth: Authentication → Providers → Google → add your OAuth credentials
 
 ---
 

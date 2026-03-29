@@ -28,10 +28,11 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 const FREE_FEATURES = [
   "100 AI requests/month",
   "AI Chat (Llama 3.1 8B)",
-  "Text Summarizer (10 modes)",
+  "Text Summarizer (11 modes)",
   "YouTube URL → transcript",
   "1 Brand Voice",
-  "3 Remix formats",
+  "Content Remix (3 formats)",
+  "Content Calendar",
   "Email support",
 ];
 
@@ -41,9 +42,6 @@ const PRO_FEATURES = [
   "All 10 Remix formats",
   "Content Remix Studio",
   "3 Brand Voices",
-  "Content Calendar",
-  "Export to Notion & Google Docs",
-  "AI Image Prompt Generator",
   "Priority support",
   "Early access to new features",
 ];
@@ -52,7 +50,7 @@ const FAQ = [
   { q: "What counts as an AI request?", a: "Each summarization or chat message counts as one request. Remix Studio generates all formats in a single request — not 10 separate ones." },
   { q: "Can I upgrade or downgrade anytime?", a: "Yes. Upgrade instantly, downgrade at the end of your billing period. No contracts, no penalties." },
   { q: "What happens when I hit my request limit?", a: "You'll see a clear warning at 80% usage. Once the limit is reached, you can still view past outputs but won't be able to run new AI requests until you upgrade or your cycle resets." },
-  { q: "Is there a free trial for Pro?", a: "We offer a 7-day free trial on the Pro plan when you sign up with a card. You won't be charged until the trial ends." },
+  { q: "Is there a free trial for Pro?", a: "The Free plan gives you 100 AI requests per month with no credit card required — a great way to try Clario before upgrading." },
   { q: "Do you offer refunds?", a: "Yes — if you're unsatisfied within 14 days of your first charge, contact us for a full refund, no questions asked." },
   { q: "What AI models power Clario?", a: "We use Groq's Llama 3.3 70B for summarization and Llama 3.1 8B for chat. These are state-of-the-art open models running on Groq's ultra-fast inference infrastructure." },
 ];
@@ -60,14 +58,12 @@ const FAQ = [
 const TABLE_ROWS: [string, string, string][] = [
   ["AI requests/month", "100", "1,000"],
   ["Text Summarizer", "✓", "✓"],
-  ["Summary modes", "10", "10"],
+  ["Summary modes", "11", "11"],
   ["YouTube URL → transcript", "✓", "✓"],
   ["AI Chat", "✓", "✓"],
   ["Brand Voices", "1", "3"],
   ["Remix formats", "3", "All 10"],
-  ["Content Calendar", "—", "✓"],
-  ["Export to Notion/Google Docs", "—", "✓"],
-  ["AI Image Prompt Generator", "—", "✓"],
+  ["Content Calendar", "✓", "✓"],
   ["Priority support", "—", "✓"],
   ["Early access to features", "—", "✓"],
 ];
@@ -195,11 +191,11 @@ export default function PricingPage() {
             <ul className="p-list">{PRO_FEATURES.map(f => <li key={f} className="p-item"><span className="p-ck">✓</span>{f}</li>)}</ul>
             <button className="btn-pro" onClick={() => handleUpgrade("pro")} disabled={loadingPlan === "pro"}>
               {loadingPlan === "pro" && <div className="spinner-sm" />}
-              {loadingPlan === "pro" ? "Redirecting..." : "Start free trial →"}
+              {loadingPlan === "pro" ? "Redirecting..." : "Upgrade to Pro →"}
             </button>
           </div>
         </div>
-        <p style={{ fontSize: ".72rem", color: "var(--g4)", marginTop: 18 }}>7-day free trial · Cancel anytime · 14-day money-back guarantee</p>
+        <p style={{ fontSize: ".72rem", color: "var(--g4)", marginTop: 18 }}>No card required on Free · Cancel anytime · 14-day money-back guarantee</p>
       </div>
 
       {/* Feature comparison table */}

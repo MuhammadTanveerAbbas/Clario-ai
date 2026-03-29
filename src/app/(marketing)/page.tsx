@@ -131,7 +131,7 @@ function HeroMockup() {
                   </div>
                 ))}
               </div>
-              <div style={{ fontSize: 10, color: "#15803d", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: 9 }}>✓ Trained on 12 samples. All outputs match your voice.</div>
+              <div style={{ fontSize: 10, color: "#15803d", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8, padding: 9 }}>✓ Brand voice active. Applied to all AI outputs.</div>
             </div>
           )}
         </div>
@@ -144,14 +144,12 @@ function ComparisonTable() {
   const { ref, inView } = useInView(0.1);
   const features = [
     { feature: "AI Text Summarizer", clario: true, jasper: true, copy: false, notion: false },
-    { feature: "10 summary modes incl. Brutal Roast", clario: true, jasper: false, copy: false, notion: false },
+    { feature: "11 summary modes incl. Brutal Roast", clario: true, jasper: false, copy: false, notion: false },
     { feature: "YouTube URL → auto transcript", clario: true, jasper: false, copy: false, notion: false },
     { feature: "Content Remix Studio (10 formats)", clario: true, jasper: true, copy: true, notion: false },
     { feature: "Brand Voice Library", clario: true, jasper: true, copy: true, notion: false },
     { feature: "AI Chat with creator prompts", clario: true, jasper: false, copy: false, notion: true },
     { feature: "Content Calendar", clario: true, jasper: false, copy: false, notion: true },
-    { feature: "Export to Notion / Google Docs", clario: true, jasper: false, copy: false, notion: false },
-    { feature: "AI image prompt generator", clario: true, jasper: false, copy: false, notion: false },
     { feature: "Free tier available", clario: true, jasper: false, copy: true, notion: true },
     { feature: "Starting price", clario: "$0", jasper: "$49/mo", copy: "$49/mo", notion: "$10/mo" },
   ];
@@ -399,7 +397,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <div className="stars-sm">★★★★★</div>
-                <p className="soc-t"><strong>2,400+ creators</strong> saving 4+ hrs/week</p>
+                <p className="soc-t"><strong>Loved by creators</strong> saving hours every week</p>
               </div>
             </div>
           </div>
@@ -412,7 +410,7 @@ export default function LandingPage() {
       <div className="mq-w">
         <div className="mq-t">
           {[...Array(2)].map((_, ri) =>
-            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","Content Calendar","YouTube → Summary","Export to Notion","10 Summary Modes","AI Image Prompts","Twitter Threads","LinkedIn Posts","Email Newsletters"].map((item, i) => (
+            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","Content Calendar","YouTube → Summary","11 Summary Modes","Twitter Threads","LinkedIn Posts","Email Newsletters","Podcast Notes","Blog Outlines"].map((item, i) => (
               <span key={`${ri}-${i}`} className="mq-i"><span className="mq-d" />{item}</span>
             ))
           )}
@@ -421,7 +419,7 @@ export default function LandingPage() {
 
       <section style={{ padding: "64px 5%" }}>
         <div className="stats-g">
-          {[{n:2400,s:"+",l:"Active creators"},{n:1000000,s:"+",l:"AI requests served"},{n:10,s:"×",l:"More content output"},{n:4,s:"hrs",l:"Saved per week"}].map(s => (
+          {[{n:11,s:"",l:"Summary modes"},{n:10,s:"",l:"Remix formats"},{n:100,s:"",l:"Free requests/month"},{n:4,s:"hrs",l:"Saved per week"}].map(s => (
             <div key={s.l} className="stat-c">
               <div className="stat-n"><Counter to={s.n} suffix={s.s} /></div>
               <div className="stat-l">{s.l}</div>
@@ -625,7 +623,7 @@ export default function LandingPage() {
         <div style={{ position: "relative", zIndex: 1 }}>
           <p style={{ fontSize: ".62rem", fontWeight: 700, color: "rgba(255,255,255,.28)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 18 }}>The last content tool you&apos;ll need</p>
           <h2 style={{ fontFamily: "var(--serif)", fontSize: "clamp(2rem,4.5vw,3.6rem)", fontWeight: 300, color: "#fff", letterSpacing: "-.03em", lineHeight: 1.07, marginBottom: 18 }}>Your content,<br /><em style={{ color: "var(--o)" }}>multiplied.</em></h2>
-          <p style={{ fontSize: ".88rem", color: "rgba(255,255,255,.38)", marginBottom: 36, maxWidth: 400, margin: "0 auto 36px", lineHeight: 1.75 }}>Join 2,400+ YouTubers, podcasters, and bloggers saving 4+ hours a week.</p>
+          <p style={{ fontSize: ".88rem", color: "rgba(255,255,255,.38)", marginBottom: 36, maxWidth: 400, margin: "0 auto 36px", lineHeight: 1.75 }}>The AI toolkit built for YouTubers, podcasters, and bloggers.</p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <button className="btn-p" onClick={() => window.location.href="/sign-up"} style={{ fontSize: ".88rem", padding: "13px 26px" }}>
               Start for free — no card needed <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
