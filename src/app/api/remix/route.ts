@@ -18,7 +18,7 @@ const REMIX_PROMPTS: Record<string, string> = {
   twitter: `Create a compelling 10-tweet Twitter/X thread from this content.
 
 Format:
-🧵 1/10 [Hook tweet — make it impossible to scroll past. Bold claim or surprising fact.]
+🧵 1/10 [Hook tweet  make it impossible to scroll past. Bold claim or surprising fact.]
 
 2/10 [Context or setup]
 
@@ -36,14 +36,14 @@ Format:
 
 9/10 [Key point with specific detail]
 
-10/10 [Strong CTA — follow, share, or link]
+10/10 [Strong CTA  follow, share, or link]
 
 Rules: Short punchy sentences. One idea per tweet. Use line breaks within tweets. Add 1-2 relevant emojis per tweet.`,
 
   linkedin: `Write a high-performing LinkedIn post from this content.
 
 Format:
-[Hook line — bold statement or question that stops the scroll]
+[Hook line  bold statement or question that stops the scroll]
 
 [1-2 lines of context]
 
@@ -66,14 +66,14 @@ Rules: Use line breaks generously. Keep under 1300 characters. No walls of text.
   email: `Write an engaging email newsletter from this content.
 
 Format:
-Subject: [Compelling subject line — specific, creates curiosity]
+Subject: [Compelling subject line  specific, creates curiosity]
 Preview: [Preview text that complements the subject]
 
 ---
 
 Hey [First Name],
 
-[Opening hook — 1-2 sentences that make them want to keep reading]
+[Opening hook  1-2 sentences that make them want to keep reading]
 
 [Main section header]
 
@@ -96,7 +96,7 @@ P.S. [One bonus insight or teaser for next issue]`,
 
   instagram: `Create 3 Instagram caption variations from this content.
 
-**Caption 1 — Story-driven:**
+**Caption 1  Story-driven:**
 [Hook sentence]
 [2-3 sentences telling a story or sharing an insight]
 [CTA]
@@ -107,7 +107,7 @@ P.S. [One bonus insight or teaser for next issue]`,
 
 ---
 
-**Caption 2 — List format:**
+**Caption 2  List format:**
 [Hook]
 [Numbered list of 3-5 points]
 [CTA]
@@ -118,7 +118,7 @@ P.S. [One bonus insight or teaser for next issue]`,
 
 ---
 
-**Caption 3 — Question-based:**
+**Caption 3  Question-based:**
 [Thought-provoking question]
 [Brief answer/insight]
 [Engagement question]
@@ -130,7 +130,7 @@ P.S. [One bonus insight or teaser for next issue]`,
   youtube: `Write a complete YouTube video description optimized for search and clicks.
 
 Format:
-[Compelling first 2-3 lines — these show in search results. Include main keyword naturally.]
+[Compelling first 2-3 lines  these show in search results. Include main keyword naturally.]
 
 🎯 In this video:
 • [What viewers will learn/get]
@@ -158,7 +158,7 @@ ABOUT THIS VIDEO:
   blog: `Create a complete blog post outline and introduction from this content.
 
 Format:
-# [SEO-optimized title — include main keyword]
+# [SEO-optimized title  include main keyword]
 
 **Meta description:** [150-160 chars, includes keyword, compelling]
 
@@ -223,13 +223,13 @@ Format:
 
 ## Episode Highlights
 
-**[Timestamp] — [Topic]**
+**[Timestamp]  [Topic]**
 [Brief description of what's covered]
 
-**[Timestamp] — [Topic]**
+**[Timestamp]  [Topic]**
 [Brief description of what's covered]
 
-**[Timestamp] — [Topic]**
+**[Timestamp]  [Topic]**
 [Brief description of what's covered]
 
 ---
@@ -254,7 +254,7 @@ Format:
 Format each quote like this:
 
 **Quote 1:**
-> "[Exact or paraphrased impactful statement — 10-25 words, punchy and standalone]"
+> "[Exact or paraphrased impactful statement  10-25 words, punchy and standalone]"
 
 **Why it works:** [1 sentence on why this quote resonates]
 **Best for:** [Twitter / LinkedIn / Slide deck / Newsletter]
@@ -272,17 +272,17 @@ Format each quote like this:
 
 ---
 
-**Most shareable:** Quote [#] — [Brief reason why]`,
+**Most shareable:** Quote [#]  [Brief reason why]`,
 
   shorts: `Create 3 short-form video scripts (45-60 seconds each) from this content.
 
 **Script 1:**
-🎬 HOOK (0-3s): [Attention-grabbing opening line — say this to camera]
+🎬 HOOK (0-3s): [Attention-grabbing opening line  say this to camera]
 📱 VISUAL: [What to show on screen]
 
 MAIN CONTENT (3-45s):
 [Script line by line, conversational]
-[Keep each line short — one breath]
+[Keep each line short  one breath]
 [Build to a payoff]
 
 CTA (45-60s): [Clear call to action]
@@ -302,44 +302,44 @@ CTA (45-60s): [Clear call to action]
 
   carousel: `Create a 10-slide LinkedIn/Instagram carousel from this content.
 
-**Slide 1 — Cover:**
+**Slide 1  Cover:**
 Title: [Bold, curiosity-driving title]
 Subtitle: [What they'll learn]
 Visual note: [Suggested background/image]
 
 **Slide 2:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 3:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 4:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 5:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 6:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 7:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
 **Slide 8:**
-Headline: [Key point — max 8 words]
+Headline: [Key point  max 8 words]
 Body: [2-3 sentences expanding on it]
 
-**Slide 9 — Summary:**
+**Slide 9  Summary:**
 "The [X] things to remember:"
 [Bullet list of key points]
 
-**Slide 10 — CTA:**
+**Slide 10  CTA:**
 [Strong call to action]
 [Follow/save/share prompt]`,
 }
@@ -402,11 +402,11 @@ export async function POST(request: NextRequest) {
       ? `\n\nBRAND VOICE TO APPLY:\n${brandVoice}\nAdapt the tone and style to match this brand voice.`
       : ''
 
-    const systemPrompt = `You are an expert content repurposing specialist. Transform content into platform-native formats that feel natural and engaging — not like they were copy-pasted from somewhere else.${brandVoiceNote}
+    const systemPrompt = `You are an expert content repurposing specialist. Transform content into platform-native formats that feel natural and engaging  not like they were copy-pasted from somewhere else.${brandVoiceNote}
 
 Rules:
 - Follow the exact format specified in each prompt
-- Use actual content from the source material — no generic filler
+- Use actual content from the source material  no generic filler
 - Write words normally without spacing between letters
 - Make each format feel native to its platform`
 

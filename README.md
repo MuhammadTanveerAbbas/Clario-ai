@@ -1,4 +1,4 @@
-# Clario — AI Content Platform for Creators
+# Clario  AI Content Platform for Creators
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
@@ -7,20 +7,20 @@
 [![Stripe](https://img.shields.io/badge/Payments-Stripe-purple?logo=stripe)](https://stripe.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An AI-powered SaaS platform for content creators — summarize, remix, and chat with AI across YouTube, podcasts, blogs, and newsletters.
+An AI-powered SaaS platform for content creators  summarize, remix, and chat with AI across YouTube, podcasts, blogs, and newsletters.
 
 ---
 
 ## Features
 
-- **Text Summarizer** — 11 AI-powered summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, Brutal Roast, Decisions. Export to `.md` or `.txt`.
-- **YouTube Summarizer** — Paste any YouTube URL and get an instant summary. Supports `watch`, `shorts`, `live`, and `youtu.be` formats with multi-language transcript fallback.
-- **AI Chat** — Conversational AI with persistent session history, brand voice injection, and creator-focused system prompt.
-- **Content Remix Studio** — Turn one piece of content into 10 formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, LinkedIn carousel.
-- **Brand Voice Library** — Create and manage custom brand voices. Activate one at a time — applied across Chat and Remix.
-- **Content Calendar** — Schedule and track content across platforms with a full month view.
-- **Dashboard** — Real-time usage stats, activity charts, and onboarding checklist.
-- **Subscription Tiers** — Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe.
+- **Text Summarizer**  11 AI-powered summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, Brutal Roast, Decisions. Export to `.md` or `.txt`.
+- **YouTube Summarizer**  Paste any YouTube URL and get an instant summary. Supports `watch`, `shorts`, `live`, and `youtu.be` formats with multi-language transcript fallback.
+- **AI Chat**  Conversational AI with persistent session history, brand voice injection, and creator-focused system prompt.
+- **Content Remix Studio**  Turn one piece of content into 10 formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, LinkedIn carousel.
+- **Brand Voice Library**  Create and manage custom brand voices. Activate one at a time  applied across Chat and Remix.
+- **Content Calendar**  Schedule and track content across platforms with a full month view.
+- **Dashboard**  Real-time usage stats, activity charts, and onboarding checklist.
+- **Subscription Tiers**  Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe.
 
 ---
 
@@ -35,7 +35,7 @@ An AI-powered SaaS platform for content creators — summarize, remix, and chat 
 | Animations | Framer Motion |
 | Database | Supabase (PostgreSQL) |
 | Auth | Supabase Auth (PKCE flow) |
-| AI | Groq SDK — Llama 3.3 70B (summarize/remix), Llama 3.1 8B (chat) |
+| AI | Groq SDK  Llama 3.3 70B (summarize/remix), Llama 3.1 8B (chat) |
 | Payments | Stripe (Checkout + Billing Portal) |
 | Error Monitoring | Sentry |
 | Analytics | PostHog |
@@ -91,7 +91,7 @@ Copy `.env.example` to `.env.local` and fill in the values.
 | `NEXT_PUBLIC_STRIPE_PRICE_ID` | Yes | Stripe price ID for the Pro monthly plan |
 | `STRIPE_PRICE_PRO_MONTHLY` | Yes | Stripe price ID for Pro monthly (same as above) |
 | `STRIPE_PRICE_PRO_ANNUAL` | No | Stripe price ID for Pro annual plan |
-| `ADMIN_EMAIL` | Yes | Admin email — bypasses usage limits |
+| `ADMIN_EMAIL` | Yes | Admin email  bypasses usage limits |
 | `SENTRY_DSN` | No | Sentry DSN for server-side error tracking |
 | `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN for client-side error tracking |
 | `SENTRY_AUTH_TOKEN` | No | Sentry auth token for source map uploads |

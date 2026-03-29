@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
-/** Invisible honeypot field — bots fill it in, humans never see it. */
+/** Invisible honeypot field  bots fill it in, humans never see it. */
 export function HoneypotField() {
   return (
     <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}>

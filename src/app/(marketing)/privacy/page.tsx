@@ -58,7 +58,7 @@ export default function PrivacyPage() {
           <h2 className="legal-h2">3. Data Storage and Security</h2>
           <p className="legal-p">Your data is stored in Supabase (PostgreSQL) on AWS infrastructure. We implement:</p>
           <ul className="legal-ul">
-            <li>Row Level Security (RLS) — your data is isolated at the database level</li>
+            <li>Row Level Security (RLS)  your data is isolated at the database level</li>
             <li>PKCE authentication flow for OAuth</li>
             <li>TLS 1.3 encryption in transit</li>
             <li>AES-256 encryption at rest</li>

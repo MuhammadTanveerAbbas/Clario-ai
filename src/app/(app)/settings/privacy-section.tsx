@@ -94,7 +94,7 @@ export function PrivacySection() {
       <div style={{ padding: "24px", background: "var(--card)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 14 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: ".9rem", color: "var(--error)", fontWeight: 500, marginBottom: 4 }}>Danger Zone</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Irreversible actions — proceed with caution</div>
+          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Irreversible actions  proceed with caution</div>
         </div>
         <div style={{ padding: "16px", background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 10 }}>
           <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Delete Account</div>

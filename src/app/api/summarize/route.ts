@@ -67,14 +67,14 @@ Format your response exactly like this:
 ## Action Items
 
 ### 🔴 High Priority
-- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
-- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
+- [ ] **[Task]**  Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
+- [ ] **[Task]**  Owner: [Person or "TBD"] | Due: [Date or "ASAP"]
 
 ### 🟡 Medium Priority
-- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "This week"]
+- [ ] **[Task]**  Owner: [Person or "TBD"] | Due: [Date or "This week"]
 
 ### 🟢 Low Priority / Nice to Have
-- [ ] **[Task]** — Owner: [Person or "TBD"] | Due: [Date or "When possible"]
+- [ ] **[Task]**  Owner: [Person or "TBD"] | Due: [Date or "When possible"]
 
 ---
 
@@ -90,7 +90,7 @@ Format your response exactly like this:
 ## Decisions Made
 
 ### Decision 1: [Title]
-**Decision:** [What was decided — one clear sentence]
+**Decision:** [What was decided  one clear sentence]
 **Rationale:** [Why this decision was made]
 **Impact:** [Who/what is affected and how]
 **Owner:** [Who is responsible]
@@ -152,7 +152,7 @@ Format your response exactly like this:
 
 ## Executive Brief
 
-**Bottom Line:** [One sentence — the single most important thing]
+**Bottom Line:** [One sentence  the single most important thing]
 
 ---
 
@@ -174,8 +174,8 @@ Format your response exactly like this:
 ---
 
 ## Recommended Actions
-1. **[Action]** — [Owner] — [Timeline]
-2. **[Action]** — [Owner] — [Timeline]
+1. **[Action]**  [Owner]  [Timeline]
+2. **[Action]**  [Owner]  [Timeline]
 
 **Decision needed:** [What requires approval or a decision]`,
 
@@ -206,9 +206,9 @@ Format your response exactly like this:
 ---
 
 ## Key Themes
-1. **[Theme]** — [Explanation]
-2. **[Theme]** — [Explanation]
-3. **[Theme]** — [Explanation]
+1. **[Theme]**  [Explanation]
+2. **[Theme]**  [Explanation]
+3. **[Theme]**  [Explanation]
 
 ---
 
@@ -232,7 +232,7 @@ Format your response exactly like this:
 > "[The single most powerful quote from the content]"
 
 **Why it matters:** [1-2 sentences on significance]
-**Best use:** [Where to share this — Twitter, presentation, etc.]
+**Best use:** [Where to share this  Twitter, presentation, etc.]
 
 ---
 
@@ -401,8 +401,8 @@ Format your response exactly like this:
 ---
 
 ## Decisions Made
-1. **[Decision]** — Approved by: [Name or "Group"]
-2. **[Decision]** — Approved by: [Name or "Group"]
+1. **[Decision]**  Approved by: [Name or "Group"]
+2. **[Decision]**  Approved by: [Name or "Group"]
 
 ---
 
@@ -482,7 +482,7 @@ export async function POST(request: Request) {
     const systemPrompt = `${modePrompt}
 
 CRITICAL RULES:
-- Write all words normally — never add spaces between letters of a word
+- Write all words normally  never add spaces between letters of a word
 - Use proper markdown: ## for headers, **bold**, - for bullets, > for quotes, --- for dividers
 - Be specific and use actual content from the text, not generic placeholders
 - Keep formatting clean and consistent throughout`

@@ -67,7 +67,7 @@ export default function TermsPage() {
         <div className="legal-section">
           <h2 className="legal-h2">6. Subscription and Billing</h2>
           <p className="legal-p">Free accounts are subject to usage limits as described on the pricing page. Pro subscriptions are billed monthly or annually via Stripe. Prices may change with 30 days&apos; notice.</p>
-          <p className="legal-p">You may cancel your subscription at any time. Cancellations take effect at the end of the current billing period — you retain Pro access until then.</p>
+          <p className="legal-p">You may cancel your subscription at any time. Cancellations take effect at the end of the current billing period  you retain Pro access until then.</p>
           <p className="legal-p">We offer a 14-day money-back guarantee on your first Pro payment. Contact <a href="mailto:support@clario.ai" className="legal-a">support@clario.ai</a>.</p>
         </div>
 

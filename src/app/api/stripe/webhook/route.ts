@@ -32,7 +32,7 @@ export async function POST(request: Request) {
   )
 
   try {
-    // Idempotency check — Stripe may deliver the same event more than once
+    // Idempotency check  Stripe may deliver the same event more than once
     const { data: existing } = await supabase
       .from('processed_webhook_events')
       .select('id')

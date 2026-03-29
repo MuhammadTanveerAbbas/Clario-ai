@@ -280,7 +280,7 @@ export default function RemixPage() {
                         <span style={{ fontSize: ".74rem", background: "var(--accent-l)", color: "var(--accent)", border: "1px solid var(--accent-m)", borderRadius: 100, padding: "2px 10px" }}>🎨 {activeBrandVoice.name} active</span>
                       </div>
                     )}
-                    <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Paste your content here — a video transcript, blog post, newsletter, or any text..." style={{ width: "100%", minHeight: 160, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "vertical", outline: "none", lineHeight: 1.6 }} />
+                    <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Paste your content here  a video transcript, blog post, newsletter, or any text..." style={{ width: "100%", minHeight: 160, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "vertical", outline: "none", lineHeight: 1.6 }} />
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
                       <div style={{ display: "flex", gap: 12 }}>
                         <button onClick={() => setSelectedFormats(new Set(FORMATS.map(f => f.id)))} style={{ background: "none", border: "none", color: "var(--text3)", fontSize: ".76rem", cursor: "pointer" }}>Select All</button>
@@ -355,7 +355,7 @@ export default function RemixPage() {
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", animation: "fu .4s .15s ease both" }}>
                     <div style={{ fontSize: "3rem", marginBottom: 12 }}>🔄</div>
                     <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>One input. Ten formats. Instantly.</h2>
-                    <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Paste any content and Clario remixes it into every format you need — simultaneously.</p>
+                    <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Paste any content and Clario remixes it into every format you need  simultaneously.</p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }} className="remix-feature-grid">
                       {[["All 10 formats at once", "Twitter, LinkedIn, newsletters, and 7 more"], ["Sounds like you", "Applies your Brand Voice automatically"], ["Calendar ready", "Add any output directly to your content calendar"]].map(([title, desc]) => (
                         <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>

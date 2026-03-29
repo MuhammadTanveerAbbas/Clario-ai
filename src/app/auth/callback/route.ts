@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
                 cookieStore.set(name, value, options)
               )
             } catch {
-              // Cookie writes fail in middleware during static rendering — safe to ignore
+              // Cookie writes fail in middleware during static rendering  safe to ignore
             }
           },
         },

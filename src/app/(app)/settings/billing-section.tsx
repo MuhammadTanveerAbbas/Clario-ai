@@ -38,7 +38,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
         month: "long",
         day: "numeric",
       })
-    : isPaid ? "Contact support" : "—";
+    : isPaid ? "Contact support" : "";
 
   const handleManageBilling = async () => {
     setPortalLoading(true);

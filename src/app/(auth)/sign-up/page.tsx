@@ -209,7 +209,7 @@ function SignUpForm() {
               Clario
             </Link>
             {plan === "pro" && (
-              <div className="pro-badge">⚡ You&apos;re signing up for Pro — $19/mo after free trial</div>
+              <div className="pro-badge">⚡ You&apos;re signing up for Pro  $19/mo after free trial</div>
             )}
             <h1 className="auth-h1">Start creating<br /><em>for free.</em></h1>
             <p className="auth-sub">No credit card required. Cancel anytime.</p>
@@ -299,7 +299,7 @@ function SignUpForm() {
         <div className="auth-right">
           <AuthRightPanel
             headline="Built for creators, not enterprises."
-            sub="Everything you need to publish more, in less time — starting at $0."
+            sub="Everything you need to publish more, in less time  starting at $0."
             features={[
               "Free plan includes 100 AI requests/month",
               "YouTube URL → instant transcript summary",

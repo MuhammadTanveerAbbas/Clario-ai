@@ -1,6 +1,6 @@
 {
   "name": "clario",
-  "description": "AI-powered SaaS platform for content creators — summarize, remix, and chat with AI",
+  "description": "AI-powered SaaS platform for content creators  summarize, remix, and chat with AI",
   "version": "3.0.0",
   "private": true,
   "scripts": {

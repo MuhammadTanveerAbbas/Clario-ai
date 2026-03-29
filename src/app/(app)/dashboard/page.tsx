@@ -592,7 +592,7 @@ export default function Dashboard() {
                   <div style={{ fontSize: ".78rem", color: "var(--text3)", lineHeight: 1.5 }}>Get 1,000 AI requests, all 10 remix formats, Content Calendar, and Notion export.</div>
                 </div>
                 <button onClick={() => router.push("/pricing")} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px 20px", fontSize: ".8rem", fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", whiteSpace: "nowrap", transition: "background .18s" }}>
-                  Upgrade — $19/mo →
+                  Upgrade  $19/mo →
                 </button>
               </div>
             )}

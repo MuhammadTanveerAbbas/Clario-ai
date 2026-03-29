@@ -422,7 +422,7 @@ export default function SummarizerPage() {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", animation: "fu .4s .15s ease both" }}>
                 <div style={{ fontSize: "3rem", marginBottom: 12 }}>📄</div>
                 <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Summarize anything, instantly.</h2>
-                <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>YouTube videos, articles, meeting notes, podcast transcripts — in 10 formats.</p>
+                <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>YouTube videos, articles, meeting notes, podcast transcripts  in 10 formats.</p>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 600 }}>
                   {[["10 summary modes", "From executive briefs to brutal roasts"], ["YouTube ready", "Paste a URL, we fetch the transcript"], ["Export anywhere", "Download as .md, .txt or push to Notion"]].map(([title, desc]) => (
                     <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>

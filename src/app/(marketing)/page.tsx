@@ -203,9 +203,9 @@ export default function LandingPage() {
   const remixFormats = [
     { icon: "𝕏", label: "Twitter Thread", preview: "🧵 I just analyzed 500 creator accounts.\n\nHere's the ONE system that separates 7-figure creators from everyone else:\n\n1/ They don't create MORE content.\n   They repurpose SMARTER.\n\n2/ One video → 10 formats → 10x the reach\n   Same effort. Exponential results." },
     { icon: "in", label: "LinkedIn Post", preview: "After 3 years building in public, here's what I wish someone told me:\n\nThe creators winning in 2025 aren't publishing the most.\nThey're publishing the smartest.\n\nOne anchor piece → repurposed everywhere → compounding reach with zero extra effort." },
-    { icon: "✉", label: "Newsletter", preview: "Subject: The content OS that changed everything\n\nHey [First Name],\n\nI used to spend 20 hours/week creating content.\nNow I spend 4 — and reach 10x more people.\n\nHere's the exact framework:" },
+    { icon: "✉", label: "Newsletter", preview: "Subject: The content OS that changed everything\n\nHey [First Name],\n\nI used to spend 20 hours/week creating content.\nNow I spend 4  and reach 10x more people.\n\nHere's the exact framework:" },
     { icon: "▶", label: "YT Description", preview: "In this video, I break down the complete repurposing system I use to turn ONE video into 10+ pieces across every platform.\n\n00:00 Intro\n02:14 The anchor content framework\n08:30 AI repurposing walkthrough\n\n🔗 Try Clario free → clario.ai" },
-    { icon: "🎙", label: "Podcast Notes", preview: "Episode 47 — The Content Repurposing OS\n\nTop Takeaways:\n→ Anchor content is your foundation\n→ AI handles the repurposing layer\n→ Distribution is the new creation\n\nResources: Clario (clario.ai), Notion, Descript" },
+    { icon: "🎙", label: "Podcast Notes", preview: "Episode 47  The Content Repurposing OS\n\nTop Takeaways:\n→ Anchor content is your foundation\n→ AI handles the repurposing layer\n→ Distribution is the new creation\n\nResources: Clario (clario.ai), Notion, Descript" },
   ];
   const [remixActive, setRemixActive] = useState(0);
   const [remixFading, setRemixFading] = useState(false);
@@ -382,7 +382,7 @@ export default function LandingPage() {
             <div className="h-badge"><span className="h-dot" />Built for content creators</div>
             <h1 className="h-h1">Your content,<br /><em>repurposed</em> for<br /><strong>every platform.</strong></h1>
             <p className="h-typ">Turn any idea into a <TypingEffect /></p>
-            <p className="h-sub">Clario is the AI toolkit built specifically for YouTubers, podcasters, and bloggers. Summarize, remix, and repurpose your content — in seconds, in your voice.</p>
+            <p className="h-sub">Clario is the AI toolkit built specifically for YouTubers, podcasters, and bloggers. Summarize, remix, and repurpose your content  in seconds, in your voice.</p>
             <div className="h-ctas">
               <button className="btn-p" onClick={() => window.location.href="/sign-up"}>
                 Start for free <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -442,7 +442,7 @@ export default function LandingPage() {
                 <h3 className="b-title">10 modes. Every<br /><em>format you need.</em></h3>
                 <p className="b-desc" style={{ marginBottom: 20 }}>YouTube URL or paste text. Powered by Llama 3.3 70B.</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-                  {[["Executive Brief","POPULAR"],["Action Items","POPULAR"],["SWOT Analysis","POPULAR"],["Meeting Minutes",""],["ELI5 — Explain Like I'm 5",""],["Brutal Roast",""],["+ 4 more modes",""]].map(([m,badge]) => (
+                  {[["Executive Brief","POPULAR"],["Action Items","POPULAR"],["SWOT Analysis","POPULAR"],["Meeting Minutes",""],["ELI5  Explain Like I'm 5",""],["Brutal Roast",""],["+ 4 more modes",""]].map(([m,badge]) => (
                     <div key={m} style={{ padding: "7px 11px", borderRadius: 8, background: badge?"var(--ol)":"var(--g0)", border: `1px solid ${badge?"var(--om)":"var(--g2)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <span style={{ fontSize: ".76rem", fontWeight: badge?600:400, color: badge?"var(--o)":"var(--g7)" }}>{m}</span>
                       {badge && <span style={{ fontSize: ".58rem", color: "var(--o)", fontWeight: 700 }}>{badge}</span>}
@@ -574,7 +574,7 @@ export default function LandingPage() {
           <div className="sec-h">
             <div className="s-tag">Why Clario</div>
             <h2 className="s-title">How we stack up <em>against the rest.</em></h2>
-            <p className="s-sub">Every tool in one place — purpose-built for creators.</p>
+            <p className="s-sub">Every tool in one place  purpose-built for creators.</p>
           </div>
           <div className="comp-wrap"><ComparisonTable /></div>
         </div>
@@ -585,7 +585,7 @@ export default function LandingPage() {
           <div className="sec-h">
             <div className="s-tag">Pricing</div>
             <h2 className="s-title">Simple, <em>honest</em> pricing.</h2>
-            <p className="s-sub">Start free. Upgrade when Clario has paid for itself — which will happen on day one.</p>
+            <p className="s-sub">Start free. Upgrade when Clario has paid for itself  which will happen on day one.</p>
           </div>
           <div className="p-grid">
             <div className="p-card">
@@ -626,7 +626,7 @@ export default function LandingPage() {
           <p style={{ fontSize: ".88rem", color: "rgba(255,255,255,.38)", marginBottom: 36, maxWidth: 400, margin: "0 auto 36px", lineHeight: 1.75 }}>The AI toolkit built for YouTubers, podcasters, and bloggers.</p>
           <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
             <button className="btn-p" onClick={() => window.location.href="/sign-up"} style={{ fontSize: ".88rem", padding: "13px 26px" }}>
-              Start for free — no card needed <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              Start for free  no card needed <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
             <button onClick={() => window.location.href="/pricing"} style={{ background: "rgba(255,255,255,.07)", color: "rgba(255,255,255,.55)", padding: "13px 22px", borderRadius: 9, fontSize: ".88rem", fontWeight: 500, border: "1.5px solid rgba(255,255,255,.1)", cursor: "pointer", fontFamily: "var(--sans)", transition: "all .2s" }}>See pricing</button>
           </div>

@@ -113,7 +113,7 @@ export default function OGImage() {
           </div>
 
           <div style={{ fontSize: 22, color: "rgba(255,255,255,.45)", lineHeight: 1.6, maxWidth: 620, marginBottom: 44 }}>
-            AI-powered summarizer, remix studio, brand voice library & chat — built for YouTubers, podcasters, and bloggers.
+            AI-powered summarizer, remix studio, brand voice library & chat  built for YouTubers, podcasters, and bloggers.
           </div>
 
           {/* Feature pills */}
@@ -137,7 +137,7 @@ export default function OGImage() {
           </div>
         </div>
 
-        {/* Bottom right — price badge */}
+        {/* Bottom right  price badge */}
         <div
           style={{
             position: "absolute",

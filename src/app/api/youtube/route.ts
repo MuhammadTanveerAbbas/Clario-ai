@@ -28,7 +28,7 @@ function extractVideoId(input: string): string | null {
   return null;
 }
 
-/** Fetches video title, author, and thumbnail via oEmbed — no API key required. */
+/** Fetches video title, author, and thumbnail via oEmbed  no API key required. */
 async function fetchVideoMetadata(videoId: string): Promise<{ title: string; author: string; thumbnail: string } | null> {
   try {
     const res = await fetch(

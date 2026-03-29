@@ -7,7 +7,7 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  // Silently ignore errors injected by browser extensions — they're not app errors
+  // Silently ignore errors injected by browser extensions  they're not app errors
   if (error.message?.includes('spoofer') || 
       error.message?.includes('onMessage listener') ||
       error.message?.includes('vendors.chunk')) {

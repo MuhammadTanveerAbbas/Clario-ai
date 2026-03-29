@@ -47,11 +47,11 @@ const PRO_FEATURES = [
 ];
 
 const FAQ = [
-  { q: "What counts as an AI request?", a: "Each summarization or chat message counts as one request. Remix Studio generates all formats in a single request — not 10 separate ones." },
+  { q: "What counts as an AI request?", a: "Each summarization or chat message counts as one request. Remix Studio generates all formats in a single request  not 10 separate ones." },
   { q: "Can I upgrade or downgrade anytime?", a: "Yes. Upgrade instantly, downgrade at the end of your billing period. No contracts, no penalties." },
   { q: "What happens when I hit my request limit?", a: "You'll see a clear warning at 80% usage. Once the limit is reached, you can still view past outputs but won't be able to run new AI requests until you upgrade or your cycle resets." },
-  { q: "Is there a free trial for Pro?", a: "The Free plan gives you 100 AI requests per month with no credit card required — a great way to try Clario before upgrading." },
-  { q: "Do you offer refunds?", a: "Yes — if you're unsatisfied within 14 days of your first charge, contact us for a full refund, no questions asked." },
+  { q: "Is there a free trial for Pro?", a: "The Free plan gives you 100 AI requests per month with no credit card required  a great way to try Clario before upgrading." },
+  { q: "Do you offer refunds?", a: "Yes  if you're unsatisfied within 14 days of your first charge, contact us for a full refund, no questions asked." },
   { q: "What AI models power Clario?", a: "We use Groq's Llama 3.3 70B for summarization and Llama 3.1 8B for chat. These are state-of-the-art open models running on Groq's ultra-fast inference infrastructure." },
 ];
 
@@ -64,8 +64,8 @@ const TABLE_ROWS: [string, string, string][] = [
   ["Brand Voices", "1", "3"],
   ["Remix formats", "3", "All 10"],
   ["Content Calendar", "✓", "✓"],
-  ["Priority support", "—", "✓"],
-  ["Early access to features", "—", "✓"],
+  ["Priority support", "", "✓"],
+  ["Early access to features", "", "✓"],
 ];
 
 export default function PricingPage() {
@@ -219,8 +219,8 @@ export default function PricingPage() {
               {TABLE_ROWS.map(([f, fr, pr]) => (
                 <tr key={f}>
                   <td style={{ fontWeight: 500 }}>{f}</td>
-                  <td style={{ textAlign: "center", color: fr === "—" ? "var(--g2)" : "var(--g7)" }}>{fr}</td>
-                  <td className="highlight" style={{ textAlign: "center", color: pr === "—" ? "var(--g2)" : "var(--o)", fontWeight: pr !== "—" && pr !== "✓" ? 600 : 400 }}>{pr}</td>
+                  <td style={{ textAlign: "center", color: fr === "" ? "var(--g2)" : "var(--g7)" }}>{fr}</td>
+                  <td className="highlight" style={{ textAlign: "center", color: pr === "" ? "var(--g2)" : "var(--o)", fontWeight: pr !== "" && pr !== "✓" ? 600 : 400 }}>{pr}</td>
                 </tr>
               ))}
             </tbody>
