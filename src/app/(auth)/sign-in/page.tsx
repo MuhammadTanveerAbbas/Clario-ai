@@ -236,7 +236,7 @@ function SignInForm() {
               </div>
               <button className="btn-primary" type="submit" disabled={loading}>
                 {loading && <div className="spinner" />}
-                {loading ? "Signing in..." : "Sign in →"}
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </form>
             <div className="auth-footer">Don&apos;t have an account? <Link href="/sign-up">Create one free</Link></div>

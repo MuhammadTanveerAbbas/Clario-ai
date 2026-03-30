@@ -12,8 +12,6 @@ import {
   Settings,
   CreditCard,
   LogOut,
-  Menu,
-  X,
   User,
   ChevronDown,
   Zap,
@@ -198,18 +196,6 @@ export function AppNavbar() {
                 )}
               </div>
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden text-white/50 hover:text-white hover:bg-white/[0.04] h-9 w-9"
-              >
-                {mobileOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
-                  <Menu className="h-5 w-5" />
-                )}
-              </Button>
             </div>
           </div>
         </div>

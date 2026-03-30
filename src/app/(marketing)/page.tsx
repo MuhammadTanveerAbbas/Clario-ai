@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 function TypingEffect() {
   const phrases = ["Twitter thread","LinkedIn post","email newsletter","YouTube description","podcast show notes","blog outline","Instagram caption"];
@@ -144,7 +145,7 @@ function ComparisonTable() {
   const { ref, inView } = useInView(0.1);
   const features = [
     { feature: "AI Text Summarizer", clario: true, jasper: true, copy: false, notion: false },
-    { feature: "11 summary modes incl. Brutal Roast", clario: true, jasper: false, copy: false, notion: false },
+    { feature: "10 summary modes incl. Brutal Roast", clario: true, jasper: false, copy: false, notion: false },
     { feature: "YouTube URL → auto transcript", clario: true, jasper: false, copy: false, notion: false },
     { feature: "Content Remix Studio (10 formats)", clario: true, jasper: true, copy: true, notion: false },
     { feature: "Brand Voice Library", clario: true, jasper: true, copy: true, notion: false },
@@ -193,7 +194,7 @@ function ComparisonTable() {
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { user } = useAuth();
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
@@ -247,7 +248,7 @@ export default function LandingPage() {
         .mobile-nav.open{display:flex}
         .mobile-nav a{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--bk);text-decoration:none;letter-spacing:-.02em}
         .mobile-nav-btns{display:flex;flex-direction:column;gap:10px;width:200px;margin-top:8px}
-        @media(max-width:680px){.nl{display:none}.np{display:none}.nav-hamburger{display:flex}}
+        @media(max-width:680px){.nl{display:none}.nav-hamburger{display:flex}}
         .hero{min-height:100vh;padding:96px 5% 72px;display:grid;grid-template-columns:1fr 1.1fr;gap:52px;align-items:center;max-width:1160px;margin:0 auto}
         @media(max-width:860px){.hero{grid-template-columns:1fr;text-align:center;padding-top:88px;gap:36px}}
         @media(max-width:480px){.hero{padding:80px 4% 48px;gap:28px}}
@@ -348,33 +349,13 @@ export default function LandingPage() {
           Clario
         </a>
         <ul className="nl">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#demo">Demo</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#compare">Compare</a></li>
         </ul>
         <div className="np">
-          <button className="btn-si" onClick={() => window.location.href="/sign-in"}>Sign in</button>
-          <button className="btn-n" onClick={() => window.location.href="/sign-up"}>Get started free</button>
+          <button className="btn-n" onClick={() => window.location.href= user ? "/dashboard" : "/sign-up"}>
+            {user ? "Dashboard" : "Get started free"}
+          </button>
         </div>
-        <button className="nav-hamburger" onClick={() => setMobileNavOpen(true)} aria-label="Open menu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-        </button>
       </nav>
-
-      <div className={`mobile-nav${mobileNavOpen ? " open" : ""}`}>
-        <button onClick={() => setMobileNavOpen(false)} style={{ position: "absolute", top: 18, right: "5%", background: "none", border: "none", cursor: "pointer", color: "var(--bk)" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <a href="#features" onClick={() => setMobileNavOpen(false)}>Features</a>
-        <a href="#demo" onClick={() => setMobileNavOpen(false)}>Demo</a>
-        <a href="#pricing" onClick={() => setMobileNavOpen(false)}>Pricing</a>
-        <a href="#compare" onClick={() => setMobileNavOpen(false)}>Compare</a>
-        <div className="mobile-nav-btns">
-          <button className="btn-si" style={{ width: "100%", textAlign: "center" }} onClick={() => window.location.href="/sign-in"}>Sign in</button>
-          <button className="btn-n" style={{ width: "100%" }} onClick={() => window.location.href="/sign-up"}>Get started free</button>
-        </div>
-      </div>
 
       <section style={{ background: "var(--w)" }}>
         <div className="hero">
@@ -389,17 +370,6 @@ export default function LandingPage() {
               </button>
               <button className="btn-s" onClick={() => document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" })}>Watch demo</button>
             </div>
-            <div className="h-soc">
-              <div className="avs">
-                {[["#fde68a","JK"],["#bfdbfe","AM"],["#bbf7d0","SR"],["#fecaca","TL"]].map(([bg,initials]) => (
-                  <div key={initials} className="av" style={{ background: bg }}>{initials}</div>
-                ))}
-              </div>
-              <div>
-                <div className="stars-sm">★★★★★</div>
-                <p className="soc-t"><strong>Loved by creators</strong> saving hours every week</p>
-              </div>
-            </div>
           </div>
           <div style={{ display: "flex", justifyContent: "center", animation: "fu .9s .3s ease both" }}>
             <div style={{ animation: "float 5s ease-in-out infinite", width: "100%" }}><HeroMockup /></div>
@@ -410,7 +380,7 @@ export default function LandingPage() {
       <div className="mq-w">
         <div className="mq-t">
           {[...Array(2)].map((_, ri) =>
-            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","Content Calendar","YouTube → Summary","11 Summary Modes","Twitter Threads","LinkedIn Posts","Email Newsletters","Podcast Notes","Blog Outlines"].map((item, i) => (
+            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","Content Calendar","YouTube → Summary","10 Summary Modes","Twitter Threads","LinkedIn Posts","Email Newsletters","Podcast Notes","Blog Outlines"].map((item, i) => (
               <span key={`${ri}-${i}`} className="mq-i"><span className="mq-d" />{item}</span>
             ))
           )}
@@ -419,7 +389,7 @@ export default function LandingPage() {
 
       <section style={{ padding: "64px 5%" }}>
         <div className="stats-g">
-          {[{n:11,s:"",l:"Summary modes"},{n:10,s:"",l:"Remix formats"},{n:100,s:"",l:"Free requests/month"},{n:4,s:"hrs",l:"Saved per week"}].map(s => (
+          {[{n:10,s:"",l:"Summary modes"},{n:10,s:"",l:"Remix formats"},{n:100,s:"",l:"Free requests/month"},{n:4,s:"hrs",l:"Saved per week"}].map(s => (
             <div key={s.l} className="stat-c">
               <div className="stat-n"><Counter to={s.n} suffix={s.s} /></div>
               <div className="stat-l">{s.l}</div>

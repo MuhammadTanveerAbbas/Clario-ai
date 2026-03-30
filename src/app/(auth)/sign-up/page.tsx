@@ -285,10 +285,10 @@ function SignUpForm() {
               </div>
               <button className="btn-primary" type="submit" disabled={loading}>
                 {loading && <div className="spinner" />}
-                {loading ? "Creating account..." : "Create free account →"}
+                {loading ? "Creating account..." : "Create free account"}
               </button>
               <p className="terms-note">
-                By creating an account you agree to our{" "}
+                I agree to {" "}
                 <Link href="/terms">Terms of Service</Link> and{" "}
                 <Link href="/privacy">Privacy Policy</Link>.
               </p>

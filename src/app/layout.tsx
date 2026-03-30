@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Poppins, Fraunces, Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { ScrollToTop } from "@/components/layout/scroll-to-top";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ClientProviders } from "@/components/providers/client-providers";
@@ -124,7 +123,6 @@ export default function RootLayout({
               <ThemeProvider>
                 {children}
                 <Toaster />
-                <ScrollToTop />
               </ThemeProvider>
             </SidebarProvider>
           </AuthProvider>

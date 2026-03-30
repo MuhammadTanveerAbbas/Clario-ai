@@ -251,7 +251,7 @@ export default function PricingPage() {
         </h2>
         <p style={{ fontSize: ".88rem", color: "rgba(255,255,255,.38)", marginBottom: 28, position: "relative" }}>No card required. 100 AI requests a month on us.</p>
         <button className="btn-pro" onClick={() => router.push("/sign-up")} style={{ display: "inline-flex", width: "auto", padding: "13px 28px", position: "relative", fontSize: ".9rem" }}>
-          Get started free →
+          Get started free
         </button>
       </section>
 
