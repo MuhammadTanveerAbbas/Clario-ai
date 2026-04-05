@@ -240,7 +240,7 @@ export default function CalendarPage() {
         body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-        .dash-layout{display:flex;min-height:100vh;background:var(--bg)}
+        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
 
         .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
         .sidebar[data-collapsed="true"]{width:60px}

@@ -246,7 +246,7 @@ export default function ChatPage() {
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
         @keyframes dotPulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
 
-        .dash-layout{display:flex;min-height:100vh;background:var(--bg)}
+        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
         .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
         .sidebar[data-collapsed="true"]{width:60px}
         .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
