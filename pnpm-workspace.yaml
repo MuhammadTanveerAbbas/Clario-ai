@@ -1,5 +1,8 @@
+packages:
+  - "."
+
 allowBuilds:
-  '@sentry/cli': true
+  "@sentry/cli": true
   core-js: true
   protobufjs: true
   sharp: true
