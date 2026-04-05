@@ -343,15 +343,19 @@ export default function SummarizerPage() {
 
           <div className="page-content">
           <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
-            <div style={{ animation: "fu .4s ease both" }}>
+            <div style={{ animation: "fu .4s ease both", textAlign: "center" }}>
               <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", marginBottom: 6 }}>Text Summarizer</h1>
               <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>Summarize anything in 10 different ways. Paste text or drop a YouTube URL.</p>
             </div>
 
             <div className="card" style={{ animation: "fu .4s .05s ease both" }}>
-              <div style={{ display: "flex", borderBottom: "1px solid var(--card-b)", padding: "12px 16px", gap: 8 }}>
+              <div style={{ display: "flex", justifyContent: "center", borderBottom: "1px solid var(--card-b)", padding: "12px 16px", gap: 8 }}>
                 {(["text", "youtube"] as const).map(t => (
-                  <button key={t} onClick={() => setTab(t)} style={{ padding: "6px 14px", borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "var(--sans)", fontSize: ".82rem", fontWeight: 500, background: tab === t ? "var(--accent)" : "transparent", color: tab === t ? "#fff" : "var(--text3)", transition: "all .15s" }}>
+                  <button key={t} onClick={() => setTab(t)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 18px", borderRadius: 8, border: "none", cursor: "pointer", fontFamily: "var(--sans)", fontSize: ".82rem", fontWeight: 500, background: tab === t ? "var(--accent)" : "transparent", color: tab === t ? "#fff" : "var(--text3)", transition: "all .15s" }}>
+                    {t === "text"
+                      ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                      : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                    }
                     {t === "text" ? "Paste Text" : "YouTube URL"}
                   </button>
                 ))}
@@ -359,7 +363,7 @@ export default function SummarizerPage() {
               <div style={{ padding: 16 }}>
                 {tab === "text" ? (
                   <>
-                    <textarea value={pasteText} onChange={e => setPasteText(e.target.value)} placeholder="Paste your article, transcript, meeting notes, or any text here..." style={{ width: "100%", minHeight: 180, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "vertical", outline: "none", lineHeight: 1.6 }} />
+                    <textarea value={pasteText} onChange={e => setPasteText(e.target.value)} placeholder="Paste your article, transcript, meeting notes, or any text here..." style={{ width: "100%", height: 160, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "none", outline: "none", lineHeight: 1.6, display: "block" }} />
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
                       <span style={{ fontSize: ".72rem", color: "var(--text3)" }}>{pasteText.length.toLocaleString()} chars</span>
                       <button onClick={handleSummarize} disabled={loading || !pasteText.trim()} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, padding: "9px 20px", fontFamily: "var(--sans)", fontSize: ".84rem", fontWeight: 600, cursor: loading || !pasteText.trim() ? "not-allowed" : "pointer", opacity: loading || !pasteText.trim() ? .5 : 1 }}>
@@ -369,8 +373,8 @@ export default function SummarizerPage() {
                   </>
                 ) : (
                   <>
-                    <input value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." style={{ width: "100%", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", outline: "none" }} />
-                    <button onClick={handleSummarize} disabled={loading || !youtubeUrl.trim()} style={{ marginTop: 12, width: "100%", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px", fontFamily: "var(--sans)", fontSize: ".84rem", fontWeight: 600, cursor: loading || !youtubeUrl.trim() ? "not-allowed" : "pointer", opacity: loading || !youtubeUrl.trim() ? .5 : 1 }}>
+                    <input value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=..." style={{ width: "100%", height: 46, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "0 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", outline: "none", display: "block" }} />
+                    <button onClick={handleSummarize} disabled={loading || !youtubeUrl.trim()} style={{ marginTop: 12, width: "100%", height: 42, background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontFamily: "var(--sans)", fontSize: ".84rem", fontWeight: 600, cursor: loading || !youtubeUrl.trim() ? "not-allowed" : "pointer", opacity: loading || !youtubeUrl.trim() ? .5 : 1 }}>
                       {loading ? loadingMsg : "Fetch & Summarize"}
                     </button>
                   </>
