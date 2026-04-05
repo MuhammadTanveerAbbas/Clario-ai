@@ -1,6 +1,8 @@
 "use client";
 import React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -418,7 +420,26 @@ export default function SummarizerPage() {
                       {[100, 90, 95, 80, 85].map((w, i) => <Skeleton key={i} w={`${w}%`} h={14} />)}
                     </div>
                   ) : (
-                    <div style={{ fontFamily: "var(--serif)", fontSize: "1rem", lineHeight: 1.8, color: "var(--text)", whiteSpace: "pre-wrap" }}>{output}</div>
+                    <div style={{ fontFamily: "var(--serif)", fontSize: "1rem", lineHeight: 1.8, color: "var(--text)" }} className="summary-prose-modern">
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          h1: ({node, ...props}) => <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.75rem", color: "var(--text)", borderBottom: "1px solid var(--border)", paddingBottom: "0.5rem" }} {...props} />,
+                          h2: ({node, ...props}) => <h2 style={{ fontSize: "1.25rem", fontWeight: 600, marginTop: "1.25rem", marginBottom: "0.5rem", color: "var(--text)" }} {...props} />,
+                          h3: ({node, ...props}) => <h3 style={{ fontSize: "1.1rem", fontWeight: 600, marginTop: "1rem", marginBottom: "0.4rem", color: "var(--text2)" }} {...props} />,
+                          p: ({node, ...props}) => <p style={{ marginBottom: "0.75rem", color: "var(--text2)" }} {...props} />,
+                          ul: ({node, ...props}) => <ul style={{ marginBottom: "0.75rem", paddingLeft: "1.5rem", listStyleType: "disc" }} {...props} />,
+                          ol: ({node, ...props}) => <ol style={{ marginBottom: "0.75rem", paddingLeft: "1.5rem", listStyleType: "decimal" }} {...props} />,
+                          li: ({node, ...props}) => <li style={{ marginBottom: "0.25rem", color: "var(--text2)" }} {...props} />,
+                          strong: ({node, ...props}) => <strong style={{ fontWeight: 700, color: "var(--text)" }} {...props} />,
+                          em: ({node, ...props}) => <em style={{ fontStyle: "italic" }} {...props} />,
+                          blockquote: ({node, ...props}) => <blockquote style={{ borderLeft: "3px solid var(--accent)", paddingLeft: "1rem", margin: "0.75rem 0", fontStyle: "italic", color: "var(--text3)" }} {...props} />,
+                          hr: ({node, ...props}) => <hr style={{ borderColor: "var(--border)", margin: "1rem 0" }} {...props} />,
+                        }}
+                      >
+                        {output}
+                      </ReactMarkdown>
+                    </div>
                   )}
                 </div>
               </div>
