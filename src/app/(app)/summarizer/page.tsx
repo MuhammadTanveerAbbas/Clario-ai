@@ -340,7 +340,8 @@ export default function SummarizerPage() {
             </button>
           </div>
 
-          <div className="page-content" style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
+          <div className="page-content">
+          <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ animation: "fu .4s ease both" }}>
               <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", marginBottom: 6 }}>Text Summarizer</h1>
               <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>Summarize anything in 10 different ways. Paste text or drop a YouTube URL.</p>
@@ -433,6 +434,7 @@ export default function SummarizerPage() {
                 </div>
               </div>
             )}
+          </div>
           </div>
         </div>
       </div>
