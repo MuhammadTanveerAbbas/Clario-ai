@@ -15,10 +15,10 @@ export function PrivacySection() {
     setExporting(true);
     try {
       const [summaries, chatMessages, chatSessions, voices] = await Promise.all([
-        supabase.from("ai_summaries").select("*").eq("user_id", user.id),
-        supabase.from("chat_messages").select("*").eq("user_id", user.id),
-        supabase.from("chat_sessions").select("*").eq("user_id", user.id),
-        supabase.from("brand_voices").select("*").eq("user_id", user.id),
+        supabase.from("ai_summaries").select("id, title, content, created_at").eq("user_id", user.id),
+        supabase.from("chat_messages").select("id, role, content, created_at").eq("user_id", user.id),
+        supabase.from("chat_sessions").select("id, title, created_at").eq("user_id", user.id),
+        supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, created_at").eq("user_id", user.id),
       ]);
       const exportData = {
         exported_at: new Date().toISOString(),

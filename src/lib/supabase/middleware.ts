@@ -59,16 +59,24 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/sign-in') &&
-    !request.nextUrl.pathname.startsWith('/sign-up') &&
-    !request.nextUrl.pathname.startsWith('/pricing') &&
-    !request.nextUrl.pathname.startsWith('/api') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    request.nextUrl.pathname !== '/'
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const publicPaths = ['/', '/sign-in', '/sign-up', '/pricing', '/privacy', '/terms', '/forgot-password']
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname) ||
+    request.nextUrl.pathname.startsWith('/api') ||
+    request.nextUrl.pathname.startsWith('/auth')
+
+  // Logged-in user visiting public/auth pages → redirect to dashboard
+  if (user && (
+    request.nextUrl.pathname === '/' ||
+    request.nextUrl.pathname.startsWith('/sign-in') ||
+    request.nextUrl.pathname.startsWith('/sign-up')
+  )) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
+  // Unauthenticated user visiting protected pages → redirect to sign-in
+  if (!user && !isPublicPath) {
     const url = request.nextUrl.clone()
     url.pathname = '/sign-in'
     url.searchParams.set('redirect', request.nextUrl.pathname)

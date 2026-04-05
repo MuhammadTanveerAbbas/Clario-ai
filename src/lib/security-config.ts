@@ -21,7 +21,7 @@ export const SECURITY_HEADERS = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()',
   'Strict-Transport-Security': 'max-age=63072000; includeSubDomains; preload',
-  // CSP allows Paddle (payments), Sentry (monitoring), PostHog (analytics), and Groq/Gemini (AI)
+  // CSP allows Paddle (payments), Sentry (monitoring), PostHog (analytics), and Groq (AI)
   'Content-Security-Policy': [
     "default-src 'self'",
     "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.paddle.com https://js.sentry-cdn.com https://us-assets.i.posthog.com",
@@ -29,7 +29,7 @@ export const SECURITY_HEADERS = {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
-    "connect-src 'self' https://*.supabase.co https://api.groq.com https://generativelanguage.googleapis.com https://cdn.paddle.com https://*.sentry.io https://*.posthog.com",
+    "connect-src 'self' https://*.supabase.co https://api.groq.com https://cdn.paddle.com https://*.sentry.io https://*.posthog.com",
     "frame-src 'self' https://cdn.paddle.com",
     "object-src 'none'",
     "base-uri 'self'",

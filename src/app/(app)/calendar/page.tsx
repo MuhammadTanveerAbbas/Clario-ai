@@ -129,7 +129,7 @@ export default function CalendarPage() {
       const startDate = new Date(year, month, 1).toISOString();
       const endDate = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
       const { data, error } = await supabase
-        .from("calendar_events").select("*").eq("user_id", user.id)
+        .from("calendar_events").select("id, title, content, platform, scheduled_at, status, created_at").eq("user_id", user.id)
         .gte("scheduled_at", startDate).lte("scheduled_at", endDate)
         .order("scheduled_at", { ascending: true });
       if (error) throw error;

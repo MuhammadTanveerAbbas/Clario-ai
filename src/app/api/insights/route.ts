@@ -40,7 +40,7 @@ export async function GET() {
     const insightText = await generateWithFallback(
       `Here are recent content summaries from a creator:\n\n${contentSummary}`,
       'You are an AI content strategist. Analyze these summaries and generate 3-5 actionable insights about patterns, recurring themes, content gaps, and opportunities. Be specific and practical. Format as a numbered list.',
-      { model: 'llama-3.1-8b-instant', maxTokens: 800, temperature: 0.6 }
+      { model: 'llama-3.3-70b-versatile', maxTokens: 800, temperature: 0.6 }
     )
 
     const insights = insightText

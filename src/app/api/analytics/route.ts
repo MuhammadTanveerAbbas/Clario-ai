@@ -27,16 +27,16 @@ export async function GET(request: NextRequest) {
   const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
   const sixtyDaysAgo = new Date(today.getTime() - 60 * 24 * 60 * 60 * 1000)
 
-  const { data: currentMonth } = await supabase
+        const { data: currentMonth } = await supabase
     .from('usage_stats')
-    .select('*')
+    .select('date, total_requests, summaries_count, chats_count, writing_count, meeting_notes_count')
     .eq('user_id', userId)
     .gte('date', thirtyDaysAgo.toISOString().split('T')[0])
     .order('date', { ascending: false })
 
   const { data: previousMonth } = await supabase
     .from('usage_stats')
-    .select('*')
+    .select('date, total_requests, summaries_count, chats_count, writing_count, meeting_notes_count')
     .eq('user_id', userId)
     .gte('date', sixtyDaysAgo.toISOString().split('T')[0])
     .lt('date', thirtyDaysAgo.toISOString().split('T')[0])

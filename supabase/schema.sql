@@ -27,6 +27,14 @@ DROP VIEW IF EXISTS dashboard_stats CASCADE;
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Move vector extension out of public schema to avoid security lint warning
+CREATE SCHEMA IF NOT EXISTS extensions;
+CREATE EXTENSION IF NOT EXISTS "vector" WITH SCHEMA extensions;
+
+-- Drop any stale functions that may exist from previous migrations
+DROP FUNCTION IF EXISTS public.track_code_generation() CASCADE;
+DROP FUNCTION IF EXISTS public.get_monthly_usage(UUID) CASCADE;
+
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- SHARED UTILITY FUNCTION
 -- ═══════════════════════════════════════════════════════════════════════════════
@@ -144,6 +152,7 @@ CREATE TABLE brand_voices (
   user_id     UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   name        TEXT        NOT NULL CHECK (char_length(name) BETWEEN 1 AND 100),
   description TEXT        CHECK (char_length(description) <= 500),
+  examples    TEXT        CHECK (char_length(examples) <= 5000),
   samples     TEXT[]      NOT NULL DEFAULT '{}',
   tone        TEXT        CHECK (char_length(tone) <= 300),
   vocabulary  TEXT        CHECK (char_length(vocabulary) <= 300),
@@ -327,6 +336,11 @@ CREATE TABLE processed_webhook_events (
 );
 
 ALTER TABLE processed_webhook_events ENABLE ROW LEVEL SECURITY;
+-- Only the service role (used by Stripe webhook handler) can access this table.
+-- No user-facing policies are needed; the service role bypasses RLS entirely.
+-- This policy blocks all direct user access.
+CREATE POLICY "webhook_events_no_user_access" ON processed_webhook_events
+  AS RESTRICTIVE FOR ALL USING (false);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- FEEDBACK
@@ -347,7 +361,10 @@ CREATE INDEX idx_feedback_type       ON feedback(type);
 
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "feedback_select_own"  ON feedback FOR SELECT USING ((SELECT auth.uid()) = user_id);
-CREATE POLICY "feedback_insert_anon" ON feedback FOR INSERT WITH CHECK (true);
+-- Allow any authenticated user to submit feedback (user_id can be null for anonymous)
+CREATE POLICY "feedback_insert_anon" ON feedback FOR INSERT WITH CHECK (
+  auth.uid() IS NOT NULL AND (user_id IS NULL OR (SELECT auth.uid()) = user_id)
+);
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- FUNCTION: increment_usage
@@ -451,9 +468,11 @@ CREATE TRIGGER enforce_single_active_voice
 
 -- ═══════════════════════════════════════════════════════════════════════════════
 -- VIEW: dashboard_stats
+-- Uses security_invoker so the view respects the querying user's RLS policies
+-- rather than the view creator's permissions.
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-CREATE VIEW dashboard_stats AS
+CREATE VIEW dashboard_stats WITH (security_invoker = true) AS
 SELECT
   p.id AS user_id,
   p.plan,

@@ -5,6 +5,65 @@
 :root {
   --serif: 'Fraunces', Georgia, serif;
   --sans: 'Geist', system-ui, sans-serif;
+  /* Light mode custom tokens (default) */
+  --bg: #ffffff;
+  --bg2: #fafaf9;
+  --bg3: #f5f5f4;
+  --border: #e7e5e4;
+  --border2: #d6d3d1;
+  --text: #0c0a09;
+  --text2: #44403c;
+  --text3: #78716c;
+  --accent: #f97316;
+  --accent-l: #fff7ed;
+  --accent-m: #fed7aa;
+  --sidebar: #fafaf9;
+  --sidebar-b: #e7e5e4;
+  --card: #ffffff;
+  --card-b: #e7e5e4;
+  --input: #fafaf9;
+  --input-b: #e7e5e4;
+  --success: #15803d;
+  --error: #be123c;
+}
+
+/* Dark mode custom tokens */
+.dark {
+  --bg: #0c0a09;
+  --bg2: #111110;
+  --bg3: #1c1917;
+  --border: #292524;
+  --border2: #3d3935;
+  --text: #fafaf9;
+  --text2: #d6d3d1;
+  --text3: #78716c;
+  --accent: #f97316;
+  --accent-l: #1a0f07;
+  --accent-m: #431407;
+  --sidebar: #111110;
+  --sidebar-b: #292524;
+  --card: #1c1917;
+  --card-b: #292524;
+  --input: #111110;
+  --input-b: #292524;
+  --success: #4ade80;
+  --error: #f87171;
+}
+
+/* Prevent horizontal overflow on all screens */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Responsive images and media */
+img, video, svg {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Hide scrollbar globally while keeping scroll functionality */
@@ -20,13 +79,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
-    font-weight: 700 !important;
-  }
-
-  * {
-    font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
-    font-weight: 700 !important;
+    font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif;
   }
 
   input:focus {
@@ -110,18 +163,15 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--sans), var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
-    background-color: var(--bg, #0c0a09);
-    color: var(--text, #fafaf9);
-    font-weight: 700 !important;
+    font-family: var(--sans), var(--font-inter), var(--font-poppins), system-ui, sans-serif;
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
   }
 }
 
 @layer components {
     .summary-prose {
         @apply max-w-none;
-        font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
-        font-weight: 700 !important;
         line-height: 1.7;
         color: #e5e7eb;
         letter-spacing: 0 !important;
@@ -248,8 +298,6 @@
         text-align: justify;
         line-height: 1.6;
         padding: 16px !important;
-        font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif !important;
-        font-weight: 700 !important;
     }
     
     .summary-prose h4 {
@@ -459,8 +507,7 @@
         @apply px-2 py-1 rounded text-sm;
         background: rgba(65, 105, 225, 0.15);
         color: #a5b4fc;
-        font-family: var(--font-inter), var(--font-poppins), system-ui, monospace !important;
-        font-weight: 700 !important;
+        font-family: monospace;
         border: 1px solid rgba(65, 105, 225, 0.2);
     }
     

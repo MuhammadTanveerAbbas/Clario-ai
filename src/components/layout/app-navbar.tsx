@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Zap,
   Mic,
+  Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -125,6 +126,15 @@ export function AppNavbar() {
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Mobile hamburger */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-white/70 hover:text-white hover:bg-white/[0.04] h-9 w-9"
+                onClick={() => setMobileOpen(!mobileOpen)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
               <Link href="/pricing" className="hidden lg:block">
                 <Button
                   size="sm"
@@ -204,7 +214,7 @@ export function AppNavbar() {
         <motion.div 
           className="absolute bottom-0 left-0 w-32 h-[2px] bg-gradient-to-r from-[#4169E1]/0 via-[#4169E1] to-[#4169E1]/0 blur-sm"
           animate={{
-            x: [0, window.innerWidth - 128, 0],
+            x: [0, 1200, 0],
           }}
           transition={{
             duration: 8,

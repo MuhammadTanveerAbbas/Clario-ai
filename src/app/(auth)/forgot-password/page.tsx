@@ -3,16 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { useTheme } from "@/components/ThemeProvider";
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{
-    --bg:#0c0a09;--bg2:#111110;--border:#292524;
-    --text:#fafaf9;--text2:#d6d3d1;--text3:#78716c;
-    --accent:#f97316;--error:#f87171;--success:#4ade80;
-    --serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif;
-  }
   body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -39,10 +34,14 @@ const STYLES = `
   .fp-footer a{color:var(--accent);text-decoration:none;font-weight:500}
   .fp-footer a:hover{text-decoration:underline}
   .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  .theme-toggle{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .theme-toggle:hover{color:var(--text)}
 `;
 
 export default function ForgotPasswordPage() {
   const supabase = createClient();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
@@ -73,6 +72,12 @@ export default function ForgotPasswordPage() {
     <>
       <style>{STYLES}</style>
       <div className="fp-wrap">
+        <button className="theme-toggle" onClick={toggleTheme} title={isDark ? "Light mode" : "Dark mode"}>
+          {isDark
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          }
+        </button>
         <div className="fp-card">
           <Link href="/" className="fp-logo">
             <div className="fp-logo-mark">

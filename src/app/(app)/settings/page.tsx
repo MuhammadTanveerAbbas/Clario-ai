@@ -230,11 +230,11 @@ export default function SettingsPage() {
     (async () => {
       setLoading(true);
       try {
-        const { data } = await supabase.from("profiles").select("*").eq("id", authUser.id).single();
+        const { data } = await supabase.from("profiles").select("id, full_name, avatar_url, subscription_tier, subscription_status, current_period_end, stripe_customer_id, requests_used_this_month, created_at").eq("id", authUser.id).single();
         setProfile({
           id: authUser.id,
           email: authUser.email || "",
-          full_name: data?.full_name || data?.name || authUser.user_metadata?.name || authUser.user_metadata?.full_name || "",
+          full_name: data?.full_name || authUser.user_metadata?.name || authUser.user_metadata?.full_name || "",
           plan: (data?.subscription_tier === "pro" ? "pro" : "free") as "free" | "pro",
           subscription_tier: data?.subscription_tier || "free",
           subscription_status: data?.subscription_status || "inactive",

@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes'
 import { applyTokens } from '@/lib/design-tokens'
 
 type Theme = 'dark' | 'light'
@@ -13,28 +14,35 @@ interface ThemeContextType {
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('dark')
+// Inner component — has access to next-themes context
+function ThemeBridge({ children }: { children: React.ReactNode }) {
+  const { resolvedTheme, setTheme: setNextTheme } = useNextTheme()
+  const theme: Theme = resolvedTheme === 'light' ? 'light' : 'dark'
 
+  // Sync custom CSS vars whenever resolved theme changes
   useEffect(() => {
-    const stored = localStorage.getItem('clario-theme') as Theme | null
-    const initial = stored === 'light' || stored === 'dark' ? stored : 'dark'
-    setThemeState(initial)
-    applyTokens(initial)
-  }, [])
+    applyTokens(theme)
+  }, [theme])
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme)
-    applyTokens(newTheme)
-    localStorage.setItem('clario-theme', newTheme)
-  }
-
+  const setTheme = (t: Theme) => setNextTheme(t)
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
+  )
+}
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="dark"
+      enableSystem={false}
+      storageKey="clario-theme"
+    >
+      <ThemeBridge>{children}</ThemeBridge>
+    </NextThemesProvider>
   )
 }
 

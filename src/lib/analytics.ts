@@ -29,14 +29,14 @@ export async function getAnalyticsInsights(userId: string): Promise<AnalyticsIns
 
   const { data: currentMonth } = await supabase
     .from('usage_stats')
-    .select('*')
+    .select('date, total_requests, summaries_count, chats_count, writing_count, meeting_notes_count')
     .eq('user_id', userId)
     .gte('date', thirtyDaysAgo.toISOString().split('T')[0])
     .order('date', { ascending: false })
 
   const { data: previousMonth } = await supabase
     .from('usage_stats')
-    .select('*')
+    .select('date, total_requests, summaries_count, chats_count, writing_count, meeting_notes_count')
     .eq('user_id', userId)
     .gte('date', sixtyDaysAgo.toISOString().split('T')[0])
     .lt('date', thirtyDaysAgo.toISOString().split('T')[0])
@@ -106,7 +106,7 @@ export async function getFeatureBreakdown(userId: string) {
   
   const { data } = await supabase
     .from('usage_stats')
-    .select('*')
+    .select('date, summaries_count, chats_count, writing_count, meeting_notes_count')
     .eq('user_id', userId)
     .gte('date', `${currentMonth}-01`)
     .order('date', { ascending: true })

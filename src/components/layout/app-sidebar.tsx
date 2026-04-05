@@ -16,6 +16,8 @@ import {
   CreditCard,
   Mic,
   Zap,
+  X,
+  Youtube,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,21 +26,34 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { name: "AI Chat", href: "/chat", icon: MessageSquare },
   { name: "Summarizer", href: "/summarizer", icon: FileText },
+  { name: "YouTube Analyzer", href: "/summarizer/youtube", icon: Youtube },
   { name: "Remix Studio", href: "/remix", icon: Zap },
   { name: "Brand Voice", href: "/brand-voice", icon: Mic },
 ];
 
 export function AppSidebar() {
-  const { collapsed, setCollapsed } = useSidebar();
+  const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = useSidebar();
   const pathname = usePathname();
 
   return (
-    <motion.aside
-      initial={false}
-      animate={{ width: collapsed ? "80px" : "256px" }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="hidden md:flex fixed left-0 top-0 z-50 h-screen bg-[#0A0A0A] border-r border-white/[0.08] flex-col overflow-hidden"
-    >
+    <>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      <motion.aside
+        initial={false}
+        animate={{ width: collapsed ? "80px" : "256px" }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className={cn(
+          "fixed left-0 top-0 z-50 h-screen bg-[#0A0A0A] border-r border-white/[0.08] flex flex-col overflow-hidden transition-transform duration-200",
+          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        )}
+      >
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08]">
         <AnimatePresence mode="wait">
@@ -176,5 +191,6 @@ export function AppSidebar() {
         </Button>
       </div>
     </motion.aside>
+    </>
   );
 }

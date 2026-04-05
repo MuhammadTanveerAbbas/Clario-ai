@@ -80,7 +80,7 @@ export default function BrandVoicePage() {
   const loadVoices = useCallback(async () => {
     if (!authUser) return;
     setLoading(true);
-    const { data } = await supabase.from("brand_voices").select("*").eq("user_id", authUser.id).order("created_at", { ascending: false });
+    const { data } = await supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, examples, is_active, created_at").eq("user_id", authUser.id).order("created_at", { ascending: false });
     setVoices(data || []);
     setLoading(false);
   }, [authUser]);

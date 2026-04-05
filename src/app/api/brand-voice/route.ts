@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { data: voices, error } = await supabase
+        const { data: voices, error } = await supabase
       .from('brand_voices')
-      .select('*')
+      .select('id, name, tone, vocabulary, personality, description, examples, is_active, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 

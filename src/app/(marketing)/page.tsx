@@ -194,6 +194,7 @@ function ComparisonTable() {
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { user } = useAuth();
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -239,16 +240,16 @@ export default function LandingPage() {
         .nl a{font-size:.82rem;color:var(--g5);text-decoration:none;transition:color .18s;font-weight:400}
         .nl a:hover{color:var(--bk)}
         .np{display:flex;align-items:center;gap:9px}
-        .btn-si{font-size:.82rem;font-weight:500;color:var(--g7);background:none;border:none;cursor:pointer;font-family:var(--sans);padding:7px 14px;border-radius:8px;transition:background .18s}
-        .btn-si:hover{background:var(--g1)}
         .btn-n{background:var(--bk);color:var(--w);padding:9px 20px;border-radius:9px;font-size:.82rem;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);letter-spacing:-.01em;transition:all .2s}
         .btn-n:hover{background:var(--o);transform:translateY(-1px)}
-        .nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--bk)}
-        .mobile-nav{display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);z-index:99;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+        .nav-hamburger{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--bk);flex-shrink:0}
+        .mobile-nav{display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:28px}
         .mobile-nav.open{display:flex}
         .mobile-nav a{font-family:var(--serif);font-size:1.6rem;font-weight:300;color:var(--bk);text-decoration:none;letter-spacing:-.02em}
-        .mobile-nav-btns{display:flex;flex-direction:column;gap:10px;width:200px;margin-top:8px}
-        @media(max-width:680px){.nl{display:none}.nav-hamburger{display:flex}}
+        .mobile-nav-close{position:absolute;top:18px;right:5%;background:none;border:none;cursor:pointer;color:var(--bk);padding:6px}
+        .mobile-nav-cta{background:var(--bk);color:var(--w);padding:13px 36px;border-radius:10px;font-size:.9rem;font-weight:600;border:none;cursor:pointer;font-family:var(--sans);margin-top:8px;transition:background .2s}
+        .mobile-nav-cta:hover{background:var(--o)}
+        @media(max-width:680px){.nl{display:none}.np{display:none}.nav-hamburger{display:flex}}
         .hero{min-height:100vh;padding:96px 5% 72px;display:grid;grid-template-columns:1fr 1.1fr;gap:52px;align-items:center;max-width:1160px;margin:0 auto}
         @media(max-width:860px){.hero{grid-template-columns:1fr;text-align:center;padding-top:88px;gap:36px}}
         @media(max-width:480px){.hero{padding:80px 4% 48px;gap:28px}}
@@ -349,13 +350,35 @@ export default function LandingPage() {
           Clario
         </a>
         <ul className="nl">
+          <li><a href="/#features">Features</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/#compare">Compare</a></li>
         </ul>
         <div className="np">
           <button className="btn-n" onClick={() => window.location.href= user ? "/dashboard" : "/sign-up"}>
             {user ? "Dashboard" : "Get started free"}
           </button>
         </div>
+        <button className="nav-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
       </nav>
+
+      <div className={`mobile-nav${mobileOpen ? " open" : ""}`}>
+        <button className="mobile-nav-close" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <a href="/#features" onClick={() => setMobileOpen(false)}>Features</a>
+        <a href="/pricing" onClick={() => setMobileOpen(false)}>Pricing</a>
+        <a href="/#compare" onClick={() => setMobileOpen(false)}>Compare</a>
+        <button className="mobile-nav-cta" onClick={() => { window.location.href = user ? "/dashboard" : "/sign-up"; setMobileOpen(false); }}>
+          {user ? "Dashboard" : "Get started free"}
+        </button>
+      </div>
 
       <section style={{ background: "var(--w)" }}>
         <div className="hero">

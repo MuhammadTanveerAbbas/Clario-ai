@@ -1,49 +1,69 @@
-# Clario  AI Content Platform for Creators
+<div align="center">
 
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-green?logo=supabase)](https://supabase.com)
-[![Groq](https://img.shields.io/badge/AI-Groq%20Llama-orange)](https://groq.com)
-[![Stripe](https://img.shields.io/badge/Payments-Stripe-purple?logo=stripe)](https://stripe.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+  <img src="public/favicon.svg" alt="Clario Logo" width="80" height="80" />
 
-An AI-powered SaaS platform for content creators  summarize, remix, and chat with AI across YouTube, podcasts, blogs, and newsletters.
+# Clario
 
----
+**AI-powered content platform for creators summarize, remix, and chat your way to better content**
 
-## Features
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://clario.vercel.app)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://typescriptlang.org)
+[![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
+[![Groq](https://img.shields.io/badge/Groq-AI-orange?style=for-the-badge)](https://groq.com)
+[![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=stripe&logoColor=white)](https://stripe.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 
-- **Text Summarizer**  11 AI-powered summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, Brutal Roast, Decisions. Export to `.md` or `.txt`.
-- **YouTube Summarizer**  Paste any YouTube URL and get an instant summary. Supports `watch`, `shorts`, `live`, and `youtu.be` formats with multi-language transcript fallback.
-- **AI Chat**  Conversational AI with persistent session history, brand voice injection, and creator-focused system prompt.
-- **Content Remix Studio**  Turn one piece of content into 10 formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, LinkedIn carousel.
-- **Brand Voice Library**  Create and manage custom brand voices. Activate one at a time  applied across Chat and Remix.
-- **Content Calendar**  Schedule and track content across platforms with a full month view.
-- **Dashboard**  Real-time usage stats, activity charts, and onboarding checklist.
-- **Subscription Tiers**  Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe.
+</div>
 
 ---
 
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript 5 |
-| UI | React 18, Tailwind CSS, ShadCN UI, Radix UI |
-| Charts | Recharts |
-| Animations | Framer Motion |
-| Database | Supabase (PostgreSQL) |
-| Auth | Supabase Auth (PKCE flow) |
-| AI | Groq SDK  Llama 3.3 70B (summarize/remix), Llama 3.1 8B (chat) |
-| Payments | Stripe (Checkout + Billing Portal) |
-| Error Monitoring | Sentry |
-| Analytics | PostHog |
-| Forms | React Hook Form + Zod |
+<div align="center">
+  <img src="public/Clario-Hub.png" alt="Clario Hub" width="100%" />
+</div>
 
 ---
 
-## Getting Started
+Clario is a production-ready SaaS platform built for YouTubers, podcasters, bloggers, and newsletter writers who want to move faster. It turns long-form content into summaries, repurposes it across 10 platforms in one click, and gives creators an AI chat assistant that actually understands their niche. Unlike generic AI tools, Clario is purpose-built for content workflows with brand voice support, a content calendar, and usage-tiered subscriptions.
+
+---
+
+## ✨ Features
+
+- 🧠 **AI Summarizer** 11 summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, Brutal Roast, and Decisions. Export to `.md` or `.txt`.
+- 📺 **YouTube Summarizer** Paste any YouTube URL and get an instant AI summary. Supports `watch`, `shorts`, `live`, and `youtu.be` formats with multi-language transcript fallback.
+- 💬 **AI Chat** Creator-focused conversational AI with persistent session history and brand voice injection.
+- 🎛️ **Content Remix Studio** Turn one piece of content into 10 platform-native formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, and LinkedIn carousel.
+- 🎨 **Brand Voice Library** Create and manage custom brand voices. Activate one at a time and it applies across Chat and Remix automatically.
+- 📅 **Content Calendar** Schedule and track content across platforms with a full month view.
+- 📊 **Dashboard** Real-time usage stats, activity charts, and an onboarding checklist.
+- 💳 **Subscription Tiers** Free (100 req/month) and Pro ($19/month, 1000 req/month) via Stripe Checkout and Billing Portal.
+- 🔒 **Security-first** RLS on all tables, PKCE auth, input sanitization, IP-based rate limiting, and strict CSP headers.
+
+---
+
+## 🛠 Tech Stack
+
+| Category         | Technology                                                |
+| ---------------- | --------------------------------------------------------- |
+| Framework        | Next.js 16 (App Router)                                   |
+| Language         | TypeScript 5                                              |
+| UI               | React 18 + Tailwind CSS v3 + shadcn/ui + Radix UI         |
+| Animations       | Framer Motion                                             |
+| Charts           | Recharts                                                  |
+| Database         | Supabase (PostgreSQL + RLS)                               |
+| Auth             | Supabase Auth (PKCE flow)                                 |
+| AI               | Groq SDK `openai/gpt-oss-120b`, `llama-3.3-70b-versatile` |
+| Payments         | Stripe (Checkout + Billing Portal + Webhooks)             |
+| Error Monitoring | Sentry                                                    |
+| Analytics        | PostHog                                                   |
+| Forms            | React Hook Form + Zod                                     |
+| Package Manager  | pnpm                                                      |
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
@@ -53,65 +73,136 @@ An AI-powered SaaS platform for content creators  summarize, remix, and chat wit
 - Groq API key
 - Stripe account
 
-### Setup
+### Installation
 
 ```bash
-# Clone the repo
+# 1. Clone the repo
 git clone https://github.com/MuhammadTanveerAbbas/Clario-ai.git
 cd Clario-ai
 
-# Install dependencies
+# 2. Install dependencies
 pnpm install
 
-# Copy environment variables
+# 3. Set up environment variables
 cp .env.example .env.local
+# Fill in your values (see Environment Variables section below)
 
-# Fill in .env.local with your credentials (see below), then start the dev server
+# 4. Run the development server
 pnpm dev
+
+# 5. Open in browser
+# http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+---
+
+## 🔐 Environment Variables
+
+Create a `.env.local` file in the root directory (or copy from `.env.example`):
+
+```env
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Supabase  https://supabase.com/dashboard/project/_/settings/api
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# Groq AI  https://console.groq.com/keys
+GROQ_API_KEY=your_groq_api_key
+
+# Stripe  https://dashboard.stripe.com/test/apikeys
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key
+STRIPE_SECRET_KEY=sk_test_your_key
+STRIPE_WEBHOOK_SECRET=whsec_your_secret
+NEXT_PUBLIC_STRIPE_PRICE_ID=price_your_pro_monthly_id
+STRIPE_PRICE_PRO_MONTHLY=price_your_pro_monthly_id
+STRIPE_PRICE_PRO_ANNUAL=price_your_pro_annual_id
+
+# Admin
+ADMIN_EMAIL=your-admin-email@example.com
+
+# Sentry (optional)  https://sentry.io
+SENTRY_DSN=
+NEXT_PUBLIC_SENTRY_DSN=
+SENTRY_AUTH_TOKEN=
+
+# PostHog (optional)  https://posthog.com
+NEXT_PUBLIC_POSTHOG_KEY=
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+
+# Rate Limiting (optional  defaults shown)
+RATE_LIMIT_AUTH_MAX=5
+RATE_LIMIT_AUTH_WINDOW=900
+RATE_LIMIT_API_MAX=100
+RATE_LIMIT_API_WINDOW=60
+```
 
 ---
 
-## Environment Variables
+## 📁 Project Structure
 
-Copy `.env.example` to `.env.local` and fill in the values.
-
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_APP_URL` | Yes | Public URL of the app (e.g. `http://localhost:3000`) |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (server-side only) |
-| `GROQ_API_KEY` | Yes | Groq API key for AI generation |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes | Stripe publishable key |
-| `STRIPE_SECRET_KEY` | Yes | Stripe secret key |
-| `STRIPE_WEBHOOK_SECRET` | Yes | Stripe webhook signing secret |
-| `NEXT_PUBLIC_STRIPE_PRICE_ID` | Yes | Stripe price ID for the Pro monthly plan |
-| `STRIPE_PRICE_PRO_MONTHLY` | Yes | Stripe price ID for Pro monthly (same as above) |
-| `STRIPE_PRICE_PRO_ANNUAL` | No | Stripe price ID for Pro annual plan |
-| `ADMIN_EMAIL` | Yes | Admin email  bypasses usage limits |
-| `SENTRY_DSN` | No | Sentry DSN for server-side error tracking |
-| `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN for client-side error tracking |
-| `SENTRY_AUTH_TOKEN` | No | Sentry auth token for source map uploads |
-| `NEXT_PUBLIC_POSTHOG_KEY` | No | PostHog project API key |
-| `NEXT_PUBLIC_POSTHOG_HOST` | No | PostHog host (default: `https://app.posthog.com`) |
-| `RATE_LIMIT_AUTH_MAX` | No | Max auth attempts per window (default: `5`) |
-| `RATE_LIMIT_AUTH_WINDOW` | No | Auth rate limit window in seconds (default: `900`) |
-| `RATE_LIMIT_API_MAX` | No | Max API requests per window (default: `100`) |
-| `RATE_LIMIT_API_WINDOW` | No | API rate limit window in seconds (default: `60`) |
+```
+clario/
+├── public/                  # Static assets, favicons, manifest
+├── src/
+│   ├── app/
+│   │   ├── (app)/           # Authenticated routes
+│   │   │   ├── dashboard/
+│   │   │   ├── chat/
+│   │   │   ├── summarizer/
+│   │   │   ├── remix/
+│   │   │   ├── brand-voice/
+│   │   │   ├── calendar/
+│   │   │   └── settings/
+│   │   ├── (auth)/          # Auth routes (sign-in, sign-up, forgot-password)
+│   │   ├── (marketing)/     # Public routes (landing, pricing, privacy, terms)
+│   │   └── api/             # API routes (chat, summarize, remix, stripe, etc.)
+│   ├── components/
+│   │   ├── ui/              # shadcn/ui primitives
+│   │   ├── layout/          # Navbar, sidebar
+│   │   ├── marketing/       # Marketing nav and footer
+│   │   └── providers/       # PostHog and client providers
+│   ├── contexts/            # AuthContext, SidebarContext
+│   ├── hooks/               # Custom React hooks
+│   ├── lib/
+│   │   ├── supabase/        # Supabase client + server helpers
+│   │   ├── ai-fallback.ts   # Groq wrapper with error normalization
+│   │   ├── usage-limits.ts  # Tier-based request limits
+│   │   ├── security-config.ts
+│   │   ├── input-validation.ts
+│   │   └── stripe.ts
+│   └── middleware/
+│       └── rate-limit.ts
+├── .env.example
+├── middleware.ts
+├── next.config.ts
+└── package.json
+```
 
 ---
 
-## Database Schema
+## 📦 Available Scripts
 
-Run these migrations in your Supabase SQL editor.
+| Command          | Description               |
+| ---------------- | ------------------------- |
+| `pnpm dev`       | Start development server  |
+| `pnpm build`     | Build for production      |
+| `pnpm start`     | Start production server   |
+| `pnpm lint`      | Run ESLint                |
+| `pnpm typecheck` | Run TypeScript type check |
 
-### Core Tables
+---
+
+## 🗄️ Database Setup
+
+Run these in your Supabase SQL editor.
+
+<details>
+<summary>Core Tables</summary>
 
 ```sql
--- User profiles (auto-created on sign-up via trigger)
 create table profiles (
   id uuid references auth.users on delete cascade primary key,
   email text,
@@ -127,7 +218,6 @@ create table profiles (
   created_at timestamptz default now()
 );
 
--- AI summaries
 create table ai_summaries (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -138,7 +228,6 @@ create table ai_summaries (
   created_at timestamptz default now()
 );
 
--- Chat sessions
 create table chat_sessions (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -147,7 +236,6 @@ create table chat_sessions (
   updated_at timestamptz default now()
 );
 
--- Chat messages
 create table chat_messages (
   id uuid default gen_random_uuid() primary key,
   session_id uuid references chat_sessions(id) on delete cascade,
@@ -157,7 +245,6 @@ create table chat_messages (
   created_at timestamptz default now()
 );
 
--- Brand voices
 create table brand_voices (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -167,7 +254,6 @@ create table brand_voices (
   created_at timestamptz default now()
 );
 
--- Usage tracking (per-request log)
 create table usage_tracking (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -175,7 +261,6 @@ create table usage_tracking (
   created_at timestamptz default now()
 );
 
--- Usage stats (aggregated daily)
 create table usage_stats (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -188,13 +273,11 @@ create table usage_stats (
   unique(user_id, date)
 );
 
--- Stripe webhook idempotency
 create table processed_webhook_events (
   id text primary key,
   processed_at timestamptz default now()
 );
 
--- Feedback
 create table feedback (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete set null,
@@ -203,7 +286,6 @@ create table feedback (
   created_at timestamptz default now()
 );
 
--- Content calendar
 create table calendar_events (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
@@ -217,10 +299,12 @@ create table calendar_events (
 );
 ```
 
-### RLS Policies
+</details>
+
+<details>
+<summary>RLS Policies</summary>
 
 ```sql
--- Enable RLS on all tables
 alter table profiles enable row level security;
 alter table ai_summaries enable row level security;
 alter table chat_sessions enable row level security;
@@ -231,11 +315,8 @@ alter table usage_stats enable row level security;
 alter table feedback enable row level security;
 alter table calendar_events enable row level security;
 
--- Profiles: users can only read/update their own
 create policy "Users can view own profile" on profiles for select using (auth.uid() = id);
 create policy "Users can update own profile" on profiles for update using (auth.uid() = id);
-
--- All other tables: users can only access their own rows
 create policy "Users own their summaries" on ai_summaries for all using (auth.uid() = user_id);
 create policy "Users own their sessions" on chat_sessions for all using (auth.uid() = user_id);
 create policy "Users own their messages" on chat_messages for all using (auth.uid() = user_id);
@@ -246,24 +327,22 @@ create policy "Users own their feedback" on feedback for all using (auth.uid() =
 create policy "Users own their calendar events" on calendar_events for all using (auth.uid() = user_id);
 ```
 
-### Required RPC Functions
+</details>
+
+<details>
+<summary>RPC Functions</summary>
 
 ```sql
--- Track usage and increment monthly counter
 create or replace function track_usage(p_user_id uuid, p_type text, p_count integer default 1)
 returns void language plpgsql security definer as $$
 begin
-  -- Insert into usage_tracking log
   insert into usage_tracking (user_id, type) values (p_user_id, p_type);
-
-  -- Increment monthly counter on profile
   update profiles
   set requests_used_this_month = requests_used_this_month + p_count
   where id = p_user_id;
 end;
 $$;
 
--- Auto-create profile on sign-up
 create or replace function handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
@@ -284,105 +363,83 @@ create trigger on_auth_user_created
   for each row execute procedure handle_new_user();
 ```
 
----
-
-## Architecture Overview
-
-```
-src/
-├── app/
-│   ├── (app)/              # Authenticated routes (dashboard, chat, summarizer, remix, brand-voice, calendar, settings)
-│   ├── (auth)/             # Auth routes (sign-in, sign-up, forgot-password)
-│   ├── (marketing)/        # Public routes (landing, pricing, privacy, terms)
-│   ├── api/                # API routes
-│   │   ├── analytics/      # Usage analytics
-│   │   ├── brand-voice/    # Brand voice CRUD + activate
-│   │   ├── chat/           # AI chat + history
-│   │   ├── creator-modes/  # Creator-specific content modes
-│   │   ├── feedback/       # User feedback
-│   │   ├── insights/       # Cross-content insights
-│   │   ├── remix/          # Content remix (10 formats)
-│   │   ├── stripe/         # Checkout, portal, webhook
-│   │   ├── summarize/      # Text summarizer + export
-│   │   ├── usage/          # Usage stats
-│   │   └── youtube/        # YouTube transcript fetcher
-│   └── auth/callback/      # OAuth callback handler
-├── components/
-│   ├── ui/                 # ShadCN UI primitives
-│   ├── layout/             # App navbar, sidebar
-│   ├── marketing/          # Marketing nav and footer
-│   └── providers/          # PostHog and client providers
-├── contexts/               # AuthContext, SidebarContext
-├── hooks/                  # useSettings, useToast, useAnalyticsInsights, useMobile
-├── lib/
-│   ├── supabase/           # Supabase client, server, and middleware helpers
-│   ├── ai-fallback.ts      # Groq wrapper with error normalization
-│   ├── usage-limits.ts     # Tier-based request limits
-│   ├── security-config.ts  # CSP, cookie, session, and rate limit config
-│   ├── input-validation.ts # Input sanitization
-│   └── stripe.ts           # Stripe checkout + portal helpers
-└── middleware/
-    └── rate-limit.ts       # IP-based rate limiting middleware
-```
-
-### Data Flow
-
-1. User authenticates via Supabase Auth (PKCE flow)
-2. Middleware validates session on every request
-3. API routes check auth, rate limits, and usage limits before calling Groq
-4. AI responses are returned to the client; usage is tracked fire-and-forget
-5. Stripe webhooks update subscription status in Supabase profiles table
+</details>
 
 ---
 
-## Security
-
-- Row Level Security (RLS) on all Supabase tables
-- PKCE authentication flow
-- Input sanitization on all AI endpoints
-- IP-based rate limiting (100 req/min API, 5 req/15min auth)
-- Strict Content Security Policy headers
-- Webhook signature verification (Stripe)
-- `httpOnly` session cookies with `SameSite=Lax`
-- Debug endpoint disabled in production
-
----
-
-## Deployment
+## 🌐 Deployment
 
 ### Vercel (Recommended)
 
-1. Push to GitHub and import the repo in Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MuhammadTanveerAbbas/Clario-ai)
+
+1. Click the button above or import the repo in Vercel
 2. Add all environment variables in the Vercel dashboard
-3. Set `NEXT_PUBLIC_APP_URL` to your production domain (e.g. `https://yourdomain.com`)
+3. Set `NEXT_PUBLIC_APP_URL` to your production domain
 4. Deploy
 
-> AI routes use `maxDuration` of 60–120 seconds. Vercel Pro plan required for functions exceeding 10s.
+> AI routes use `maxDuration` of 60–90 seconds. Vercel Pro plan required for functions exceeding 10s.
 
 ### Stripe Webhook Setup
 
-1. In the Stripe dashboard, create a webhook endpoint pointing to `https://yourdomain.com/api/stripe/webhook`
-2. Subscribe to these events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-3. Copy the webhook signing secret to `STRIPE_WEBHOOK_SECRET`
+1. Create a webhook endpoint in Stripe pointing to `https://yourdomain.com/api/stripe/webhook`
+2. Subscribe to: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+3. Copy the signing secret to `STRIPE_WEBHOOK_SECRET`
 
 ### Supabase Auth Setup
 
-1. In Supabase dashboard → Authentication → URL Configuration:
+1. In Supabase → Authentication → URL Configuration:
    - Set **Site URL** to your production domain
    - Add `https://yourdomain.com/auth/callback` to **Redirect URLs**
-2. To enable Google OAuth: Authentication → Providers → Google → add your OAuth credentials
+2. For Google OAuth: Authentication → Providers → Google → add your OAuth credentials
 
 ---
 
-## Author
+## 🗺 Roadmap
 
-Built by [Muhammad Tanveer Abbas](https://themvpguy.vercel.app/)
+- [x] AI Summarizer with 11 modes
+- [x] YouTube transcript summarization
+- [x] Content Remix Studio (10 formats)
+- [x] Brand Voice Library
+- [x] AI Chat with session history
+- [x] Content Calendar
+- [x] Stripe subscription billing
+- [ ] Team/workspace collaboration
+- [ ] Chrome extension for one-click summarization
+- [ ] Mobile app
 
 ---
 
-## License
+## 🤝 Contributing
 
-MIT
+Contributions are welcome. Feel free to:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+## 👨‍💻 Built by The MVP Guy
+
+<div align="center">
+
+**Muhammad Tanveer Abbas**
+SaaS Developer | Building production-ready MVPs in 14–21 days
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-themvpguy.vercel.app-black?style=for-the-badge)](https://themvpguy.vercel.app)
+[![Twitter](https://img.shields.io/badge/Twitter-@themvpguy-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/themvpguy)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/muhammadtanveerabbas)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-181717?style=for-the-badge&logo=github)](https://github.com/MuhammadTanveerAbbas)
+
+_If this project helped you, please consider giving it a ⭐_
+
+</div>

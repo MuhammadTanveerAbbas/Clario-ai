@@ -1,70 +1,63 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useTheme } from "@/components/ThemeProvider";
+
+const NAV_LINKS = [
+  { href: "/#features", label: "Features" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/sign-in", label: "Sign in" },
+];
 
 export function MktNav() {
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <style>{`
-        .mkt-nav-links{display:flex;gap:20px;list-style:none;margin:0;padding:0}
-        .mkt-nav-cta{background:#0c0a09;color:#fff;padding:8px 18px;border-radius:8px;font-size:.8rem;font-weight:600;border:none;cursor:pointer;font-family:'Geist',system-ui,sans-serif}
-        .mkt-hamburger{display:none;background:none;border:none;cursor:pointer;padding:4px;color:#0c0a09}
-        .mkt-mobile-nav{display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:24px}
-        .mkt-mobile-nav.open{display:flex}
-        .mkt-mobile-nav a{font-family:'Fraunces',Georgia,serif;font-size:1.5rem;font-weight:300;color:#0c0a09;text-decoration:none}
-        @media(max-width:640px){.mkt-nav-links{display:none}.mkt-nav-cta{display:none}.mkt-hamburger{display:flex}}
-      `}</style>
-      <nav style={{
-        position: "sticky", top: 0, zIndex: 100, height: 56,
-        padding: "0 5%", display: "flex", alignItems: "center",
-        justifyContent: "space-between",
-        background: "rgba(255,255,255,.92)", backdropFilter: "blur(18px)",
-        borderBottom: "1px solid #e7e5e4", fontFamily: "'Geist',system-ui,sans-serif",
-      }}>
-        <Link href="/" style={{
-          fontFamily: "'Fraunces',Georgia,serif", fontSize: "1.2rem",
-          color: "#0c0a09", textDecoration: "none", display: "flex",
-          alignItems: "center", gap: 8, fontWeight: 300, letterSpacing: "-.02em",
-        }}>
-          <div style={{
-            width: 24, height: 24, background: "#f97316", borderRadius: 6,
-            display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-          }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          Clario
-        </Link>
-        <ul className="mkt-nav-links">
-          <li><Link href="/#features" style={{ fontSize: ".8rem", color: "#78716c", textDecoration: "none" }}>Features</Link></li>
-          <li><Link href="/pricing" style={{ fontSize: ".8rem", color: "#78716c", textDecoration: "none" }}>Pricing</Link></li>
-          <li><Link href="/sign-in" style={{ fontSize: ".8rem", color: "#78716c", textDecoration: "none" }}>Sign in</Link></li>
-        </ul>
-        <button className="mkt-nav-cta" onClick={() => { window.location.href = "/sign-up"; }}>
-          Get started free
-        </button>
-        <button className="mkt-hamburger" onClick={() => setOpen(true)} aria-label="Open menu">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </nav>
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
 
-      <div className={`mkt-mobile-nav${open ? " open" : ""}`}>
-        <button onClick={() => setOpen(false)} style={{ position: "absolute", top: 16, right: "5%", background: "none", border: "none", cursor: "pointer", color: "#0c0a09" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  return (
+    <nav className="sticky top-0 z-50 h-14 flex items-center justify-between gap-2 px-[5%] bg-white/90 backdrop-blur-lg border-b border-stone-200"
+      style={{ fontFamily: "'Geist',system-ui,sans-serif" }}>
+
+      {/* Logo */}
+      <Link href="/" className="flex items-center gap-2 shrink-0 no-underline"
+        style={{ fontFamily: "'Fraunces',Georgia,serif", fontSize: "1.2rem", color: "#0c0a09", fontWeight: 300, letterSpacing: "-.02em" }}>
+        <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: "#f97316" }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
           </svg>
+        </div>
+        Clario
+      </Link>
+
+      {/* Nav links  always visible on all screen sizes */}
+      <ul className="flex items-center gap-1 list-none m-0 p-0">
+        {NAV_LINKS.map(({ href, label }) => (
+          <li key={href}>
+            <Link href={href}
+              className="text-xs text-stone-500 hover:text-stone-900 hover:bg-stone-100 px-2.5 py-1.5 rounded-md transition-colors whitespace-nowrap no-underline">
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      {/* Right side: theme toggle + CTA */}
+      <div className="flex items-center gap-2 shrink-0">
+        <button
+          onClick={toggleTheme}
+          title={isDark ? "Light mode" : "Dark mode"}
+          className="w-8 h-8 rounded-lg border border-stone-200 bg-stone-50 text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors flex items-center justify-center cursor-pointer"
+        >
+          {isDark
+            ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          }
         </button>
-        <Link href="/#features" onClick={() => setOpen(false)}>Features</Link>
-        <Link href="/pricing" onClick={() => setOpen(false)}>Pricing</Link>
-        <Link href="/sign-in" onClick={() => setOpen(false)}>Sign in</Link>
-        <button onClick={() => { window.location.href = "/sign-up"; setOpen(false); }} style={{ background: "#0c0a09", color: "#fff", padding: "12px 32px", borderRadius: 9, fontSize: ".9rem", fontWeight: 600, border: "none", cursor: "pointer", marginTop: 8 }}>
+        <button
+          onClick={() => { window.location.href = "/sign-up"; }}
+          className="bg-stone-900 text-white text-xs font-semibold px-3.5 py-2 rounded-lg hover:opacity-85 transition-opacity whitespace-nowrap cursor-pointer border-0"
+          style={{ fontFamily: "'Geist',system-ui,sans-serif" }}>
           Get started free
         </button>
       </div>
-    </>
+    </nav>
   );
 }

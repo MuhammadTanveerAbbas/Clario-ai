@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+youtube-transcript-api==1.2.4
+yt-dlp
+groq
+assemblyai
+python-dotenv

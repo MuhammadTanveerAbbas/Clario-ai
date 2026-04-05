@@ -93,7 +93,7 @@ export default function RemixPage() {
   useEffect(() => {
     if (!authUser) return;
     supabase.from("profiles").select("full_name, plan").eq("id", authUser.id).single().then(({ data }) => { if (data) setUserProfile(data); });
-    supabase.from("brand_voices").select("*").eq("user_id", authUser.id).eq("is_active", true).single().then(({ data }) => { if (data) setActiveBrandVoice(data); });
+    supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, is_active, created_at").eq("user_id", authUser.id).eq("is_active", true).single().then(({ data }) => { if (data) setActiveBrandVoice(data); });
   }, [authUser]);
 
   const toggleFormat = (id: string) => {

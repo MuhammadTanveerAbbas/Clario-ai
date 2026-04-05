@@ -209,7 +209,7 @@ export default function Dashboard() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/sign-in");
+    router.push("/");
     addToast("Signed out successfully", "success");
   };
 

@@ -420,7 +420,7 @@ Rules:
             `${prompt}\n\n---\n\nSOURCE CONTENT:\n${content}`,
             systemPrompt,
             {
-              model: 'llama-3.1-8b-instant',
+              model: 'llama-3.3-70b-versatile',
               maxTokens: 1200,
               temperature: 0.65,
             }

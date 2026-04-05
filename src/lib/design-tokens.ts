@@ -45,7 +45,7 @@ export const LIGHT_TOKENS: Record<string, string> = {
 export function applyTokens(theme: 'dark' | 'light') {
   const tokens = theme === 'dark' ? DARK_TOKENS : LIGHT_TOKENS
   const root = document.documentElement
-  root.setAttribute('data-theme', theme)
+  // Apply as inline styles on :root — these have highest specificity and override everything
   Object.entries(tokens).forEach(([key, value]) => {
     root.style.setProperty(key, value)
   })
