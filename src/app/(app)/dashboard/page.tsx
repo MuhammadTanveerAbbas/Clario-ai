@@ -256,7 +256,7 @@ export default function Dashboard() {
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-        .dash-layout{display:flex;min-height:100vh;background:var(--bg)}
+        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
 
         .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
         .sidebar[data-collapsed="true"]{width:60px}
@@ -300,7 +300,7 @@ export default function Dashboard() {
         .avatar-btn:hover{border-color:var(--accent)}
 
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-        .page-content{flex:1;padding:24px;overflow:auto;display:flex;flex-direction:column;gap:20px}
+        .page-content{flex:1;padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
         @media(max-width:768px){.page-content{padding:16px;gap:14px}}
         @media(max-width:480px){.page-content{padding:12px;gap:12px}}
 

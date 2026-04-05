@@ -1,8 +1,0 @@
-packages:
-  - "."
-
-allowBuilds:
-  "@sentry/cli": true
-  core-js: true
-  protobufjs: true
-  sharp: true
