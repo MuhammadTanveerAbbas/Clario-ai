@@ -55,7 +55,7 @@ export default function BrandVoicePage() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, loading: authLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
 
@@ -83,13 +83,14 @@ export default function BrandVoicePage() {
     const { data } = await supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, examples, is_active, created_at").eq("user_id", authUser.id).order("created_at", { ascending: false });
     setVoices(data || []);
     setLoading(false);
-  }, [authUser]);
+  }, [authUser, supabase]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!authUser) return;
     supabase.from("profiles").select("full_name, plan").eq("id", authUser.id).single().then(({ data }) => { if (data) setUserProfile(data); });
     loadVoices();
-  }, [authUser, loadVoices]);
+  }, [authUser, authLoading, loadVoices]);
 
   const openCreate = () => { setEditingVoice(null); setForm({ name: "", tone: "", vocabulary: "", personality: "", description: "" }); setModalOpen(true); };
   const openEdit = (v: BrandVoice) => { setEditingVoice(v); setForm({ name: v.name, tone: v.tone || "", vocabulary: v.vocabulary || "", personality: v.personality || "", description: v.description || "" }); setModalOpen(true); };

@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -53,17 +54,17 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
 
 type SummarizeMode = "executive-brief" | "action-items" | "swot" | "meeting-minutes" | "eli5" | "key-quotes" | "sentiment" | "full-breakdown" | "brutal-roast" | "bullet-summary";
 
-const MODES: { id: SummarizeMode; label: string; color: string; desc: string }[] = [
-  { id: "executive-brief", label: "Executive Brief", color: "#f97316", desc: "High-level overview for busy people" },
-  { id: "action-items", label: "Action Items", color: "#0ea5e9", desc: "Extract every task and next step" },
-  { id: "swot", label: "SWOT Analysis", color: "#8b5cf6", desc: "Strengths, weaknesses, opportunities, threats" },
-  { id: "meeting-minutes", label: "Meeting Minutes", color: "#10b981", desc: "Formal minutes with decisions and owners" },
-  { id: "eli5", label: "ELI5", color: "#f59e0b", desc: "Explain like I'm 5 years old" },
-  { id: "key-quotes", label: "Key Quotes", color: "#ec4899", desc: "Most memorable and shareable quotes" },
-  { id: "sentiment", label: "Sentiment Analysis", color: "#14b8a6", desc: "Emotional tone and audience reaction" },
-  { id: "full-breakdown", label: "Full Breakdown", color: "#6366f1", desc: "Comprehensive section-by-section analysis" },
-  { id: "brutal-roast", label: "Brutal Roast", color: "#ef4444", desc: "Savage honest critique of the content" },
-  { id: "bullet-summary", label: "Bullet Summary", color: "#6b7280", desc: "Clean scannable bullet points" },
+const MODES: { id: SummarizeMode; label: string; desc: string; icon: React.ReactNode }[] = [
+  { id: "executive-brief", label: "Executive Brief", desc: "High-level overview for busy people", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> },
+  { id: "action-items", label: "Action Items", desc: "Extract every task and next step", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> },
+  { id: "swot", label: "SWOT Analysis", desc: "Strengths, weaknesses, opportunities, threats", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg> },
+  { id: "meeting-minutes", label: "Meeting Minutes", desc: "Formal minutes with decisions and owners", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
+  { id: "eli5", label: "ELI5", desc: "Explain like I'm 5 years old", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
+  { id: "key-quotes", label: "Key Quotes", desc: "Most memorable and shareable quotes", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg> },
+  { id: "sentiment", label: "Sentiment Analysis", desc: "Emotional tone and audience reaction", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg> },
+  { id: "full-breakdown", label: "Full Breakdown", desc: "Comprehensive section-by-section analysis", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> },
+  { id: "brutal-roast", label: "Brutal Roast", desc: "Savage honest critique of the content", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> },
+  { id: "bullet-summary", label: "Bullet Summary", desc: "Clean scannable bullet points", icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg> },
 ];
 
 const MODE_API_MAP: Record<SummarizeMode, string> = {
@@ -382,8 +383,8 @@ export default function SummarizerPage() {
               <div className="mode-grid">
                 {MODES.map(m => (
                   <button key={m.id} className={`mode-card${selectedMode === m.id ? " selected" : ""}`} onClick={() => setSelectedMode(m.id)}>
-                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: m.color, marginBottom: 8 }} />
-                    <div style={{ fontSize: ".8rem", fontWeight: 500, color: "var(--text2)", marginBottom: 4 }}>{m.label}</div>
+                    <div style={{ color: selectedMode === m.id ? "var(--accent)" : "var(--text3)", marginBottom: 8, display: "flex", alignItems: "center" }}>{m.icon}</div>
+                    <div style={{ fontSize: ".8rem", fontWeight: 500, color: "var(--text2)", marginBottom: 4, lineHeight: 1.3 }}>{m.label}</div>
                     <div style={{ fontSize: ".7rem", color: "var(--text3)", lineHeight: 1.4 }}>{m.desc}</div>
                     {selectedMode === m.id && <div style={{ position: "absolute", top: 8, right: 8, color: "var(--accent)", fontSize: ".8rem" }}>✓</div>}
                   </button>
@@ -394,7 +395,7 @@ export default function SummarizerPage() {
             {(output || loading) && (
               <div className="card" style={{ animation: "fu .4s ease both" }}>
                 <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontSize: ".72rem", fontWeight: 700, background: MODES.find(m => m.id === selectedMode)?.color || "var(--accent)", color: "#fff", padding: "2px 10px", borderRadius: 100 }}>{MODES.find(m => m.id === selectedMode)?.label}</span>
+                  <span style={{ fontSize: ".72rem", fontWeight: 700, background: "var(--accent)", color: "#fff", padding: "2px 10px", borderRadius: 100 }}>{MODES.find(m => m.id === selectedMode)?.label}</span>
                   {videoMeta?.title ? (
                     <span style={{ fontSize: ".84rem", color: "var(--text2)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {videoMeta.title}{videoMeta.author ? ` · ${videoMeta.author}` : ""}
@@ -453,7 +454,7 @@ export default function SummarizerPage() {
             history.map(item => (
               <button key={item.id} onClick={() => { setOutput(item.output_text); setShowHistory(false); }} style={{ width: "100%", background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 10, padding: 12, marginBottom: 8, cursor: "pointer", textAlign: "left" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <span style={{ fontSize: ".66rem", fontWeight: 700, background: MODES.find(m => m.id === item.mode)?.color || "var(--accent)", color: "#fff", padding: "1px 7px", borderRadius: 100 }}>{item.mode}</span>
+                  <span style={{ fontSize: ".66rem", fontWeight: 700, background: "var(--accent)", color: "#fff", padding: "1px 7px", borderRadius: 100 }}>{item.mode}</span>
                   <span style={{ fontSize: ".7rem", color: "var(--text3)" }}>{new Date(item.created_at).toLocaleDateString()}</span>
                 </div>
                 <div style={{ fontSize: ".78rem", color: "var(--text2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{item.input_text?.slice(0, 60)}...</div>

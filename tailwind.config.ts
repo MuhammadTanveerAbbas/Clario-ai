@@ -9,15 +9,15 @@ export default {
   ],
   theme: {
     fontFamily: {
-      sans: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
-      serif: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
-      mono: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+      sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+      serif: ['Georgia', 'serif'],
+      mono: ['ui-monospace', 'monospace'],
     },
     extend: {
       fontFamily: {
-        body: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
-        headline: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
-        code: ['var(--font-inter)', 'var(--font-poppins)', 'system-ui', 'sans-serif'],
+        body: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        headline: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        code: ['ui-monospace', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

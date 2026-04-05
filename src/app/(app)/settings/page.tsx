@@ -205,7 +205,7 @@ export default function SettingsPage() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, loading: authLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
 
@@ -226,6 +226,7 @@ export default function SettingsPage() {
   const dismissToast = useCallback((id: string) => setToasts(p => p.filter(t => t.id !== id)), []);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!authUser) return;
     (async () => {
       setLoading(true);
@@ -247,7 +248,7 @@ export default function SettingsPage() {
         setLoading(false);
       }
     })();
-  }, [authUser]);
+  }, [authUser, authLoading]);
 
   const handleProfileUpdate = async (name: string) => {
     setProfile(p => p ? { ...p, full_name: name } : p);

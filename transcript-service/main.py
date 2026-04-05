@@ -164,9 +164,34 @@ def summarize(transcript: str, title: str) -> dict:
 # ── Routes ─────────────────────────────────────────────────────────────────────
 
 
+class TranscriptRequest(BaseModel):
+    url: str
+
+
 class AnalyzeRequest(BaseModel):
     url: str
     title: str = "Unknown"
+
+
+@app.post("/api/transcript")
+async def get_transcript_only(req: TranscriptRequest):
+    """Simple endpoint that just returns the transcript text"""
+    try:
+        video_id = extract_video_id(req.url)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail={"reason": "invalid_url", "message": "Not a valid YouTube URL."},
+        )
+
+    transcript, method = get_transcript(video_id)
+
+    return {
+        "video_id": video_id,
+        "transcript": transcript,
+        "method": method,
+        "char_count": len(transcript),
+    }
 
 
 @app.post("/api/analyze")

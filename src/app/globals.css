@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --serif: 'Fraunces', Georgia, serif;
-  --sans: 'Geist', system-ui, sans-serif;
+  --serif: Georgia, serif;
+  --sans: var(--font-inter), system-ui, sans-serif;
   /* Light mode custom tokens (default) */
   --bg: #ffffff;
   --bg2: #fafaf9;
@@ -79,7 +79,7 @@ img, video, svg {
 @layer base {
   html {
     scroll-behavior: smooth;
-    font-family: var(--font-inter), var(--font-poppins), system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
   }
 
   input:focus {
@@ -163,7 +163,7 @@ img, video, svg {
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--sans), var(--font-inter), var(--font-poppins), system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
     background-color: var(--bg) !important;
     color: var(--text) !important;
   }

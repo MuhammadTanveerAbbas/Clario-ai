@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Fraunces, Geist } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -9,33 +9,11 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({ 
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-inter",
   display: "swap",
-  adjustFontFallback: true,
-});
-
-const poppins = Poppins({ 
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-  display: "swap",
-  adjustFontFallback: true,
-});
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  weight: ["300", "400"],
-  style: ["normal", "italic"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-
-const geist = Geist({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-geist",
-  display: "swap",
+  preload: true,
+  fallback: ['system-ui', 'arial'],
 });
 
 
@@ -115,8 +93,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning className={`${inter.variable} ${poppins.variable} ${fraunces.variable} ${geist.variable}`}>
-      <body className="font-body antialiased">
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning className={inter.variable}>
+      <head>
+        <script src="/suppress-extension-errors.js" />
+      </head>
+      <body className="font-sans antialiased">
         <ClientProviders>
           <AuthProvider>
             <SidebarProvider>

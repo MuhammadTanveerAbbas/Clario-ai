@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -71,11 +71,19 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
 }
 
 export default function CalendarPage() {
+  return (
+    <Suspense fallback={null}>
+      <CalendarPageInner />
+    </Suspense>
+  );
+}
+
+function CalendarPageInner() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { user, signOut } = useAuth();
+  const { user, loading: authLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
 
@@ -104,14 +112,16 @@ export default function CalendarPage() {
   const dismissToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) return;
     supabase.from("profiles").select("full_name, plan").eq("id", user.id).single()
       .then(({ data }) => { if (data) setUserProfile(data); });
-  }, [user]);
+  }, [user, authLoading]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (user) fetchEvents();
-  }, [user, year, month]);
+  }, [user, authLoading, year, month]);
 
   useEffect(() => {
     const content = searchParams?.get("content");

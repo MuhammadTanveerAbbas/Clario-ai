@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  optimizeFonts: true,
   webpack: (config) => {
     config.output.chunkLoadTimeout = 120000;
     config.ignoreWarnings = [
