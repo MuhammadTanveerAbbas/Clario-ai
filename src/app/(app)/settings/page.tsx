@@ -27,7 +27,7 @@ interface UserProfile {
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 type TabId = "profile" | "security" | "billing" | "preferences" | "privacy";
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },

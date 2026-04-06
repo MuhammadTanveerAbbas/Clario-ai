@@ -10,7 +10,7 @@ import Link from "next/link";
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 interface BrandVoice { id: string; name: string; tone?: string; personality?: string; is_active: boolean; }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },

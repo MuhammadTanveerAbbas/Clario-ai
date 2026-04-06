@@ -13,7 +13,7 @@ import Link from "next/link";
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 interface HistoryItem { id: string; mode: string; source_type: string; input_text: string; output_text: string; created_at: string; }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },

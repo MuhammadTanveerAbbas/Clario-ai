@@ -43,7 +43,7 @@ interface Toast {
   message: string;
 }
 
-const NAV_ITEMS = [
+const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
