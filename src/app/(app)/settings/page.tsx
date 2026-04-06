@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -204,7 +204,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 export default function SettingsPage() {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const { user: authUser, loading: authLoading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
@@ -248,7 +248,7 @@ export default function SettingsPage() {
         setLoading(false);
       }
     })();
-  }, [authUser, authLoading]);
+  }, [authUser, authLoading, supabase, addToast]);
 
   const handleProfileUpdate = async (name: string) => {
     setProfile(p => p ? { ...p, full_name: name } : p);
