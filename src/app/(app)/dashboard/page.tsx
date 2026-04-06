@@ -49,7 +49,6 @@ const NAV_ITEMS = [
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
   { label: "Remix Studio", href: "/remix", icon: "remix" },
   { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Calendar", href: "/calendar", icon: "cal", badge: "New" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 
@@ -544,7 +543,7 @@ export default function Dashboard() {
                   { label: "Summarize a video", href: "/summarizer", color: "#f97316", bg: "var(--accent-l)", icon: "doc" },
                   { label: "Remix content", href: "/remix", color: "#8b5cf6", bg: isDark ? "#1e1b2e" : "#faf5ff", icon: "remix" },
                   { label: "Open AI chat", href: "/chat", color: "#0ea5e9", bg: isDark ? "#0c1a26" : "#f0f9ff", icon: "chat" },
-                  { label: "Schedule content", href: "/calendar", color: "#10b981", bg: isDark ? "#0c1f18" : "#f0fdf4", icon: "cal" },
+                  { label: "Set brand voice", href: "/brand-voice", color: "#10b981", bg: isDark ? "#0c1f18" : "#f0fdf4", icon: "voice" },
                 ].map(qa => (
                   <Link key={qa.label} href={qa.href} className="qa-card">
                     <div className="qa-icon" style={{ background: qa.bg, color: qa.color }}>
@@ -561,7 +560,7 @@ export default function Dashboard() {
               <div className="card" style={{ padding: "20px", background: "linear-gradient(135deg, var(--accent-l) 0%, var(--bg3) 100%)", borderColor: "var(--accent-m)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
                 <div>
                   <div style={{ fontSize: ".82rem", fontWeight: 700, color: "var(--accent)", marginBottom: 4 }}>⚡ Upgrade to Clario Pro</div>
-                  <div style={{ fontSize: ".78rem", color: "var(--text3)", lineHeight: 1.5 }}>Get 1,000 AI requests, all 10 remix formats, Content Calendar, and Notion export.</div>
+                  <div style={{ fontSize: ".78rem", color: "var(--text3)", lineHeight: 1.5 }}>Get 1,000 AI requests, all 10 remix formats, 3 Brand Voices, and priority support.</div>
                 </div>
                 <button onClick={() => router.push("/pricing")} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, padding: "10px 20px", fontSize: ".8rem", fontWeight: 600, cursor: "pointer", fontFamily: "var(--sans)", whiteSpace: "nowrap", transition: "background .18s" }}>
                   Upgrade  $19/mo →

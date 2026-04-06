@@ -19,7 +19,6 @@ const NAV_ITEMS = [
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
   { label: "Remix Studio", href: "/remix", icon: "remix" },
   { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Calendar", href: "/calendar", icon: "cal", badge: "New" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 

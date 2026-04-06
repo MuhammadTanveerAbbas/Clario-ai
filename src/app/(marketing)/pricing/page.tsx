@@ -32,7 +32,6 @@ const FREE_FEATURES = [
   "YouTube URL → transcript",
   "1 Brand Voice",
   "Content Remix (3 formats)",
-  "Content Calendar",
   "Email support",
 ];
 
@@ -63,7 +62,6 @@ const TABLE_ROWS: [string, string, string][] = [
   ["AI Chat", "✓", "✓"],
   ["Brand Voices", "1", "3"],
   ["Remix formats", "3", "All 10"],
-  ["Content Calendar", "✓", "✓"],
   ["Priority support", "", "✓"],
   ["Early access to features", "", "✓"],
 ];

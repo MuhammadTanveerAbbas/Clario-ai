@@ -33,7 +33,6 @@ const NAV_ITEMS = [
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
   { label: "Remix Studio", href: "/remix", icon: "remix" },
   { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Calendar", href: "/calendar", icon: "cal", badge: "New" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 
@@ -132,7 +131,7 @@ function Sidebar({ user, pathname, sidebarCollapsed, setSidebarCollapsed, mobile
           }
           <span className="sb-btn-lbl">{isDark ? "Light mode" : "Dark mode"}</span>
         </button>
-        <button className="sb-btn" onClick={async () => { await signOut(); router.push("/sign-in"); }} title={sidebarCollapsed ? "Sign out" : undefined}>
+        <button className="sb-btn" onClick={async () => { await signOut(); window.location.href = "/sign-in"; }} title={sidebarCollapsed ? "Sign out" : undefined}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           <span className="sb-btn-lbl">Sign out</span>
         </button>
@@ -243,7 +242,15 @@ export default function SettingsPage() {
           stripe_customer_id: data?.stripe_customer_id,
         });
       } catch {
-        addToast("error", "Failed to load profile.");
+        // Fall back to auth user data so the profile tab still renders
+        setProfile({
+          id: authUser.id,
+          email: authUser.email || "",
+          full_name: authUser.user_metadata?.name || authUser.user_metadata?.full_name || "",
+          plan: "free",
+          subscription_tier: "free",
+          subscription_status: "inactive",
+        });
       } finally {
         setLoading(false);
       }
@@ -257,7 +264,7 @@ export default function SettingsPage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/sign-in");
+    window.location.href = "/sign-in";
   };
 
   const handlePreferencesChange = (prefs: PreferencesData) => {
@@ -335,10 +342,10 @@ export default function SettingsPage() {
               </div>
 
               <div style={{ animation: "fu .25s ease both" }} key={activeTab}>
-                {activeTab === "profile" && profile && (
+                {activeTab === "profile" && (
                   <ProfileSection
-                    profile={{ name: profile.full_name || "", email: profile.email }}
-                    userId={profile.id}
+                    profile={{ name: profile?.full_name || "", email: profile?.email || authUser?.email || "" }}
+                    userId={profile?.id || authUser?.id}
                     onProfileUpdate={handleProfileUpdate}
                   />
                 )}

@@ -263,7 +263,7 @@ function SignInForm() {
               "Summarize any YouTube video in seconds",
               "Turn 1 post into 10 formats instantly",
               "Brand Voice that sounds exactly like you",
-              "Content Calendar to schedule everything",
+              "AI chat trained on creator workflows",
             ]}
           />
         </div>

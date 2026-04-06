@@ -16,7 +16,6 @@ const NAV_ITEMS = [
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
   { label: "Remix Studio", href: "/remix", icon: "remix" },
   { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Calendar", href: "/calendar", icon: "cal", badge: "New" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 
@@ -341,7 +340,6 @@ export default function RemixPage() {
                             <span style={{ fontSize: ".84rem", fontWeight: 500, color: "var(--text2)", flex: 1 }}>{f.label}</span>
                             <button onClick={() => handleCopy(f.id, outputs[f.id])} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>{copiedId === f.id ? "✓" : "Copy"}</button>
                             <button onClick={() => handleDownload(f.label, outputs[f.id])} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>.md</button>
-                            <button onClick={() => router.push(`/calendar?content=${encodeURIComponent(outputs[f.id])}&platform=${encodeURIComponent(f.label)}`)} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>📅</button>
                             <button onClick={() => setCollapsed(prev => { const n = new Set(prev); n.has(f.id) ? n.delete(f.id) : n.add(f.id); return n; })} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: ".8rem" }}>{isCollapsed ? "▼" : "▲"}</button>
                           </div>
                           {!isCollapsed && <div style={{ padding: 16, fontSize: ".86rem", color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{outputs[f.id]}</div>}
@@ -357,7 +355,7 @@ export default function RemixPage() {
                     <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>One input. Ten formats. Instantly.</h2>
                     <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Paste any content and Clario remixes it into every format you need  simultaneously.</p>
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }} className="remix-feature-grid">
-                      {[["All 10 formats at once", "Twitter, LinkedIn, newsletters, and 7 more"], ["Sounds like you", "Applies your Brand Voice automatically"], ["Calendar ready", "Add any output directly to your content calendar"]].map(([title, desc]) => (
+                      {[["All 10 formats at once", "Twitter, LinkedIn, newsletters, and 7 more"], ["Sounds like you", "Applies your Brand Voice automatically"], ["Copy & export", "Download as .md or copy to paste anywhere"]].map(([title, desc]) => (
                         <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>
                           <div style={{ fontSize: ".84rem", fontWeight: 600, color: "var(--text2)", marginBottom: 4 }}>{title}</div>
                           <div style={{ fontSize: ".76rem", color: "var(--text3)" }}>{desc}</div>

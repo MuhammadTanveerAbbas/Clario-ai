@@ -150,7 +150,6 @@ function ComparisonTable() {
     { feature: "Content Remix Studio (10 formats)", clario: true, jasper: true, copy: true, notion: false },
     { feature: "Brand Voice Library", clario: true, jasper: true, copy: true, notion: false },
     { feature: "AI Chat with creator prompts", clario: true, jasper: false, copy: false, notion: true },
-    { feature: "Content Calendar", clario: true, jasper: false, copy: false, notion: true },
     { feature: "Free tier available", clario: true, jasper: false, copy: true, notion: true },
     { feature: "Starting price", clario: "$0", jasper: "$49/mo", copy: "$49/mo", notion: "$10/mo" },
   ];
@@ -403,7 +402,7 @@ export default function LandingPage() {
       <div className="mq-w">
         <div className="mq-t">
           {[...Array(2)].map((_, ri) =>
-            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","Content Calendar","YouTube → Summary","10 Summary Modes","Twitter Threads","LinkedIn Posts","Email Newsletters","Podcast Notes","Blog Outlines"].map((item, i) => (
+            ["Text Summarizer","Content Remix Studio","Brand Voice Library","AI Chat","YouTube → Summary","10 Summary Modes","Twitter Threads","LinkedIn Posts","Email Newsletters","Podcast Notes","Blog Outlines"].map((item, i) => (
               <span key={`${ri}-${i}`} className="mq-i"><span className="mq-d" />{item}</span>
             ))
           )}
@@ -600,7 +599,7 @@ export default function LandingPage() {
               <p className="p-desc">For creators who ship content every day.</p>
               <hr className="p-div" />
               <ul className="p-list">
-                {["1,000 AI requests/month","All 10 Remix formats","Content Calendar","Export to Notion / Google Docs","AI Image Prompt Generator","3 Brand Voices","Priority support","Early access to features"].map(item => (
+                {["1,000 AI requests/month","All 10 Remix formats","Export to Notion / Google Docs","AI Image Prompt Generator","3 Brand Voices","Priority support","Early access to features"].map(item => (
                   <li key={item} className="p-item"><span className="p-ck">✓</span>{item}</li>
                 ))}
               </ul>
