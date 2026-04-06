@@ -227,7 +227,7 @@ export default function SettingsPage() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!authUser) return;
+    if (!authUser) { setLoading(false); return; }
     (async () => {
       setLoading(true);
       try {

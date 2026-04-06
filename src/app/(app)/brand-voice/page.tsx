@@ -87,10 +87,10 @@ export default function BrandVoicePage() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!authUser) return;
+    if (!authUser) { setLoading(false); return; }
     supabase.from("profiles").select("full_name, plan").eq("id", authUser.id).single().then(({ data }) => { if (data) setUserProfile(data); });
     loadVoices();
-  }, [authUser, authLoading, loadVoices]);
+  }, [authUser, authLoading, loadVoices, supabase]);
 
   const openCreate = () => { setEditingVoice(null); setForm({ name: "", tone: "", vocabulary: "", personality: "", description: "" }); setModalOpen(true); };
   const openEdit = (v: BrandVoice) => { setEditingVoice(v); setForm({ name: v.name, tone: v.tone || "", vocabulary: v.vocabulary || "", personality: v.personality || "", description: v.description || "" }); setModalOpen(true); };
