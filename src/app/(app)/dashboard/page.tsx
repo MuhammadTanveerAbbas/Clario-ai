@@ -453,34 +453,6 @@ export default function Dashboard() {
           </div>
 
           <div className="page-content">
-            {!onboardingDone && !loading && (
-              <div className="card" style={{ padding: "18px 20px" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                  <div>
-                    <div style={{ fontSize: ".82rem", fontWeight: 600, color: "var(--text2)", marginBottom: 3 }}>Get started with Clario</div>
-                    <div style={{ fontSize: ".72rem", color: "var(--text3)" }}>{onboardingProgress}/4 completed</div>
-                  </div>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {ONBOARDING.map((o, i) => (
-                      <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: o.done ? "var(--accent)" : "var(--border2)" }} />
-                    ))}
-                  </div>
-                </div>
-                <div style={{ marginBottom: 10 }}>
-                  <div className="usage-bar"><div className="usage-fill" style={{ width: `${(onboardingProgress / 4) * 100}%` }} /></div>
-                </div>
-                {ONBOARDING.map(step => (
-                  <Link key={step.key} href={step.href} className="ob-step" onClick={() => completeOnboardingStep(step.key)}>
-                    <div className={`ob-check${step.done ? " done" : ""}`}>
-                      {step.done && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                    </div>
-                    <span className={`ob-label${step.done ? " done" : ""}`}>{step.label}</span>
-                    {!step.done && <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--text3)" strokeWidth="1.8" strokeLinecap="round" style={{ marginLeft: "auto" }}><path d="M5 12h14M12 5l7 7-7 7"/></svg>}
-                  </Link>
-                ))}
-              </div>
-            )}
-
             <div className="stat-grid">
               {loading ? [...Array(4)].map((_, i) => (
                 <div key={i} className="card stat-card"><Skeleton h={14} w="60%" /><Skeleton h={36} w="40%" r={6} /><Skeleton h={12} w="50%" /></div>
