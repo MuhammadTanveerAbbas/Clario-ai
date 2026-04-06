@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
@@ -17,6 +17,11 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
   const [name, setName] = useState(profile.name);
   const { toast } = useToast();
   const supabase = createClient();
+
+  // Update name when profile changes
+  useEffect(() => {
+    setName(profile.name);
+  }, [profile.name]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();

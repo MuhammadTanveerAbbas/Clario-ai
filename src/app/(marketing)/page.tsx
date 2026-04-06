@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 function TypingEffect() {
   const phrases = ["Twitter thread","LinkedIn post","email newsletter","YouTube description","podcast show notes","blog outline","Instagram caption"];
@@ -194,12 +195,20 @@ function ComparisonTable() {
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const router = useRouter();
+  
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+    router.refresh();
+  };
 
   const remixFormats = [
     { icon: "𝕏", label: "Twitter Thread", preview: "🧵 I just analyzed 500 creator accounts.\n\nHere's the ONE system that separates 7-figure creators from everyone else:\n\n1/ They don't create MORE content.\n   They repurpose SMARTER.\n\n2/ One video → 10 formats → 10x the reach\n   Same effort. Exponential results." },
@@ -354,9 +363,20 @@ export default function LandingPage() {
           <li><a href="/#compare">Compare</a></li>
         </ul>
         <div className="np">
-          <button className="btn-n" onClick={() => window.location.href= user ? "/dashboard" : "/sign-up"}>
-            {user ? "Dashboard" : "Get started free"}
-          </button>
+          {user ? (
+            <>
+              <button className="btn-n" style={{ background: "transparent", color: "var(--g7)", border: "1.5px solid var(--g2)" }} onClick={() => window.location.href="/dashboard"}>
+                Dashboard
+              </button>
+              <button className="btn-n" onClick={handleSignOut}>
+                Sign out
+              </button>
+            </>
+          ) : (
+            <button className="btn-n" onClick={() => window.location.href="/sign-up"}>
+              Get started free
+            </button>
+          )}
         </div>
         <button className="nav-hamburger" onClick={() => setMobileOpen(true)} aria-label="Open menu">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -374,9 +394,20 @@ export default function LandingPage() {
         <a href="/#features" onClick={() => setMobileOpen(false)}>Features</a>
         <a href="/pricing" onClick={() => setMobileOpen(false)}>Pricing</a>
         <a href="/#compare" onClick={() => setMobileOpen(false)}>Compare</a>
-        <button className="mobile-nav-cta" onClick={() => { window.location.href = user ? "/dashboard" : "/sign-up"; setMobileOpen(false); }}>
-          {user ? "Dashboard" : "Get started free"}
-        </button>
+        {user ? (
+          <>
+            <button className="mobile-nav-cta" style={{ background: "transparent", color: "var(--bk)", border: "1.5px solid var(--g2)" }} onClick={() => { window.location.href = "/dashboard"; setMobileOpen(false); }}>
+              Dashboard
+            </button>
+            <button className="mobile-nav-cta" onClick={() => { handleSignOut(); setMobileOpen(false); }}>
+              Sign out
+            </button>
+          </>
+        ) : (
+          <button className="mobile-nav-cta" onClick={() => { window.location.href = "/sign-up"; setMobileOpen(false); }}>
+            Get started free
+          </button>
+        )}
       </div>
 
       <section style={{ background: "var(--w)" }}>
