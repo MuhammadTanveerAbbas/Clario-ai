@@ -3,8 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --serif: Georgia, serif;
+  --serif: var(--font-fraunces), Georgia, serif;
   --sans: var(--font-inter), system-ui, sans-serif;
+  --geist: var(--font-inter), system-ui, sans-serif;
   /* Light mode custom tokens (default) */
   --bg: #ffffff;
   --bg2: #fafaf9;

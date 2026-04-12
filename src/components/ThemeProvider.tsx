@@ -1,55 +1,65 @@
-'use client'
+"use client";
 
-import { createContext, useContext, useEffect } from 'react'
-import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from 'next-themes'
-import { applyTokens } from '@/lib/design-tokens'
+import { createContext, useContext, useEffect, useState } from "react";
+import { applyTokens } from "@/lib/design-tokens";
 
-type Theme = 'dark' | 'light'
+type Theme = "dark" | "light";
 
 interface ThemeContextType {
-  theme: Theme
-  toggleTheme: () => void
-  setTheme: (theme: Theme) => void
+  theme: Theme;
+  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
 }
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+export const ThemeContext = createContext<ThemeContextType | undefined>(
+  undefined,
+);
 
-// Inner component — has access to next-themes context
-function ThemeBridge({ children }: { children: React.ReactNode }) {
-  const { resolvedTheme, setTheme: setNextTheme } = useNextTheme()
-  const theme: Theme = resolvedTheme === 'light' ? 'light' : 'dark'
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>("dark");
 
-  // Sync custom CSS vars whenever resolved theme changes
   useEffect(() => {
-    applyTokens(theme)
-  }, [theme])
+    // Get theme from localStorage or default to 'dark'
+    const storedTheme = localStorage.getItem("clario-theme") as Theme | null;
+    const initialTheme = storedTheme || "dark";
 
-  const setTheme = (t: Theme) => setNextTheme(t)
-  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
+    if (initialTheme !== theme) {
+      setThemeState(initialTheme);
+    }
+
+    // Apply theme to document
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(initialTheme);
+    applyTokens(initialTheme);
+  }, []);
+
+  useEffect(() => {
+    // Apply theme changes
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+    applyTokens(theme);
+  }, [theme]);
+
+  const setTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+    localStorage.setItem("clario-theme", newTheme);
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>
       {children}
     </ThemeContext.Provider>
-  )
-}
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <NextThemesProvider
-      attribute="class"
-      defaultTheme="dark"
-      enableSystem={false}
-      storageKey="clario-theme"
-    >
-      <ThemeBridge>{children}</ThemeBridge>
-    </NextThemesProvider>
-  )
+  );
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
+  const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error("useTheme must be used within a ThemeProvider");
   }
-  return context
+  return context;
 }

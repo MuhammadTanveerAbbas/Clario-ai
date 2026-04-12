@@ -7,10 +7,25 @@ import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
 import Link from "next/link";
 
-interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
-interface BrandVoice { id: string; name: string; tone?: string; personality?: string; is_active: boolean; }
+interface Toast {
+  id: string;
+  type: "success" | "error" | "info";
+  message: string;
+}
+interface BrandVoice {
+  id: string;
+  name: string;
+  tone?: string;
+  personality?: string;
+  is_active: boolean;
+}
 
-const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[] = [
+const NAV_ITEMS: {
+  label: string;
+  href: string;
+  icon: string;
+  badge?: string;
+}[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
@@ -20,30 +35,150 @@ const NAV_ITEMS: { label: string; href: string; icon: string; badge?: string }[]
 ];
 
 function NavIcon({ type }: { type: string }) {
-  const p = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const p = {
+    width: 16,
+    height: 16,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
   switch (type) {
-    case "grid": return <svg {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
-    case "chat": return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
-    case "doc": return <svg {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>;
-    case "remix": return <svg {...p}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>;
-    case "voice": return <svg {...p}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
-    case "cal": return <svg {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-    case "settings": return <svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
-    default: return null;
+    case "grid":
+      return (
+        <svg {...p}>
+          <rect x="3" y="3" width="7" height="7" />
+          <rect x="14" y="3" width="7" height="7" />
+          <rect x="3" y="14" width="7" height="7" />
+          <rect x="14" y="14" width="7" height="7" />
+        </svg>
+      );
+    case "chat":
+      return (
+        <svg {...p}>
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      );
+    case "doc":
+      return (
+        <svg {...p}>
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14,2 14,8 20,8" />
+        </svg>
+      );
+    case "remix":
+      return (
+        <svg {...p}>
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+        </svg>
+      );
+    case "voice":
+      return (
+        <svg {...p}>
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      );
+    case "cal":
+      return (
+        <svg {...p}>
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      );
+    case "settings":
+      return (
+        <svg {...p}>
+          <circle cx="12" cy="12" r="3" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+        </svg>
+      );
+    default:
+      return null;
   }
 }
 
-function Skeleton({ w = "100%", h = 16, r = 8 }: { w?: string | number; h?: number; r?: number }) {
-  return <div style={{ width: w, height: h, borderRadius: r, background: "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)", backgroundSize: "200% 100%", animation: "shimmer 1.5s infinite" }} />;
+function Skeleton({
+  w = "100%",
+  h = 16,
+  r = 8,
+}: {
+  w?: string | number;
+  h?: number;
+  r?: number;
+}) {
+  return (
+    <div
+      style={{
+        width: w,
+        height: h,
+        borderRadius: r,
+        background:
+          "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)",
+        backgroundSize: "200% 100%",
+        animation: "shimmer 1.5s infinite",
+      }}
+    />
+  );
 }
 
-function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
+function ToastContainer({
+  toasts,
+  dismiss,
+}: {
+  toasts: Toast[];
+  dismiss: (id: string) => void;
+}) {
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000, display: "flex", flexDirection: "column", gap: 8 }}>
-      {toasts.map(t => (
-        <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--card)", border: "1px solid var(--border)", borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--accent)"}`, borderRadius: 10, padding: "11px 14px", boxShadow: "0 8px 24px rgba(0,0,0,.2)", animation: "fu .3s ease both", maxWidth: 320, fontFamily: "var(--sans)" }}>
-          <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>{t.message}</span>
-          <button onClick={() => dismiss(t.id)} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: ".75rem", padding: 0 }}>✕</button>
+    <div
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+      }}
+    >
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--accent)"}`,
+            borderRadius: 10,
+            padding: "11px 14px",
+            boxShadow: "0 8px 24px rgba(0,0,0,.2)",
+            animation: "fu .3s ease both",
+            maxWidth: 320,
+            fontFamily: "var(--sans)",
+          }}
+        >
+          <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>
+            {t.message}
+          </span>
+          <button
+            onClick={() => dismiss(t.id)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--text3)",
+              cursor: "pointer",
+              fontSize: ".75rem",
+              padding: 0,
+            }}
+          >
+            ✕
+          </button>
         </div>
       ))}
     </div>
@@ -51,17 +186,110 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
 }
 
 const FORMATS = [
-  { id: "twitter", label: "Twitter Thread", color: "#f97316" },
-  { id: "linkedin", label: "LinkedIn Post", color: "#0ea5e9" },
-  { id: "email", label: "Email Newsletter", color: "#8b5cf6" },
-  { id: "youtube", label: "YouTube Description", color: "#10b981" },
-  { id: "podcast", label: "Podcast Show Notes", color: "#f43f5e" },
-  { id: "blog", label: "Blog Outline", color: "#f59e0b" },
-  { id: "instagram", label: "Instagram Caption", color: "#ec4899" },
-  { id: "shorts", label: "Short-form Script", color: "#6366f1" },
-  { id: "quotes", label: "Quote Graphics", color: "#14b8a6" },
-  { id: "carousel", label: "LinkedIn Carousel", color: "#84cc16" },
+  { id: "twitter", label: "Twitter Thread" },
+  { id: "linkedin", label: "LinkedIn Post" },
+  { id: "email", label: "Email Newsletter" },
+  { id: "youtube", label: "YouTube Description" },
+  { id: "podcast", label: "Podcast Show Notes" },
+  { id: "blog", label: "Blog Outline" },
+  { id: "instagram", label: "Instagram Caption" },
+  { id: "shorts", label: "Short-form Script" },
+  { id: "quotes", label: "Quote Graphics" },
+  { id: "carousel", label: "LinkedIn Carousel" },
 ];
+
+function FormatIcon({ type }: { type: string }) {
+  const p = {
+    width: 14,
+    height: 14,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "1.8",
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  switch (type) {
+    case "twitter":
+      return (
+        <svg {...p}>
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.657l-5.207-6.807-5.974 6.807H2.882l7.432-8.504-8.17-10.996h6.82l4.71 6.23 5.886-6.23zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+        </svg>
+      );
+    case "linkedin":
+      return (
+        <svg {...p}>
+          <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z" />
+          <circle cx="4" cy="4" r="2" />
+        </svg>
+      );
+    case "email":
+      return (
+        <svg {...p}>
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
+        </svg>
+      );
+    case "youtube":
+      return (
+        <svg {...p}>
+          <path d="M22.54 6.42a2.78 2.78 0 00-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 00-1.94 2A29 29 0 001 11.75a29 29 0 00.46 5.33A2.78 2.78 0 003.4 19.54c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 001.94-2 29 29 0 00.46-5.33 29 29 0 00-.46-5.33z" />
+          <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+        </svg>
+      );
+    case "podcast":
+      return (
+        <svg {...p}>
+          <circle cx="12" cy="14" r="1" />
+          <path d="M16.67 16.67a5 5 0 00-9.34 0" />
+          <path d="M20.83 20.83a9 9 0 00-17.66 0" />
+          <path d="M12 2a7 7 0 017 7" />
+        </svg>
+      );
+    case "blog":
+      return (
+        <svg {...p}>
+          <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+        </svg>
+      );
+    case "instagram":
+      return (
+        <svg {...p}>
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+          <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
+          <circle cx="17.5" cy="6.5" r="1.5" />
+        </svg>
+      );
+    case "shorts":
+      return (
+        <svg {...p}>
+          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+          <line x1="7" y1="2" x2="7" y2="22" />
+          <line x1="17" y1="2" x2="17" y2="22" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <line x1="2" y1="7" x2="22" y2="7" />
+          <line x1="2" y1="17" x2="22" y2="17" />
+        </svg>
+      );
+    case "quotes":
+      return (
+        <svg {...p}>
+          <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
+          <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
+        </svg>
+      );
+    case "carousel":
+      return (
+        <svg {...p}>
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <line x1="9" y1="3" x2="9" y2="21" />
+          <line x1="15" y1="3" x2="15" y2="21" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
 
 export default function RemixPage() {
   const pathname = usePathname();
@@ -69,42 +297,91 @@ export default function RemixPage() {
   const supabase = createClient();
   const { user: authUser, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
+  const {
+    collapsed: sidebarCollapsed,
+    setCollapsed: setSidebarCollapsed,
+    mobileOpen: mobileSidebarOpen,
+    setMobileOpen: setMobileSidebarOpen,
+  } = useSidebar();
 
   const [content, setContent] = useState("");
-  const [selectedFormats, setSelectedFormats] = useState<Set<string>>(new Set(FORMATS.map(f => f.id)));
+  const [selectedFormats, setSelectedFormats] = useState<Set<string>>(
+    new Set(FORMATS.map((f) => f.id)),
+  );
   const [outputs, setOutputs] = useState<Record<string, string>>({});
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
-  const [activeBrandVoice, setActiveBrandVoice] = useState<BrandVoice | null>(null);
+  const [activeBrandVoice, setActiveBrandVoice] = useState<BrandVoice | null>(
+    null,
+  );
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [userProfile, setUserProfile] = useState<{ full_name?: string; plan?: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{
+    full_name?: string;
+    plan?: string;
+  } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const isDark = theme === "dark";
 
-  const addToast = useCallback((message: string, type: Toast["type"] = "info") => {
-    const id = Math.random().toString(36).slice(2);
-    setToasts(prev => [...prev, { id, type, message }]);
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
-  }, []);
-  const dismissToast = useCallback((id: string) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+  const addToast = useCallback(
+    (message: string, type: Toast["type"] = "info") => {
+      const id = Math.random().toString(36).slice(2);
+      setToasts((prev) => [...prev, { id, type, message }]);
+      setTimeout(
+        () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+        4000,
+      );
+    },
+    [],
+  );
+  const dismissToast = useCallback(
+    (id: string) => setToasts((prev) => prev.filter((t) => t.id !== id)),
+    [],
+  );
 
   useEffect(() => {
     if (!authUser) return;
-    supabase.from("profiles").select("full_name, plan").eq("id", authUser.id).single().then(({ data }) => { if (data) setUserProfile(data); });
-    supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, is_active, created_at").eq("user_id", authUser.id).eq("is_active", true).single().then(({ data }) => { if (data) setActiveBrandVoice(data); });
+    supabase
+      .from("profiles")
+      .select("full_name, plan")
+      .eq("id", authUser.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setUserProfile(data);
+      });
+    supabase
+      .from("brand_voices")
+      .select(
+        "id, name, tone, vocabulary, personality, description, is_active, created_at",
+      )
+      .eq("user_id", authUser.id)
+      .eq("is_active", true)
+      .single()
+      .then(({ data }) => {
+        if (data) setActiveBrandVoice(data);
+      });
   }, [authUser]);
 
   const toggleFormat = (id: string) => {
-    setSelectedFormats(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+    setSelectedFormats((prev) => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
   };
 
   const handleGenerate = async () => {
-    if (!content.trim() || content.trim().length < 50) { addToast("Content must be at least 50 characters", "error"); return; }
+    if (!content.trim() || content.trim().length < 50) {
+      addToast("Content must be at least 50 characters", "error");
+      return;
+    }
     setLoading(true);
     setOutputs({});
     try {
-      const res = await fetch("/api/remix", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: content.trim() }) });
+      const res = await fetch("/api/remix", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: content.trim() }),
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Request failed" }));
         throw new Error(err.error || "Request failed");
@@ -112,11 +389,13 @@ export default function RemixPage() {
       const data = await res.json();
       const results: Record<string, string> = data.results || {};
       // Reveal outputs one by one
-      const keys = FORMATS.filter(f => selectedFormats.has(f.id)).map(f => f.id);
+      const keys = FORMATS.filter((f) => selectedFormats.has(f.id)).map(
+        (f) => f.id,
+      );
       for (const key of keys) {
         if (results[key]) {
-          setOutputs(prev => ({ ...prev, [key]: results[key] }));
-          await new Promise(r => setTimeout(r, 150));
+          setOutputs((prev) => ({ ...prev, [key]: results[key] }));
+          await new Promise((r) => setTimeout(r, 150));
         }
       }
       addToast("Remix complete!", "success");
@@ -129,12 +408,18 @@ export default function RemixPage() {
   };
 
   const handleCopy = (id: string, text: string) => {
-    navigator.clipboard.writeText(text).then(() => { setCopiedId(id); setTimeout(() => setCopiedId(null), 2000); });
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
   };
 
   const handleDownload = (label: string, text: string) => {
     const blob = new Blob([text], { type: "text/plain" });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `${label.replace(/\s+/g, "-").toLowerCase()}.md`; a.click();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${label.replace(/\s+/g, "-").toLowerCase()}.md`;
+    a.click();
   };
 
   const hasOutputs = Object.keys(outputs).length > 0;
@@ -186,16 +471,20 @@ export default function RemixPage() {
         .page-content{flex:1;padding:24px;overflow:auto}
         @media(max-width:768px){.page-content{padding:16px}}
         @media(max-width:480px){.page-content{padding:12px}}
-        .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden}
+        .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:visible}
+        textarea{color:var(--text)!important;background:var(--bg2)!important;border:1px solid var(--border)!important}
         .remix-layout{display:flex;gap:20px;min-height:0}
         .remix-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
         .remix-right{width:280px;flex-shrink:0}
         @media(max-width:900px){.remix-right{display:none}}
-        .format-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+        .format-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+        @media(max-width:1024px){.format-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:768px){.format-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:480px){.format-grid{grid-template-columns:1fr}}
-        .format-card{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px;position:relative}
-        .format-card:hover{background:var(--bg3)}
-        .output-card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:hidden;animation:fu .3s ease both}
+        .format-card{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+        .format-card:hover{background:var(--bg3);border-color:var(--border)}
+        .format-card.selected{border-color:var(--accent);background:var(--accent-l)}
+        .format-card.selected svg{color:var(--accent)}
         @media(max-width:768px){
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
           .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
@@ -210,43 +499,170 @@ export default function RemixPage() {
       `}</style>
 
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
+      {mobileSidebarOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
 
       <div className="dash-layout">
-        <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
+        <aside
+          className="sidebar"
+          data-collapsed={String(sidebarCollapsed)}
+          data-mobile-open={String(mobileSidebarOpen)}
+        >
           <div className="sb-logo">
-            <div className="sb-logo-mark"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>
+            <div className="sb-logo-mark">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
             <span className="sb-logo-text">Clario</span>
           </div>
           <nav className="sb-nav">
-            {NAV_ITEMS.map(item => (
-              <Link key={item.href} href={item.href} className={`sb-item${pathname === item.href ? " active" : ""}`}>
-                <NavIcon type={item.icon} /><span className="sb-lbl">{item.label}</span>
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sb-item${pathname === item.href ? " active" : ""}`}
+              >
+                <NavIcon type={item.icon} />
+                <span className="sb-lbl">{item.label}</span>
                 {item.badge && <span className="sb-badge">{item.badge}</span>}
               </Link>
             ))}
           </nav>
           <div className="sb-bottom">
-            {userProfile?.plan === "free" && <button className="sb-upgrade" onClick={() => router.push("/pricing")}>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              Upgrade to Pro
-            </button>}
-            <button className="sb-btn" onClick={toggleTheme} title={sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}>
-              {isDark
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            {userProfile?.plan === "free" && (
+              <button
+                className="sb-upgrade"
+                onClick={() => router.push("/pricing")}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                Upgrade to Pro
+              </button>
+            )}
+            <button
+              className="sb-btn"
+              onClick={toggleTheme}
+              title={
+                sidebarCollapsed
+                  ? isDark
+                    ? "Light mode"
+                    : "Dark mode"
+                  : undefined
               }
-              <span className="sb-btn-lbl">{isDark ? "Light mode" : "Dark mode"}</span>
+            >
+              {isDark ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+              <span className="sb-btn-lbl">
+                {isDark ? "Light mode" : "Dark mode"}
+              </span>
             </button>
-            <button className="sb-btn" onClick={async () => { await signOut(); router.push("/sign-in"); }} title={sidebarCollapsed ? "Sign out" : undefined}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <button
+              className="sb-btn"
+              onClick={async () => {
+                await signOut();
+                router.push("/sign-in");
+              }}
+              title={sidebarCollapsed ? "Sign out" : undefined}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
               <span className="sb-btn-lbl">Sign out</span>
             </button>
-            <button className="sb-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-              {sidebarCollapsed
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-              }
+            <button
+              className="sb-btn"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              )}
               <span className="sb-btn-lbl">Collapse</span>
             </button>
           </div>
@@ -254,40 +670,242 @@ export default function RemixPage() {
 
         <div className="main-area">
           <div className="topbar">
-            <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <button
+              className="topbar-btn topbar-hamburger"
+              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
             </button>
-            <span style={{ fontFamily: "var(--serif)", fontSize: "1.1rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>Remix Studio</span>
+            <span
+              style={{
+                fontFamily: "var(--serif)",
+                fontSize: "1.1rem",
+                fontWeight: 300,
+                color: "var(--text)",
+                flex: 1,
+              }}
+            >
+              Remix Studio
+            </span>
             <button className="topbar-btn" onClick={toggleTheme}>
-              {isDark ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
+              {isDark ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
             </button>
           </div>
 
           <div className="page-content">
-            <div style={{ animation: "fu .4s ease both", marginBottom: 20 }}>
-              <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", marginBottom: 6 }}>Remix Studio</h1>
-              <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>One input. Ten formats. Instantly.</p>
+            <div
+              style={{
+                animation: "fu .4s ease both",
+                marginBottom: 20,
+                textAlign: "center",
+              }}
+            >
+              <h1
+                style={{
+                  fontFamily: "var(--serif)",
+                  fontSize: "1.8rem",
+                  fontWeight: 300,
+                  color: "var(--text)",
+                  marginBottom: 6,
+                }}
+              >
+                Remix Studio
+              </h1>
+              <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>
+                One input. Ten formats. Instantly.
+              </p>
             </div>
 
             <div className="remix-layout">
               <div className="remix-left">
-                <div className="card" style={{ animation: "fu .4s .05s ease both" }}>
+                <div
+                  className="card"
+                  style={{ animation: "fu .4s .05s ease both" }}
+                >
                   <div style={{ padding: 16 }}>
                     {activeBrandVoice && (
                       <div style={{ marginBottom: 8 }}>
-                        <span style={{ fontSize: ".74rem", background: "var(--accent-l)", color: "var(--accent)", border: "1px solid var(--accent-m)", borderRadius: 100, padding: "2px 10px" }}>🎨 {activeBrandVoice.name} active</span>
+                        <span
+                          style={{
+                            fontSize: ".74rem",
+                            background: "var(--accent-l)",
+                            color: "var(--accent)",
+                            border: "1px solid var(--accent-m)",
+                            borderRadius: 100,
+                            padding: "2px 10px",
+                          }}
+                        >
+                          🎨 {activeBrandVoice.name} active
+                        </span>
                       </div>
                     )}
-                    <textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Paste your content here  a video transcript, blog post, newsletter, or any text..." style={{ width: "100%", minHeight: 160, background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontFamily: "var(--sans)", fontSize: ".88rem", color: "var(--text)", resize: "vertical", outline: "none", lineHeight: 1.6 }} />
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, flexWrap: "wrap", gap: 8 }}>
+                    <textarea
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      placeholder="Paste your content here  a video transcript, blog post, newsletter, or any text..."
+                      style={{
+                        width: "100%",
+                        height: 160,
+                        background: "var(--bg2)",
+                        border: "1px solid var(--border)",
+                        borderRadius: 10,
+                        padding: "12px 14px",
+                        fontFamily: "var(--sans)",
+                        fontSize: ".88rem",
+                        color: "var(--text)",
+                        resize: "none",
+                        outline: "none",
+                        lineHeight: 1.6,
+                        marginBottom: 12,
+                        display: "block",
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginTop: 0,
+                        flexWrap: "wrap",
+                        gap: 8,
+                      }}
+                    >
                       <div style={{ display: "flex", gap: 12 }}>
-                        <button onClick={() => setSelectedFormats(new Set(FORMATS.map(f => f.id)))} style={{ background: "none", border: "none", color: "var(--text3)", fontSize: ".76rem", cursor: "pointer" }}>Select All</button>
-                        <button onClick={() => setSelectedFormats(new Set())} style={{ background: "none", border: "none", color: "var(--text3)", fontSize: ".76rem", cursor: "pointer" }}>Deselect All</button>
+                        <button
+                          onClick={() =>
+                            setSelectedFormats(
+                              new Set(FORMATS.map((f) => f.id)),
+                            )
+                          }
+                          style={{
+                            background: "var(--bg3)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 8,
+                            padding: "7px 14px",
+                            fontSize: ".78rem",
+                            fontWeight: 500,
+                            color: "var(--text2)",
+                            cursor: "pointer",
+                            transition: "all .15s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "var(--bg2)";
+                            e.currentTarget.style.borderColor =
+                              "var(--border2)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "var(--bg3)";
+                            e.currentTarget.style.borderColor = "var(--border)";
+                          }}
+                        >
+                          Select All
+                        </button>
+                        <button
+                          onClick={() => setSelectedFormats(new Set())}
+                          style={{
+                            background: "var(--bg3)",
+                            border: "1px solid var(--border)",
+                            borderRadius: 8,
+                            padding: "7px 14px",
+                            fontSize: ".78rem",
+                            fontWeight: 500,
+                            color: "var(--text2)",
+                            cursor: "pointer",
+                            transition: "all .15s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "var(--bg2)";
+                            e.currentTarget.style.borderColor =
+                              "var(--border2)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "var(--bg3)";
+                            e.currentTarget.style.borderColor = "var(--border)";
+                          }}
+                        >
+                          Deselect All
+                        </button>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <span style={{ fontSize: ".72rem", color: "var(--text3)" }}>{selectedFormats.size} formats selected</span>
-                        <button onClick={handleGenerate} disabled={loading || !content.trim() || selectedFormats.size === 0} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, padding: "8px 18px", fontFamily: "var(--sans)", fontSize: ".84rem", fontWeight: 600, cursor: loading || !content.trim() || selectedFormats.size === 0 ? "not-allowed" : "pointer", opacity: loading || !content.trim() || selectedFormats.size === 0 ? .5 : 1 }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 10,
+                        }}
+                      >
+                        <span
+                          style={{ fontSize: ".72rem", color: "var(--text3)" }}
+                        >
+                          {selectedFormats.size} formats selected
+                        </span>
+                        <button
+                          onClick={handleGenerate}
+                          disabled={
+                            loading ||
+                            !content.trim() ||
+                            selectedFormats.size === 0
+                          }
+                          style={{
+                            background: "var(--accent)",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 9,
+                            padding: "8px 18px",
+                            fontFamily: "var(--sans)",
+                            fontSize: ".84rem",
+                            fontWeight: 600,
+                            cursor:
+                              loading ||
+                              !content.trim() ||
+                              selectedFormats.size === 0
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity:
+                              loading ||
+                              !content.trim() ||
+                              selectedFormats.size === 0
+                                ? 0.5
+                                : 1,
+                          }}
+                        >
                           {loading ? "Generating..." : "Generate Selected"}
                         </button>
                       </div>
@@ -296,17 +914,39 @@ export default function RemixPage() {
                 </div>
 
                 <div style={{ animation: "fu .4s .1s ease both" }}>
-                  <p style={{ fontSize: ".78rem", fontWeight: 600, color: "var(--text3)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>Formats</p>
+                  <p
+                    style={{
+                      fontSize: ".78rem",
+                      fontWeight: 600,
+                      color: "var(--text3)",
+                      marginBottom: 10,
+                      textTransform: "uppercase",
+                      letterSpacing: ".06em",
+                    }}
+                  >
+                    Formats
+                  </p>
                   <div className="format-grid">
-                    {FORMATS.map(f => {
+                    {FORMATS.map((f) => {
                       const sel = selectedFormats.has(f.id);
                       return (
-                        <button key={f.id} className="format-card" onClick={() => toggleFormat(f.id)} style={{ borderColor: sel ? f.color : "var(--card-b)", background: sel ? `${f.color}15` : "var(--card)", opacity: sel ? 1 : .6 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: f.color, flexShrink: 0 }} />
-                          <span style={{ fontSize: ".8rem", fontWeight: 500, color: "var(--text2)", flex: 1, textAlign: "left" }}>{f.label}</span>
-                          <div style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${sel ? f.color : "var(--border)"}`, background: sel ? f.color : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            {sel && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
-                          </div>
+                        <button
+                          key={f.id}
+                          className={`format-card${sel ? " selected" : ""}`}
+                          onClick={() => toggleFormat(f.id)}
+                        >
+                          <FormatIcon type={f.id} />
+                          <span
+                            style={{
+                              fontSize: ".7rem",
+                              fontWeight: 500,
+                              color: "var(--text2)",
+                              flex: 1,
+                              textAlign: "center",
+                            }}
+                          >
+                            {f.label}
+                          </span>
                         </button>
                       );
                     })}
@@ -314,71 +954,265 @@ export default function RemixPage() {
                 </div>
 
                 {loading && !hasOutputs && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {FORMATS.filter(f => selectedFormats.has(f.id)).map(f => (
-                      <div key={f.id} className="card" style={{ padding: 16 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                          <div style={{ width: 8, height: 8, borderRadius: "50%", background: f.color }} />
-                          <span style={{ fontSize: ".82rem", fontWeight: 500, color: "var(--text2)" }}>{f.label}</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {FORMATS.filter((f) => selectedFormats.has(f.id)).map(
+                      (f) => (
+                        <div
+                          key={f.id}
+                          className="card"
+                          style={{ padding: 16 }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              marginBottom: 12,
+                            }}
+                          >
+                            <FormatIcon type={f.id} />
+                            <span
+                              style={{
+                                fontSize: ".82rem",
+                                fontWeight: 500,
+                                color: "var(--text2)",
+                              }}
+                            >
+                              {f.label}
+                            </span>
+                          </div>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: 8,
+                            }}
+                          >
+                            {[100, 90, 95].map((w, i) => (
+                              <Skeleton key={i} w={`${w}%`} h={12} />
+                            ))}
+                          </div>
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                          {[100, 90, 95].map((w, i) => <Skeleton key={i} w={`${w}%`} h={12} />)}
-                        </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 )}
 
                 {hasOutputs && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                    {FORMATS.filter(f => outputs[f.id]).map(f => {
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {FORMATS.filter((f) => outputs[f.id]).map((f) => {
                       const isCollapsed = collapsed.has(f.id);
                       return (
                         <div key={f.id} className="output-card">
-                          <div style={{ padding: "12px 16px", borderBottom: isCollapsed ? "none" : "1px solid var(--card-b)", display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                            <div style={{ width: 8, height: 8, borderRadius: "50%", background: f.color, flexShrink: 0 }} />
-                            <span style={{ fontSize: ".84rem", fontWeight: 500, color: "var(--text2)", flex: 1 }}>{f.label}</span>
-                            <button onClick={() => handleCopy(f.id, outputs[f.id])} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>{copiedId === f.id ? "✓" : "Copy"}</button>
-                            <button onClick={() => handleDownload(f.label, outputs[f.id])} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 10px", fontSize: ".72rem", color: "var(--text2)", cursor: "pointer" }}>.md</button>
-                            <button onClick={() => setCollapsed(prev => { const n = new Set(prev); n.has(f.id) ? n.delete(f.id) : n.add(f.id); return n; })} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: ".8rem" }}>{isCollapsed ? "▼" : "▲"}</button>
+                          <div
+                            style={{
+                              padding: "12px 16px",
+                              borderBottom: isCollapsed
+                                ? "none"
+                                : "1px solid var(--card-b)",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 8,
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            <FormatIcon type={f.id} />
+                            <span
+                              style={{
+                                fontSize: ".84rem",
+                                fontWeight: 500,
+                                color: "var(--text2)",
+                                flex: 1,
+                              }}
+                            >
+                              {f.label}
+                            </span>
+                            <button
+                              onClick={() => handleCopy(f.id, outputs[f.id])}
+                              style={{
+                                background: "var(--bg3)",
+                                border: "1px solid var(--border)",
+                                borderRadius: 8,
+                                padding: "7px 14px",
+                                fontSize: ".78rem",
+                                fontWeight: 500,
+                                color: "var(--text2)",
+                                cursor: "pointer",
+                                transition: "all .15s",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "var(--bg2)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "var(--bg3)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border)";
+                              }}
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+                                <rect
+                                  x="8"
+                                  y="2"
+                                  width="8"
+                                  height="4"
+                                  rx="1"
+                                  ry="1"
+                                />
+                              </svg>
+                              {copiedId === f.id ? "✓ Copied" : "Copy"}
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDownload(f.label, outputs[f.id])
+                              }
+                              style={{
+                                background: "var(--bg3)",
+                                border: "1px solid var(--border)",
+                                borderRadius: 8,
+                                padding: "7px 14px",
+                                fontSize: ".78rem",
+                                fontWeight: 500,
+                                color: "var(--text2)",
+                                cursor: "pointer",
+                                transition: "all .15s",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 6,
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "var(--bg2)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "var(--bg3)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border)";
+                              }}
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="7 10 12 15 17 10" />
+                                <line x1="12" y1="15" x2="12" y2="3" />
+                              </svg>
+                              .md
+                            </button>
+                            <button
+                              onClick={() =>
+                                setCollapsed((prev) => {
+                                  const n = new Set(prev);
+                                  n.has(f.id) ? n.delete(f.id) : n.add(f.id);
+                                  return n;
+                                })
+                              }
+                              style={{
+                                background: "var(--bg3)",
+                                border: "1px solid var(--border)",
+                                borderRadius: 8,
+                                padding: "7px 14px",
+                                fontSize: ".78rem",
+                                fontWeight: 500,
+                                color: "var(--text2)",
+                                cursor: "pointer",
+                                transition: "all .15s",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.background = "var(--bg2)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border2)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.background = "var(--bg3)";
+                                e.currentTarget.style.borderColor =
+                                  "var(--border)";
+                              }}
+                            >
+                              {isCollapsed ? (
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <polyline points="6 9 12 15 18 9" />
+                                </svg>
+                              ) : (
+                                <svg
+                                  width="14"
+                                  height="14"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <polyline points="18 15 12 9 6 15" />
+                                </svg>
+                              )}
+                            </button>
                           </div>
-                          {!isCollapsed && <div style={{ padding: 16, fontSize: ".86rem", color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{outputs[f.id]}</div>}
+                          {!isCollapsed && (
+                            <div
+                              style={{
+                                padding: 16,
+                                fontSize: ".86rem",
+                                color: "var(--text)",
+                                lineHeight: 1.7,
+                                whiteSpace: "pre-wrap",
+                              }}
+                            >
+                              {outputs[f.id]}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
                   </div>
                 )}
-
-                {!hasOutputs && !loading && (
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", animation: "fu .4s .15s ease both" }}>
-                    <div style={{ fontSize: "3rem", marginBottom: 12 }}>🔄</div>
-                    <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.4rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>One input. Ten formats. Instantly.</h2>
-                    <p style={{ fontSize: ".88rem", color: "var(--text3)", textAlign: "center", maxWidth: 400, marginBottom: 24 }}>Paste any content and Clario remixes it into every format you need  simultaneously.</p>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, width: "100%", maxWidth: 560 }} className="remix-feature-grid">
-                      {[["All 10 formats at once", "Twitter, LinkedIn, newsletters, and 7 more"], ["Sounds like you", "Applies your Brand Voice automatically"], ["Copy & export", "Download as .md or copy to paste anywhere"]].map(([title, desc]) => (
-                        <div key={title} style={{ background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 12, padding: 16 }}>
-                          <div style={{ fontSize: ".84rem", fontWeight: 600, color: "var(--text2)", marginBottom: 4 }}>{title}</div>
-                          <div style={{ fontSize: ".76rem", color: "var(--text3)" }}>{desc}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="remix-right">
-                <div className="card" style={{ position: "sticky", top: 80 }}>
-                  <div style={{ padding: "12px 14px", borderBottom: "1px solid var(--card-b)" }}>
-                    <span style={{ fontSize: ".78rem", fontWeight: 600, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".06em" }}>Recent Remixes</span>
-                  </div>
-                  <div style={{ padding: 12 }}>
-                    <div style={{ textAlign: "center", padding: "24px 12px", color: "var(--text3)", fontSize: ".8rem" }}>
-                      <div style={{ fontSize: "1.5rem", marginBottom: 8 }}>🔄</div>
-                      <div style={{ fontWeight: 500, color: "var(--text2)", marginBottom: 4 }}>No remixes yet</div>
-                      <div>Your history appears here after your first remix</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

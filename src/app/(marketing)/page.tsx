@@ -55,7 +55,7 @@ function HeroMockup() {
   }, []);
   const tabs = ["Summarizer","Remix","Chat","Brand Voice"];
   return (
-    <div style={{ background: "#fff", borderRadius: 18, border: "1px solid #e7e5e4", boxShadow: "0 28px 72px rgba(0,0,0,.11)", overflow: "hidden", width: "100%", maxWidth: 600, fontFamily: "Geist, system-ui, sans-serif" }}>
+    <div style={{ background: "#fff", borderRadius: 18, border: "1px solid #e7e5e4", boxShadow: "0 28px 72px rgba(0,0,0,.11)", overflow: "hidden", width: "100%", maxWidth: 600, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
       <div style={{ background: "#fafaf9", borderBottom: "1px solid #e7e5e4", padding: "10px 14px", display: "flex", alignItems: "center", gap: 9 }}>
         <div style={{ display: "flex", gap: 5 }}>{["#ff5f57","#ffbd2e","#28c840"].map(c => <div key={c} style={{ width: 10, height: 10, borderRadius: "50%", background: c }} />)}</div>
         <div style={{ flex: 1, background: "#eeede8", borderRadius: 5, padding: "3px 10px", fontSize: 11, color: "#a8a29e", textAlign: "center" }}>app.clario.ai/summarizer</div>
@@ -77,7 +77,7 @@ function HeroMockup() {
         <div style={{ flex: 1, padding: 16, display: "flex", flexDirection: "column", gap: 10, overflow: "hidden" }}>
           <div style={{ display: "flex", gap: 2, background: "#f2f1ef", borderRadius: 8, padding: 3 }}>
             {tabs.map((t, i) => (
-              <button key={t} onClick={() => setTab(i)} style={{ flex: 1, padding: "4px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 10, fontWeight: 600, background: tab === i ? "#fff" : "transparent", color: tab === i ? "#0c0a09" : "#a8a29e", boxShadow: tab === i ? "0 1px 4px rgba(0,0,0,.08)" : "none", transition: "all .18s", fontFamily: "Geist, system-ui, sans-serif" }}>{t}</button>
+              <button key={t} onClick={() => setTab(i)} style={{ flex: 1, padding: "4px 0", borderRadius: 6, border: "none", cursor: "pointer", fontSize: 10, fontWeight: 600, background: tab === i ? "#fff" : "transparent", color: tab === i ? "#0c0a09" : "#a8a29e", boxShadow: tab === i ? "0 1px 4px rgba(0,0,0,.08)" : "none", transition: "all .18s", fontFamily: "var(--font-inter), system-ui, sans-serif" }}>{t}</button>
             ))}
           </div>
           {tab === 0 && <>
@@ -163,7 +163,7 @@ function ComparisonTable() {
   };
   return (
     <div ref={ref} style={{ opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(24px)", transition: "all .6s ease", overflowX: "auto" }}>
-      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontFamily: "Geist, system-ui, sans-serif" }}>
+      <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, fontFamily: "var(--font-inter), system-ui, sans-serif" }}>
         <thead>
           <tr>
             <th style={{ textAlign: "left", padding: "12px 16px", fontSize: ".78rem", fontWeight: 600, color: "#78716c", borderBottom: "1.5px solid #e7e5e4", width: "36%" }}>Feature</th>
@@ -230,9 +230,8 @@ export default function LandingPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Geist:wght@300;400;500;600&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--o:#f97316;--ol:#fff7ed;--om:#fed7aa;--bk:#0c0a09;--g7:#44403c;--g5:#78716c;--g4:#a8a29e;--g2:#e7e5e4;--g1:#f5f5f4;--g0:#fafaf9;--w:#fff;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
+        :root{--o:#f97316;--ol:#fff7ed;--om:#fed7aa;--bk:#0c0a09;--g7:#44403c;--g5:#78716c;--g4:#a8a29e;--g2:#e7e5e4;--g1:#f5f5f4;--g0:#fafaf9;--w:#fff;--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
         html{scroll-behavior:smooth}
         body{font-family:var(--sans);background:var(--w);color:var(--bk);-webkit-font-smoothing:antialiased;overflow-x:hidden}
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}

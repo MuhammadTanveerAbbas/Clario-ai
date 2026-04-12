@@ -10,7 +10,6 @@ import {
   MessageSquare,
   FileText,
   Settings,
-  CreditCard,
   LogOut,
   User,
   ChevronDown,
@@ -61,7 +60,8 @@ export function AppNavbar() {
       .toUpperCase()
       .slice(0, 2) || "U";
 
-  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  const userAvatar =
+    user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 
   return (
     <>
@@ -72,16 +72,16 @@ export function AppNavbar() {
           "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
           scrolled
             ? "bg-black/80 backdrop-blur-xl border-b border-white/[0.08]"
-            : "bg-transparent"
+            : "bg-transparent",
         )}
       >
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/dashboard" className="flex items-center gap-2.5 group">
-              <Image 
-                src="/favicon.svg" 
-                alt="Clario Logo" 
-                width={32} 
+              <Image
+                src="/favicon.svg"
+                alt="Clario Logo"
+                width={32}
                 height={32}
                 className="group-hover:scale-105 transition-transform"
               />
@@ -93,7 +93,8 @@ export function AppNavbar() {
             <div className="hidden md:flex items-center gap-1">
               {navigation.map((item) => {
                 const isActive =
-                  pathname === item.href || pathname?.startsWith(item.href + "/");
+                  pathname === item.href ||
+                  pathname?.startsWith(item.href + "/");
                 const Icon = item.icon;
 
                 return (
@@ -105,17 +106,26 @@ export function AppNavbar() {
                         "flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 relative",
                         isActive
                           ? "text-white"
-                          : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+                          : "text-white/50 hover:text-white hover:bg-white/[0.04]",
                       )}
                     >
                       {isActive && (
                         <motion.div
                           layoutId="navbar-indicator"
                           className="absolute inset-0 bg-[#4169E1]/20 rounded-lg border border-[#4169E1]/40"
-                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          transition={{
+                            type: "spring",
+                            bounce: 0.2,
+                            duration: 0.6,
+                          }}
                         />
                       )}
-                      <Icon className={cn("h-4 w-4 relative z-10", isActive ? "text-[#4169E1]" : "")} />
+                      <Icon
+                        className={cn(
+                          "h-4 w-4 relative z-10",
+                          isActive ? "text-[#4169E1]" : "",
+                        )}
+                      />
                       <span className="text-sm font-medium relative z-10">
                         {item.name}
                       </span>
@@ -135,15 +145,6 @@ export function AppNavbar() {
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <Link href="/pricing" className="hidden lg:block">
-                <Button
-                  size="sm"
-                  className="bg-[#4169E1] text-white hover:bg-[#3159D1] font-medium shadow-lg shadow-[#4169E1]/30 h-9 px-4"
-                >
-                  <CreditCard className="h-3.5 w-3.5 mr-2" />
-                  Upgrade
-                </Button>
-              </Link>
 
               <Link href="/settings" className="hidden md:block">
                 <Button
@@ -151,7 +152,8 @@ export function AppNavbar() {
                   size="icon"
                   className={cn(
                     "text-white/50 hover:text-white hover:bg-white/[0.04] h-9 w-9",
-                    pathname === "/settings" && "text-[#4169E1] bg-[#4169E1]/10"
+                    pathname === "/settings" &&
+                      "text-[#4169E1] bg-[#4169E1]/10",
                   )}
                 >
                   <Settings className="h-4 w-4" />
@@ -205,13 +207,12 @@ export function AppNavbar() {
                   </>
                 )}
               </div>
-
             </div>
           </div>
         </div>
-        
+
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-gray-600 to-transparent opacity-50"></div>
-        <motion.div 
+        <motion.div
           className="absolute bottom-0 left-0 w-32 h-[2px] bg-gradient-to-r from-[#4169E1]/0 via-[#4169E1] to-[#4169E1]/0 blur-sm"
           animate={{
             x: [0, 1200, 0],
@@ -249,14 +250,17 @@ export function AppNavbar() {
                   <p className="text-sm font-medium text-white truncate">
                     {user?.user_metadata?.name || "User"}
                   </p>
-                  <p className="text-xs text-white/40 truncate">{user?.email}</p>
+                  <p className="text-xs text-white/40 truncate">
+                    {user?.email}
+                  </p>
                 </div>
               </div>
 
               <div className="space-y-1">
                 {navigation.map((item) => {
                   const isActive =
-                    pathname === item.href || pathname?.startsWith(item.href + "/");
+                    pathname === item.href ||
+                    pathname?.startsWith(item.href + "/");
                   const Icon = item.icon;
 
                   return (
@@ -270,10 +274,15 @@ export function AppNavbar() {
                           "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
                           isActive
                             ? "bg-[#4169E1]/10 text-white"
-                            : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+                            : "text-white/50 hover:text-white hover:bg-white/[0.04]",
                         )}
                       >
-                        <Icon className={cn("h-5 w-5", isActive && "text-[#4169E1]")} />
+                        <Icon
+                          className={cn(
+                            "h-5 w-5",
+                            isActive && "text-[#4169E1]",
+                          )}
+                        />
                         <span className="text-sm font-medium">{item.name}</span>
                       </div>
                     </Link>
@@ -287,18 +296,16 @@ export function AppNavbar() {
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-all",
                     pathname === "/settings"
                       ? "bg-[#4169E1]/10 text-white"
-                      : "text-white/50 hover:text-white hover:bg-white/[0.04]"
+                      : "text-white/50 hover:text-white hover:bg-white/[0.04]",
                   )}
                 >
-                  <Settings className={cn("h-5 w-5", pathname === "/settings" && "text-[#4169E1]")} />
+                  <Settings
+                    className={cn(
+                      "h-5 w-5",
+                      pathname === "/settings" && "text-[#4169E1]",
+                    )}
+                  />
                   <span className="text-sm font-medium">Settings</span>
-                </div>
-              </Link>
-
-              <Link href="/pricing" onClick={() => setMobileOpen(false)}>
-                <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-[#4169E1] text-white hover:bg-[#3159D1] transition-all">
-                  <CreditCard className="h-5 w-5" />
-                  <span className="text-sm font-medium">Upgrade to Pro</span>
                 </div>
               </Link>
 
