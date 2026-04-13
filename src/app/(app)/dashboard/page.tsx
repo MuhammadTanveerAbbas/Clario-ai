@@ -717,7 +717,14 @@ export default function Dashboard() {
               {loading ? (
                 <Skeleton w={200} h={18} />
               ) : (
-                `Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${user?.full_name?.split(" ")[0] || "there"} 👋`
+                <>
+                  <span className="topbar-greeting-full">
+                    {`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${user?.full_name?.split(" ")[0] || "there"} 👋`}
+                  </span>
+                  <span className="topbar-greeting-short">
+                    {`${user?.full_name?.split(" ")[0] || "Hey"} 👋`}
+                  </span>
+                </>
               )}
             </div>
             <button

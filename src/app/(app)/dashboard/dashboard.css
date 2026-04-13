@@ -290,6 +290,9 @@
   color: var(--text);
   letter-spacing: -0.02em;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .topbar-btn {
@@ -304,6 +307,7 @@
   color: var(--text3);
   cursor: pointer;
   transition: all 0.15s;
+  flex-shrink: 0;
 }
 
 .topbar-btn:hover {
@@ -321,9 +325,56 @@
     display: flex;
   }
   .topbar {
-    padding: 0 12px;
-    gap: 8px;
+    height: 48px;
+    padding: 0 10px;
+    gap: 6px;
   }
+  .topbar-title {
+    font-size: 0.9rem;
+  }
+  .topbar-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+  }
+  .topbar-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  .topbar-greeting-full {
+    display: none;
+  }
+  .topbar-greeting-short {
+    display: inline;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    height: 44px;
+    padding: 0 8px;
+    gap: 5px;
+  }
+  .topbar-title {
+    font-size: 0.82rem;
+  }
+  .topbar-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+  }
+  .topbar-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.topbar-greeting-short {
+  display: none;
+}
+
+.topbar-greeting-full {
+  display: inline;
 }
 
 .avatar-btn {
@@ -345,6 +396,22 @@
 
 .avatar-btn:hover {
   border-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .avatar-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.6rem;
+  }
 }
 
 .main-area {
