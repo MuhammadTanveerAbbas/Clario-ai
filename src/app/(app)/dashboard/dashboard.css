@@ -201,7 +201,6 @@
   overflow: hidden;
 }
 
-/* ── Topbar ── */
 .topbar {
   height: 56px;
   border-bottom: 1px solid var(--border);
@@ -209,7 +208,9 @@
   align-items: center;
   padding: 0 20px;
   gap: 12px;
-  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 40;
@@ -314,12 +315,22 @@
 
 /* ── Section label ── */
 .section-label {
-  font-size: 0.68rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: var(--text3);
+  color: var(--text2);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  margin-bottom: 10px;
+  letter-spacing: 0.1em;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
 }
 
 .section-block {
@@ -335,23 +346,23 @@
 }
 
 .overview-card {
-  background: var(--card);
+  background: linear-gradient(145deg, var(--card), var(--bg2));
   border: 1px solid var(--card-b);
-  border-left: 3px solid var(--ov-color, var(--accent));
-  border-radius: 14px;
-  padding: 18px 20px;
+  border-left: 4px solid var(--ov-color, var(--accent));
+  border-radius: 16px;
+  padding: 22px 24px;
   display: flex;
   flex-direction: column;
   gap: 8px;
   text-decoration: none;
-  transition:
-    transform 0.18s,
-    box-shadow 0.18s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
 }
 
 .overview-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
+  border-color: var(--border2);
 }
 
 .ov-top {
@@ -403,20 +414,18 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  border-radius: 12px;
+  padding: 16px 20px;
+  border-radius: 16px;
   border: 1px solid var(--card-b);
-  background: var(--card);
+  background: linear-gradient(145deg, var(--card), var(--bg2));
   text-decoration: none;
-  transition:
-    transform 0.18s,
-    box-shadow 0.18s,
-    border-color 0.18s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
 }
 
 .launch-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.08);
   border-color: var(--border2);
 }
 
@@ -475,13 +484,15 @@
 
 /* ── Usage meter ── */
 .usage-meter-card {
-  background: var(--card);
+  background: linear-gradient(145deg, var(--card), var(--bg2));
   border: 1px solid var(--card-b);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+  height: 100%;
 }
 
 .um-top {
@@ -614,13 +625,15 @@
 }
 
 .analytics-mini-card {
-  background: var(--card);
+  background: linear-gradient(145deg, var(--card), var(--bg2));
   border: 1px solid var(--card-b);
-  border-radius: 14px;
-  padding: 16px;
+  border-radius: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+  height: 100%;
 }
 
 .analytics-mini-header {

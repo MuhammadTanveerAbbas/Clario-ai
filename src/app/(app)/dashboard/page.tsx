@@ -592,10 +592,10 @@ export default function Dashboard() {
             </div>
 
             {/* ── Usage + Analytics ── */}
-            <div className="dash-bottom-grid">
-              {/* Usage Meter */}
-              <div className="section-block">
-                <div className="section-label">Monthly Usage</div>
+            <div className="section-block">
+              <div className="section-label">Usage & Analytics</div>
+              <div className="dash-bottom-grid">
+                {/* Usage Meter */}
                 <div className="usage-meter-card">
                   <div className="um-top">
                     <div className="um-left">
@@ -685,11 +685,8 @@ export default function Dashboard() {
                     </Link>
                   )}
                 </div>
-              </div>
 
-              {/* Analytics Charts */}
-              <div className="section-block">
-                <div className="section-label">Analytics</div>
+                {/* Analytics Charts */}
                 {loading ? (
                   <div className="analytics-mini-grid">
                     <div className="analytics-mini-skeleton" />
