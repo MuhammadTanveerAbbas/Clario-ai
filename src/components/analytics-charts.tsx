@@ -73,7 +73,7 @@ export function AnalyticsCharts() {
           <h4 className="analytics-mini-title">Activity</h4>
           <span className="analytics-mini-badge">{data.totalUsage} total</span>
         </div>
-        <ResponsiveContainer width="100%" height={120}>
+        <ResponsiveContainer width="100%" height={230}>
           <LineChart
             data={last7Days}
             margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
@@ -120,7 +120,7 @@ export function AnalyticsCharts() {
         <div className="analytics-mini-header">
           <h4 className="analytics-mini-title">Features</h4>
         </div>
-        <ResponsiveContainer width="100%" height={120}>
+        <ResponsiveContainer width="100%" height={230}>
           <BarChart
             data={topFeatures}
             margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
