@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
-import posthog from 'posthog-js'
 
 interface AuthContextType {
   user: User | null
@@ -25,12 +24,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-      
-      if (session?.user) {
-        posthog.identify(session.user.id, {
-          email: session.user.email,
-        })
-      }
     })
 
     const {
@@ -39,16 +32,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-
-      if (event === 'SIGNED_IN' && session?.user) {
-        posthog.identify(session.user.id, {
-          email: session.user.email,
-        })
-        posthog.capture('user_signed_in')
-      } else if (event === 'SIGNED_OUT') {
-        posthog.capture('user_signed_out')
-        posthog.reset()
-      }
 
       // Proactively refresh the session every 30 minutes to prevent expiry mid-session
       if (session) {
@@ -68,11 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase])
 
   const signOut = async () => {
-    posthog.capture('user_signed_out')
     await supabase.auth.signOut()
     setUser(null)
     setSession(null)
-    posthog.reset()
   }
 
   return (

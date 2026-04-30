@@ -49,17 +49,15 @@ Clario is a production-ready SaaS platform built for YouTubers, podcasters, blog
 | ---------------- | --------------------------------------------------------- |
 | Framework        | Next.js 16 (App Router)                                   |
 | Language         | TypeScript 5                                              |
-| UI               | React 18 + Tailwind CSS v3 + shadcn/ui + Radix UI         |
+| UI               | React 18 + Tailwind CSS v3 + shadcn/ui + Radix UI           |
 | Animations       | Framer Motion                                             |
-| Charts           | Recharts                                                  |
+| Charts           | Recharts                                                 |
 | Database         | Supabase (PostgreSQL + RLS)                               |
 | Auth             | Supabase Auth (PKCE flow)                                 |
 | AI               | Groq SDK `openai/gpt-oss-120b`, `llama-3.3-70b-versatile` |
-| Payments         | Stripe (Checkout + Billing Portal + Webhooks)             |
-| Error Monitoring | Sentry                                                    |
-| Analytics        | PostHog                                                   |
-| Forms            | React Hook Form + Zod                                     |
-| Package Manager  | pnpm                                                      |
+| Payments         | Stripe (Checkout + Billing Portal + Webhooks)                |
+| Forms            | React Hook Form + Zod                                      |
+| Package Manager  | pnpm                                                     |
 
 ---
 
@@ -123,15 +121,6 @@ STRIPE_PRICE_PRO_ANNUAL=price_your_pro_annual_id
 # Admin
 ADMIN_EMAIL=your-admin-email@example.com
 
-# Sentry (optional)  https://sentry.io
-SENTRY_DSN=
-NEXT_PUBLIC_SENTRY_DSN=
-SENTRY_AUTH_TOKEN=
-
-# PostHog (optional)  https://posthog.com
-NEXT_PUBLIC_POSTHOG_KEY=
-NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
-
 # Rate Limiting (optional  defaults shown)
 RATE_LIMIT_AUTH_MAX=5
 RATE_LIMIT_AUTH_WINDOW=900
@@ -163,13 +152,13 @@ clario/
 │   │   ├── ui/              # shadcn/ui primitives
 │   │   ├── layout/          # Navbar, sidebar
 │   │   ├── marketing/       # Marketing nav and footer
-│   │   └── providers/       # PostHog and client providers
-│   ├── contexts/            # AuthContext, SidebarContext
-│   ├── hooks/               # Custom React hooks
+│   │   └── providers/      # Client providers
+│   ├── contexts/           # AuthContext, SidebarContext
+│   ├── hooks/              # Custom React hooks
 │   ├── lib/
 │   │   ├── supabase/        # Supabase client + server helpers
-│   │   ├── ai-fallback.ts   # Groq wrapper with error normalization
-│   │   ├── usage-limits.ts  # Tier-based request limits
+│   │   ├── ai-fallback.ts  # Groq wrapper with error normalization
+│   │   ├── usage-limits.ts # Tier-based request limits
 │   │   ├── security-config.ts
 │   │   ├── input-validation.ts
 │   │   └── stripe.ts
@@ -189,8 +178,8 @@ clario/
 | ---------------- | ------------------------- |
 | `pnpm dev`       | Start development server  |
 | `pnpm build`     | Build for production      |
-| `pnpm start`     | Start production server   |
-| `pnpm lint`      | Run ESLint                |
+| `pnpm start`     | Start production server |
+| `pnpm lint`      | Run ESLint              |
 | `pnpm typecheck` | Run TypeScript type check |
 
 ---

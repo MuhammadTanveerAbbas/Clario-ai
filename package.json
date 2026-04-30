@@ -5,9 +5,9 @@
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "NODE_NO_WARNINGS=1 next dev",
+    "build": "NODE_NO_WARNINGS=1 next build",
+    "start": "NODE_NO_WARNINGS=1 next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
@@ -33,7 +33,6 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.2.8",
-    "@sentry/nextjs": "^10.32.1",
     "@stripe/stripe-js": "^8.6.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.2",
@@ -51,7 +50,6 @@
     "marked": "^17.0.1",
     "next": "^16.1.6",
     "next-themes": "^0.4.6",
-    "posthog-js": "^1.203.0",
     "react": "^18.3.1",
     "react-day-picker": "^9.14.0",
     "react-dom": "^18.3.1",

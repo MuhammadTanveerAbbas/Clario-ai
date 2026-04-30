@@ -72,8 +72,6 @@ export default function PrivacyPage() {
             <li><strong>Groq:</strong> AI inference. Content not stored or used for training. (<a href="https://groq.com/privacy" className="legal-a">groq.com/privacy</a>)</li>
             <li><strong>Supabase:</strong> Database and authentication. (<a href="https://supabase.com/privacy" className="legal-a">supabase.com/privacy</a>)</li>
             <li><strong>Stripe:</strong> Payment processing. (<a href="https://stripe.com/privacy" className="legal-a">stripe.com/privacy</a>)</li>
-            <li><strong>PostHog:</strong> Product analytics (anonymized). (<a href="https://posthog.com/privacy" className="legal-a">posthog.com/privacy</a>)</li>
-            <li><strong>Sentry:</strong> Error monitoring. (<a href="https://sentry.io/privacy" className="legal-a">sentry.io/privacy</a>)</li>
           </ul>
         </div>
 

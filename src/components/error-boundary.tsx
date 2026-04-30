@@ -4,7 +4,6 @@ import { Component, ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertTriangle } from 'lucide-react'
-import * as Sentry from '@sentry/nextjs'
 
 interface Props {
   children: ReactNode
@@ -24,10 +23,6 @@ export class ErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error }
-  }
-
-  componentDidCatch(error: Error, errorInfo: any) {
-    Sentry.captureException(error, { contexts: { react: errorInfo } })
   }
 
   render() {
@@ -80,4 +75,3 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children
   }
 }
-

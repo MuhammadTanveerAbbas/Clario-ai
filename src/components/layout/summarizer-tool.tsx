@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import posthog from 'posthog-js';
 import {
   Baby,
   Briefcase,
@@ -173,10 +172,6 @@ export function SummarizerTool() {
         description: "YouTube transcript fetched successfully. Ready to summarize.",
       });
 
-      posthog.capture('youtube_transcript_fetched', {
-        video_id: data.videoId,
-      });
-
     } catch (error: any) {
       toast({
         variant: "destructive",
@@ -200,8 +195,6 @@ export function SummarizerTool() {
       });
       return;
     }
-
-    posthog.capture('summarize_started', { mode });
 
     setIsLoading(true);
     setError(null);
@@ -228,14 +221,11 @@ export function SummarizerTool() {
       setShowSuccess(true);
       fetchUsageData();
 
-      posthog.capture('summarize_completed', { mode });
-
       setTimeout(() => setShowSuccess(false), 2000);
 
     } catch (error: any) {
       const friendly = error.message || "Failed to generate summary";
       setError(friendly);
-      posthog.capture('summarize_failed', { mode, error: friendly });
     } finally {
       setIsLoading(false);
     }

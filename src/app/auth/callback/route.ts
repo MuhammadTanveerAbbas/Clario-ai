@@ -43,10 +43,16 @@ export async function GET(request: NextRequest) {
     
     if (error) {
       console.error('Auth callback error:', error)
-      return NextResponse.redirect(new URL('/sign-in?error=auth_failed', requestUrl.origin))
+      const errorUrl = new URL(requestUrl)
+      errorUrl.pathname = '/sign-in'
+      errorUrl.search = '?error=auth_failed'
+      return NextResponse.redirect(errorUrl)
     }
   }
 
-  return NextResponse.redirect(new URL(redirect, requestUrl.origin))
+  const redirectUrl = new URL(requestUrl)
+  redirectUrl.pathname = redirect.startsWith('/') ? redirect : `/${redirect}`
+  redirectUrl.search = ''
+  return NextResponse.redirect(redirectUrl)
 }
 
