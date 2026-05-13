@@ -17,7 +17,6 @@ import {
   Sparkles,
   Mic,
   Zap,
-  X,
   Calendar,
   LogOut,
 } from "lucide-react";
@@ -55,7 +54,6 @@ export function AppSidebar() {
   }, [user?.id, supabase]);
 
   const isPro = tier === "pro" || tier === "enterprise";
-
   const closeMobile = () => setMobileOpen(false);
 
   return (
@@ -71,12 +69,20 @@ export function AppSidebar() {
         initial={false}
         animate={{ width: collapsed ? "80px" : "256px" }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
+        style={{
+          background: "var(--sidebar)",
+          borderRight: "1px solid var(--sidebar-b)",
+        }}
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen bg-[#0A0A0A] border-r border-white/[0.08] flex flex-col overflow-hidden transition-transform duration-200",
+          "fixed left-0 top-0 z-50 h-screen flex flex-col overflow-hidden transition-transform duration-200",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
       >
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/[0.08] w-full">
+        {/* Logo */}
+        <div
+          className="flex items-center justify-between px-6 py-5 w-full"
+          style={{ borderBottom: "1px solid var(--sidebar-b)" }}
+        >
           <AnimatePresence mode="wait">
             {!collapsed && (
               <motion.div
@@ -87,10 +93,16 @@ export function AppSidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex items-center gap-2.5"
               >
-                <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-black" />
+                <div
+                  className="h-7 w-7 rounded-lg flex items-center justify-center"
+                  style={{ background: "hsl(var(--accent))" }}
+                >
+                  <Sparkles className="h-4 w-4 text-white" />
                 </div>
-                <span className="text-white font-semibold text-[15px] tracking-tight">
+                <span
+                  className="font-semibold text-[15px] tracking-tight"
+                  style={{ color: "var(--text)" }}
+                >
                   Clario
                 </span>
               </motion.div>
@@ -104,15 +116,19 @@ export function AppSidebar() {
                 transition={{ duration: 0.2 }}
                 className="flex justify-center w-full"
               >
-                <div className="h-7 w-7 rounded-lg bg-white flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-black" />
+                <div
+                  className="h-7 w-7 rounded-lg flex items-center justify-center"
+                  style={{ background: "hsl(var(--accent))" }}
+                >
+                  <Sparkles className="h-4 w-4 text-white" />
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        <nav className="app-sidebar-nav flex-1 p-3 overflow-y-auto space-y-1">
+        {/* Nav */}
+        <nav className="flex-1 p-3 overflow-y-auto space-y-1">
           {navigation.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -128,12 +144,30 @@ export function AppSidebar() {
                 onClick={closeMobile}
               >
                 <div
-                  className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150",
-                    isActive
-                      ? "bg-white/[0.08] text-white"
-                      : "text-white/50 hover:text-white hover:bg-white/[0.04]",
-                  )}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150"
+                  style={{
+                    background: isActive ? "var(--accent-l)" : "transparent",
+                    color: isActive ? "hsl(var(--accent))" : "var(--text3)",
+                    border: isActive
+                      ? "1px solid var(--accent-m)"
+                      : "1px solid transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLDivElement).style.background =
+                        "var(--bg3)";
+                      (e.currentTarget as HTMLDivElement).style.color =
+                        "var(--text2)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      (e.currentTarget as HTMLDivElement).style.background =
+                        "transparent";
+                      (e.currentTarget as HTMLDivElement).style.color =
+                        "var(--text3)";
+                    }
+                  }}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
                   <AnimatePresence>
@@ -155,12 +189,20 @@ export function AppSidebar() {
           })}
         </nav>
 
-        <div className="p-3 border-t border-white/[0.08] space-y-1">
+        {/* Bottom */}
+        <div
+          className="p-3 space-y-1"
+          style={{ borderTop: "1px solid var(--sidebar-b)" }}
+        >
           {!isPro && !collapsed && (
             <Link
               href="/pricing"
               onClick={closeMobile}
-              className="mb-2 block rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-2.5 text-center text-[13px] font-semibold text-white shadow-sm hover:opacity-95"
+              className="mb-2 block rounded-lg px-3 py-2.5 text-center text-[13px] font-semibold text-white shadow-sm hover:opacity-95"
+              style={{
+                background:
+                  "linear-gradient(135deg, hsl(var(--accent)), #f59e0b)",
+              }}
             >
               Upgrade to Pro
             </Link>
@@ -168,13 +210,41 @@ export function AppSidebar() {
 
           <Link href="/settings" onClick={closeMobile}>
             <div
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150",
-                pathname === "/settings" ||
+              className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150"
+              style={{
+                background:
+                  pathname === "/settings" ||
                   pathname?.startsWith("/settings/")
-                  ? "bg-white/[0.08] text-white"
-                  : "text-white/50 hover:text-white hover:bg-white/[0.04]",
-              )}
+                    ? "var(--accent-l)"
+                    : "transparent",
+                color:
+                  pathname === "/settings" ||
+                  pathname?.startsWith("/settings/")
+                    ? "hsl(var(--accent))"
+                    : "var(--text3)",
+              }}
+              onMouseEnter={(e) => {
+                const isSettingsActive =
+                  pathname === "/settings" ||
+                  pathname?.startsWith("/settings/");
+                if (!isSettingsActive) {
+                  (e.currentTarget as HTMLDivElement).style.background =
+                    "var(--bg3)";
+                  (e.currentTarget as HTMLDivElement).style.color =
+                    "var(--text2)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                const isSettingsActive =
+                  pathname === "/settings" ||
+                  pathname?.startsWith("/settings/");
+                if (!isSettingsActive) {
+                  (e.currentTarget as HTMLDivElement).style.background =
+                    "transparent";
+                  (e.currentTarget as HTMLDivElement).style.color =
+                    "var(--text3)";
+                }
+              }}
             >
               <Settings className="h-4 w-4 flex-shrink-0" />
               <AnimatePresence>
@@ -193,9 +263,19 @@ export function AppSidebar() {
             </div>
           </Link>
 
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3 px-3 py-2 h-auto text-white/50 hover:text-white hover:bg-white/[0.04] rounded-lg font-normal"
+          <button
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-[13px] font-medium"
+            style={{ color: "var(--text3)", background: "transparent" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--bg3)";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text2)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "transparent";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text3)";
+            }}
             onClick={async () => {
               await signOut();
               router.push("/sign-in");
@@ -214,13 +294,26 @@ export function AppSidebar() {
                 </motion.span>
               )}
             </AnimatePresence>
-          </Button>
+          </button>
 
-          <Button
-            variant="ghost"
-            size="icon"
+          <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full text-white/40 hover:text-white hover:bg-white/[0.04] border border-white/[0.08] transition-all duration-150 rounded-lg h-9"
+            className="w-full flex items-center justify-center rounded-lg h-9 transition-all duration-150 text-[13px]"
+            style={{
+              color: "var(--text3)",
+              background: "transparent",
+              border: "1px solid var(--sidebar-b)",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "var(--bg3)";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text2)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "transparent";
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text3)";
+            }}
           >
             <motion.div
               animate={{ rotate: collapsed ? 0 : 180 }}
@@ -232,7 +325,7 @@ export function AppSidebar() {
                 <ChevronLeft className="h-4 w-4" />
               )}
             </motion.div>
-          </Button>
+          </button>
         </div>
       </motion.aside>
     </>

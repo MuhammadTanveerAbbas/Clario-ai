@@ -15,26 +15,15 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
   undefined,
 );
 
+function getInitialTheme(): Theme {
+  if (typeof window === "undefined") return "dark";
+  return (localStorage.getItem("clario-theme") as Theme) || "dark";
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("dark");
+  const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
   useEffect(() => {
-    // Get theme from localStorage or default to 'dark'
-    const storedTheme = localStorage.getItem("clario-theme") as Theme | null;
-    const initialTheme = storedTheme || "dark";
-
-    if (initialTheme !== theme) {
-      setThemeState(initialTheme);
-    }
-
-    // Apply theme to document
-    document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(initialTheme);
-    applyTokens(initialTheme);
-  }, []);
-
-  useEffect(() => {
-    // Apply theme changes
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(theme);
     applyTokens(theme);

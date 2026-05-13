@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -29,7 +29,18 @@ interface UsageStat {
   requests_limit: number;
 }
 
-const NAV_ITEMS: { label: string; href: string; icon: string }[] = [
+interface Toast {
+  id: string;
+  type: "success" | "error" | "info";
+  message: string;
+}
+
+const NAV_ITEMS: {
+  label: string;
+  href: string;
+  icon: string;
+  badge?: string;
+}[] = [
   { label: "Dashboard", href: "/dashboard", icon: "grid" },
   { label: "AI Chat", href: "/chat", icon: "chat" },
   { label: "Summarizer", href: "/summarizer", icon: "doc" },
@@ -87,6 +98,15 @@ function NavIcon({ type }: { type: string }) {
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
       );
+    case "cal":
+      return (
+        <svg {...props}>
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      );
     case "settings":
       return (
         <svg {...props}>
@@ -115,11 +135,70 @@ function Skeleton({
         height: h,
         borderRadius: r,
         background:
-          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
+          "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.5s infinite",
       }}
     />
+  );
+}
+
+function ToastContainer({
+  toasts,
+  dismiss,
+}: {
+  toasts: Toast[];
+  dismiss: (id: string) => void;
+}) {
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 24,
+        right: 24,
+        zIndex: 1000,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+      }}
+    >
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: "var(--card)",
+            border: "1px solid var(--border)",
+            borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "var(--accent)"}`,
+            borderRadius: 10,
+            padding: "11px 14px",
+            boxShadow: "0 8px 24px rgba(0,0,0,.2)",
+            animation: "fu .3s ease both",
+            maxWidth: 320,
+            fontFamily: "Geist, system-ui, sans-serif",
+          }}
+        >
+          <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>
+            {t.message}
+          </span>
+          <button
+            onClick={() => dismiss(t.id)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "var(--text3)",
+              cursor: "pointer",
+              fontSize: ".75rem",
+              padding: 0,
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -136,10 +215,20 @@ export default function Dashboard() {
     setMobileOpen: setMobileSidebarOpen,
   } = useSidebar();
 
+  // State
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<UsageStat | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [onboardingDone, setOnboardingDone] = useState(false);
+  const [onboardingSteps, setOnboardingSteps] = useState({
+    summarize: false,
+    remix: false,
+    brandVoice: false,
+    chat: false,
+  });
 
+  // Persist sidebar collapse state
   useEffect(() => {
     const saved = localStorage.getItem("clario-sidebar-collapsed");
     if (saved === "true") setSidebarCollapsed(true);
@@ -149,6 +238,24 @@ export default function Dashboard() {
     localStorage.setItem("clario-sidebar-collapsed", String(sidebarCollapsed));
   }, [sidebarCollapsed]);
 
+  // Toast helpers
+  const addToast = useCallback(
+    (message: string, type: Toast["type"] = "info") => {
+      const id = Math.random().toString(36).slice(2);
+      setToasts((prev) => [...prev, { id, type, message }]);
+      setTimeout(
+        () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+        4000,
+      );
+    },
+    [],
+  );
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  // Fetch user + data
   useEffect(() => {
     async function loadData() {
       try {
@@ -158,40 +265,22 @@ export default function Dashboard() {
           return;
         }
 
-        const start = new Date();
-        start.setDate(1);
-        start.setHours(0, 0, 0, 0);
-        const startIso = start.toISOString();
-
-        const [profileRes, sumRes, chatRes, remixRes, brandVoiceRes] =
-          await Promise.all([
-            supabase
-              .from("profiles")
-              .select(
-                "id, full_name, avatar_url, subscription_tier, requests_used_this_month",
-              )
-              .eq("id", uid)
-              .single(),
-            supabase
-              .from("usage_tracking")
-              .select("*", { count: "exact", head: true })
-              .eq("user_id", uid)
-              .eq("type", "summarize")
-              .gte("created_at", startIso),
-            supabase
-              .from("usage_tracking")
-              .select("*", { count: "exact", head: true })
-              .eq("user_id", uid)
-              .eq("type", "chat")
-              .gte("created_at", startIso),
-            supabase
-              .from("usage_tracking")
-              .select("*", { count: "exact", head: true })
-              .eq("user_id", uid)
-              .eq("type", "remix")
-              .gte("created_at", startIso),
-            supabase.from("brand_voices").select("id").eq("user_id", uid),
-          ]);
+        const [profileRes, usageRes, brandVoiceRes] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select(
+              "id, full_name, avatar_url, subscription_tier, requests_used_this_month",
+            )
+            .eq("id", uid)
+            .single(),
+          supabase
+            .from("usage_tracking")
+            .select("created_at, type")
+            .eq("user_id", uid)
+            .order("created_at", { ascending: false })
+            .limit(60),
+          supabase.from("brand_voices").select("id").eq("user_id", uid),
+        ]);
 
         const profileData = profileRes.data;
         const tier = profileData?.subscription_tier || "free";
@@ -204,17 +293,40 @@ export default function Dashboard() {
           plan: (tier === "pro" ? "pro" : "free") as "free" | "pro",
         });
 
+        // Build stats from usage records
+        const usageData = usageRes.data || [];
+
+        const summaries = usageData.filter(
+          (r: { type: string }) => r.type === "summary",
+        ).length;
+        const chats = usageData.filter(
+          (r: { type: string }) => r.type === "chat",
+        ).length;
+        const remixes = usageData.filter(
+          (r: { type: string }) => r.type === "remix",
+        ).length;
+        const brand_voices = brandVoiceRes.data?.length ?? 0;
+        const requestsUsed =
+          profileData?.requests_used_this_month || usageData.length;
         setStats({
-          summaries: sumRes.count ?? 0,
-          chats: chatRes.count ?? 0,
-          remixes: remixRes.count ?? 0,
-          brand_voices: brandVoiceRes.data?.length ?? 0,
-          requests_used: profileData?.requests_used_this_month ?? 0,
+          summaries,
+          chats,
+          remixes,
+          brand_voices,
+          requests_used: requestsUsed,
           requests_limit: tier === "pro" ? 1000 : 100,
         });
+
+        // Check onboarding
+        const ob = JSON.parse(
+          localStorage.getItem("clario-onboarding") || "{}",
+        );
+        setOnboardingSteps(ob);
+        setOnboardingDone(ob.summarize && ob.remix && ob.brandVoice && ob.chat);
       } catch {
+        // Show empty state instead of fake mock data
         setUser({
-          id: authUser?.id || "",
+          id: authUser?.id || "unknown",
           email: authUser?.email || "",
           plan: "free",
         });
@@ -240,15 +352,23 @@ export default function Dashboard() {
   const handleSignOut = async () => {
     await signOut();
     router.push("/");
+    addToast("Signed out successfully", "success");
+  };
+
+  const completeOnboardingStep = (step: keyof typeof onboardingSteps) => {
+    const updated = { ...onboardingSteps, [step]: true };
+    setOnboardingSteps(updated);
+    localStorage.setItem("clario-onboarding", JSON.stringify(updated));
+    if (Object.values(updated).every(Boolean)) {
+      setOnboardingDone(true);
+      addToast("Onboarding complete! 🎉", "success");
+    }
   };
 
   const usagePercent = stats
     ? Math.round((stats.requests_used / stats.requests_limit) * 100)
     : 0;
   const isDark = theme === "dark";
-
-  if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
 
   const STAT_CARDS = [
     {
@@ -257,7 +377,20 @@ export default function Dashboard() {
       sub: "Videos processed",
       color: "#f97316",
       href: "/summarizer",
-      icon: "doc",
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <polyline points="14,2 14,8 20,8" />
+        </svg>
+      ),
     },
     {
       label: "AI Chats",
@@ -265,7 +398,19 @@ export default function Dashboard() {
       sub: "Conversations",
       color: "#0ea5e9",
       href: "/chat",
-      icon: "chat",
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      ),
     },
     {
       label: "Remixes",
@@ -273,7 +418,20 @@ export default function Dashboard() {
       sub: "Content remixed",
       color: "#8b5cf6",
       href: "/remix",
-      icon: "remix",
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+        </svg>
+      ),
     },
     {
       label: "Brand Voices",
@@ -281,60 +439,265 @@ export default function Dashboard() {
       sub: "Voices created",
       color: "#10b981",
       href: "/brand-voice",
-      icon: "voice",
+      icon: (
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+        </svg>
+      ),
     },
   ];
 
-  const QUICK_ACTIONS = [
+  const ONBOARDING = [
     {
-      label: "Summarize",
-      desc: "YouTube, text, or any URL",
+      key: "summarize" as const,
+      label: "Summarize your first video",
       href: "/summarizer",
-      color: "#f97316",
-      icon: "doc",
-      gradient: isDark
-        ? "linear-gradient(135deg,#2a1500,#1a0f07)"
-        : "linear-gradient(135deg,#fff7ed,#ffedd5)",
+      done: onboardingSteps.summarize,
     },
     {
-      label: "Remix Studio",
-      desc: "10 platform formats at once",
+      key: "remix" as const,
+      label: "Remix content into 10 formats",
       href: "/remix",
-      color: "#8b5cf6",
-      icon: "remix",
-      gradient: isDark
-        ? "linear-gradient(135deg,#1e1b2e,#130f1e)"
-        : "linear-gradient(135deg,#faf5ff,#ede9fe)",
+      done: onboardingSteps.remix,
     },
     {
-      label: "AI Chat",
-      desc: "Creator-focused assistant",
-      href: "/chat",
-      color: "#0ea5e9",
-      icon: "chat",
-      gradient: isDark
-        ? "linear-gradient(135deg,#0c1a26,#071018)"
-        : "linear-gradient(135deg,#f0f9ff,#e0f2fe)",
-    },
-    {
-      label: "Brand Voice",
-      desc: "Define your tone & style",
+      key: "brandVoice" as const,
+      label: "Create your Brand Voice",
       href: "/brand-voice",
-      color: "#10b981",
-      icon: "voice",
-      gradient: isDark
-        ? "linear-gradient(135deg,#0c1f18,#071410)"
-        : "linear-gradient(135deg,#f0fdf4,#dcfce7)",
+      done: onboardingSteps.brandVoice,
+    },
+    {
+      key: "chat" as const,
+      label: "Ask AI your first question",
+      href: "/chat",
+      done: onboardingSteps.chat,
     },
   ];
+  const onboardingProgress = ONBOARDING.filter((o) => o.done).length;
 
-  const greeting = `Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${user?.full_name?.split(" ")[0] || "there"} 👋`;
+  if (authLoading) return <LoadingPage />;
+  if (!authUser) return null;
 
   return (
     <>
+      <ToastContainer toasts={toasts} dismiss={dismissToast} />
+
+      {mobileSidebarOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
       <div className="dash-layout">
+        <aside
+          className="sidebar"
+          data-collapsed={String(sidebarCollapsed)}
+          data-mobile-open={String(mobileSidebarOpen)}
+        >
+          <div className="sb-logo">
+            <div className="sb-logo-mark">
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <span className="sb-logo-text">Clario</span>
+          </div>
+
+          <nav className="sb-nav">
+            {NAV_ITEMS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`sb-item${pathname === item.href ? " active" : ""}`}
+                title={sidebarCollapsed ? item.label : undefined}
+              >
+                <NavIcon type={item.icon} />
+                <span className="sb-lbl">{item.label}</span>
+                {item.badge && <span className="sb-badge">{item.badge}</span>}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="sb-bottom">
+            {!sidebarCollapsed && stats && (
+              <div
+                style={{
+                  padding: "8px 10px",
+                  background: "var(--bg3)",
+                  borderRadius: 9,
+                  marginBottom: 4,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 4,
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: ".68rem",
+                      color: "var(--text3)",
+                      fontWeight: 500,
+                    }}
+                  >
+                    Usage
+                  </span>
+                  <span style={{ fontSize: ".68rem", color: "var(--text3)" }}>
+                    {stats.requests_used}/{stats.requests_limit}
+                  </span>
+                </div>
+                <div className="usage-bar" style={{ margin: 0 }}>
+                  <div
+                    className="usage-fill"
+                    style={{ width: `${usagePercent}%` }}
+                    data-danger={String(usagePercent > 85)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {user?.plan === "free" && (
+              <button
+                className="sb-upgrade"
+                onClick={() => router.push("/pricing")}
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                Upgrade to Pro
+              </button>
+            )}
+
+            <button
+              className="sb-btn"
+              onClick={toggleTheme}
+              title={
+                sidebarCollapsed
+                  ? isDark
+                    ? "Light mode"
+                    : "Dark mode"
+                  : undefined
+              }
+            >
+              {isDark ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+              <span className="sb-btn-lbl">
+                {isDark ? "Light mode" : "Dark mode"}
+              </span>
+            </button>
+
+            <button className="sb-btn" onClick={handleSignOut}>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              <span className="sb-btn-lbl">Sign out</span>
+            </button>
+
+            <button
+              className="sb-btn"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {sidebarCollapsed ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              )}
+              <span className="sb-btn-lbl">Collapse</span>
+            </button>
+          </div>
+        </aside>
+
         <div className="main-area">
-          {/* Topbar */}
           <div className="topbar">
             <button
               className="topbar-btn topbar-hamburger"
@@ -358,14 +721,61 @@ export default function Dashboard() {
               {loading ? (
                 <Skeleton w={200} h={18} />
               ) : (
-                <>
-                  <span className="topbar-greeting-full">{greeting}</span>
-                  <span className="topbar-greeting-short">
-                    {user?.full_name?.split(" ")[0] || "Hey"} 👋
-                  </span>
-                </>
+                `Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}, ${user?.full_name?.split(" ")[0] || "there"} 👋`
               )}
             </div>
+            <button
+              className="topbar-btn"
+              onClick={toggleTheme}
+              title={isDark ? "Light mode" : "Dark mode"}
+            >
+              {isDark ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            <button
+              className="topbar-btn"
+              onClick={() => router.push("/settings")}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+              </svg>
+            </button>
             {user && (
               <div
                 className="avatar-btn"
@@ -377,74 +787,110 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Page content */}
           <div className="page-content">
-            {/* ── Stat Cards ── */}
-            <div className="overview-grid">
+            <div className="stat-grid">
               {loading
                 ? [...Array(4)].map((_, i) => (
-                    <div key={i} className="overview-card">
+                    <div key={i} className="card stat-card">
+                      <Skeleton h={14} w="60%" />
+                      <Skeleton h={36} w="40%" r={6} />
                       <Skeleton h={12} w="50%" />
-                      <Skeleton h={40} w="35%" r={6} />
-                      <Skeleton h={11} w="60%" />
                     </div>
                   ))
                 : STAT_CARDS.map((card) => (
                     <Link
                       key={card.label}
                       href={card.href}
-                      className="overview-card"
-                      style={
-                        { "--ov-color": card.color } as React.CSSProperties
-                      }
+                      className="card stat-card"
                     >
-                      <div className="ov-top">
-                        <span
-                          className="ov-icon"
-                          style={{
-                            color: card.color,
-                            background: `${card.color}18`,
-                          }}
-                        >
-                          <NavIcon type={card.icon} />
-                        </span>
-                        <span className="ov-label">{card.label}</span>
+                      <div className="stat-label" style={{ color: card.color }}>
+                        {card.icon}
+                        {card.label}
                       </div>
-                      <div className="ov-value">{card.value}</div>
-                      <div className="ov-sub">{card.sub}</div>
+                      <div className="stat-value">{card.value}</div>
+                      <div className="stat-sub">{card.sub}</div>
                     </Link>
                   ))}
             </div>
 
-            {/* ── Quick Actions ── */}
-            <div className="section-block">
-              <div className="section-label">Quick Actions</div>
-              <div className="launch-grid">
-                {QUICK_ACTIONS.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="launch-card"
-                  >
+            <div>
+              <div
+                style={{
+                  fontSize: ".75rem",
+                  fontWeight: 600,
+                  color: "var(--text3)",
+                  textTransform: "uppercase",
+                  letterSpacing: ".08em",
+                  marginBottom: 8,
+                }}
+              >
+                Analytics
+              </div>
+              {loading ? (
+                <div className="analytics-mini-grid">
+                  <div className="analytics-mini-skeleton" />
+                  <div className="analytics-mini-skeleton" />
+                </div>
+              ) : (
+                <AnalyticsCharts />
+              )}
+            </div>
+
+            <div>
+              <div
+                style={{
+                  fontSize: ".75rem",
+                  fontWeight: 600,
+                  color: "var(--text3)",
+                  textTransform: "uppercase",
+                  letterSpacing: ".08em",
+                  marginBottom: 10,
+                }}
+              >
+                Quick Actions
+              </div>
+              <div className="qa-grid">
+                {[
+                  {
+                    label: "Summarize a video",
+                    href: "/summarizer",
+                    color: "#f97316",
+                    bg: "var(--accent-l)",
+                    icon: "doc",
+                  },
+                  {
+                    label: "Remix content",
+                    href: "/remix",
+                    color: "#8b5cf6",
+                    bg: isDark ? "#1e1b2e" : "#faf5ff",
+                    icon: "remix",
+                  },
+                  {
+                    label: "Open AI chat",
+                    href: "/chat",
+                    color: "#0ea5e9",
+                    bg: isDark ? "#0c1a26" : "#f0f9ff",
+                    icon: "chat",
+                  },
+                  {
+                    label: "Set brand voice",
+                    href: "/brand-voice",
+                    color: "#10b981",
+                    bg: isDark ? "#0c1f18" : "#f0fdf4",
+                    icon: "voice",
+                  },
+                ].map((qa) => (
+                  <Link key={qa.label} href={qa.href} className="qa-card">
                     <div
-                      className="launch-icon"
-                      style={{ background: item.gradient, color: item.color }}
+                      className="qa-icon"
+                      style={{ background: qa.bg, color: qa.color }}
                     >
-                      <NavIcon type={item.icon} />
+                      <NavIcon type={qa.icon} />
                     </div>
-                    <div className="launch-body">
-                      <span
-                        className="launch-label"
-                        style={{ color: item.color }}
-                      >
-                        {item.label}
-                      </span>
-                      <span className="launch-desc">{item.desc}</span>
-                    </div>
+                    <span>{qa.label}</span>
                     <svg
-                      className="launch-arrow"
-                      width="14"
-                      height="14"
+                      width="12"
+                      height="12"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -455,113 +901,6 @@ export default function Dashboard() {
                     </svg>
                   </Link>
                 ))}
-              </div>
-            </div>
-
-            {/* ── Usage + Analytics ── */}
-            <div className="section-block">
-              <div className="section-label">Usage & Analytics</div>
-              <div className="dash-bottom-grid">
-                {/* Usage Meter */}
-                <div className="usage-meter-card">
-                  <div className="um-top">
-                    <div className="um-left">
-                      {loading ? (
-                        <Skeleton w={80} h={36} r={6} />
-                      ) : (
-                        <>
-                          <span
-                            className="um-count"
-                            data-danger={String(usagePercent > 85)}
-                          >
-                            {stats?.requests_used ?? 0}
-                          </span>
-                          <span className="um-limit">
-                            / {stats?.requests_limit ?? 100} requests
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {!loading && (
-                      <span
-                        className="um-plan"
-                        data-pro={String(user?.plan === "pro")}
-                      >
-                        {user?.plan === "pro" ? "Pro" : "Free"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="um-bar-track">
-                    <div
-                      className="um-bar-fill"
-                      style={{ width: `${Math.min(usagePercent, 100)}%` }}
-                      data-danger={String(usagePercent > 85)}
-                    />
-                  </div>
-                  <div className="um-breakdown">
-                    {[
-                      {
-                        label: "Summaries",
-                        val: stats?.summaries ?? 0,
-                        color: "#f97316",
-                      },
-                      {
-                        label: "Chats",
-                        val: stats?.chats ?? 0,
-                        color: "#0ea5e9",
-                      },
-                      {
-                        label: "Remixes",
-                        val: stats?.remixes ?? 0,
-                        color: "#8b5cf6",
-                      },
-                      {
-                        label: "Remaining",
-                        val: Math.max(
-                          0,
-                          (stats?.requests_limit ?? 100) -
-                            (stats?.requests_used ?? 0),
-                        ),
-                        color: "var(--text3)",
-                      },
-                    ].map((item) => (
-                      <div key={item.label} className="um-seg">
-                        <span
-                          className="um-seg-dot"
-                          style={{ background: item.color }}
-                        />
-                        <span className="um-seg-label">{item.label}</span>
-                        <span className="um-seg-val">{item.val}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {user?.plan === "free" && (
-                    <Link href="/pricing" className="um-upgrade-btn">
-                      Upgrade to Pro 1,000 requests/mo
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                      >
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  )}
-                </div>
-
-                {/* Analytics Charts */}
-                {loading ? (
-                  <div className="analytics-mini-grid">
-                    <div className="analytics-mini-skeleton" />
-                    <div className="analytics-mini-skeleton" />
-                  </div>
-                ) : (
-                  <AnalyticsCharts />
-                )}
               </div>
             </div>
           </div>

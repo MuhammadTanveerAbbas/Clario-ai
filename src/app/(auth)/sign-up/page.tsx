@@ -16,7 +16,7 @@ const AUTH_STYLES = `
   @media(max-width:820px){.auth-wrap{grid-template-columns:1fr}}
   .auth-left{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 5%;min-height:100vh}
   @media(max-width:480px){.auth-left{padding:32px 4%}}
-  .auth-right{background:#111110;border-left:1px solid #292524;padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;overflow-y:auto}
+  .auth-right{background:var(--bg2);border-left:1px solid hsl(var(--border));padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;overflow-y:auto}
   @media(max-width:820px){.auth-right{display:none}}
   .auth-card{width:100%;max-width:400px;animation:fu .5s ease both}
   .auth-logo{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;margin-bottom:40px}
@@ -131,7 +131,7 @@ function AuthRightPanel({
             fontFamily: "var(--font-fraunces), Georgia, serif",
             fontSize: "clamp(1.7rem,2.8vw,2.3rem)",
             fontWeight: 300,
-            color: "#fafaf9",
+            color: "var(--text)",
             letterSpacing: "-.03em",
             lineHeight: 1.15,
             marginBottom: 10,
@@ -142,7 +142,7 @@ function AuthRightPanel({
         <p
           style={{
             fontSize: ".85rem",
-            color: "#78716c",
+            color: "var(--text3)",
             lineHeight: 1.7,
             margin: 0,
           }}
@@ -168,9 +168,9 @@ function AuthRightPanel({
               alignItems: "flex-start",
               gap: 12,
               padding: "11px 14px",
-              background: "rgba(28,25,23,0.8)",
+              background: "var(--bg3)",
               borderRadius: 10,
-              border: "1px solid #292524",
+              border: "1px solid hsl(var(--border))",
             }}
           >
             <div
@@ -178,8 +178,8 @@ function AuthRightPanel({
                 width: 18,
                 height: 18,
                 borderRadius: "50%",
-                background: "#1a0f07",
-                border: "1px solid #431407",
+                background: "var(--accent-l)",
+                border: "1px solid var(--accent-m)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -190,7 +190,7 @@ function AuthRightPanel({
               <svg width="8" height="8" viewBox="0 0 12 12" fill="none">
                 <polyline
                   points="1.5,6 4.5,9 10.5,3"
-                  stroke="#f97316"
+                  stroke="hsl(var(--accent))"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -198,7 +198,7 @@ function AuthRightPanel({
               </svg>
             </div>
             <span
-              style={{ fontSize: ".82rem", color: "#d6d3d1", lineHeight: 1.55 }}
+              style={{ fontSize: ".82rem", color: "var(--text2)", lineHeight: 1.55 }}
             >
               {f}
             </span>
@@ -223,8 +223,8 @@ function AuthRightPanel({
           <div
             key={label}
             style={{
-              background: "rgba(28,25,23,0.8)",
-              border: "1px solid #292524",
+              background: "var(--bg3)",
+              border: "1px solid hsl(var(--border))",
               borderRadius: 10,
               padding: "14px 8px",
               textAlign: "center",
@@ -235,7 +235,7 @@ function AuthRightPanel({
                 fontFamily: "var(--font-fraunces), Georgia, serif",
                 fontSize: "1.35rem",
                 fontWeight: 400,
-                color: "#f97316",
+                color: "hsl(var(--accent))",
                 letterSpacing: "-.02em",
                 lineHeight: 1,
                 marginBottom: 4,
@@ -244,7 +244,7 @@ function AuthRightPanel({
               {value}
             </div>
             <div
-              style={{ fontSize: ".65rem", color: "#78716c", lineHeight: 1.3 }}
+              style={{ fontSize: ".65rem", color: "var(--text3)", lineHeight: 1.3 }}
             >
               {label}
             </div>
@@ -256,16 +256,16 @@ function AuthRightPanel({
       <div
         style={{
           padding: "14px 16px",
-          background: "rgba(28,25,23,0.8)",
-          border: "1px solid #292524",
+          background: "var(--bg3)",
+          border: "1px solid hsl(var(--border))",
           borderRadius: 10,
-          borderLeft: "3px solid #f97316",
+          borderLeft: "3px solid hsl(var(--accent))",
         }}
       >
         <p
           style={{
             fontSize: ".78rem",
-            color: "#a8a29e",
+            color: "var(--text2)",
             lineHeight: 1.65,
             fontStyle: "italic",
             margin: "0 0 6px 0",
@@ -274,7 +274,7 @@ function AuthRightPanel({
           &ldquo;Built for creators who want to move fast &mdash; not spend
           hours reformatting the same content for every platform.&rdquo;
         </p>
-        <p style={{ fontSize: ".7rem", color: "#57534e", margin: 0 }}>
+        <p style={{ fontSize: ".7rem", color: "var(--text3)", margin: 0 }}>
           Muhammad Tanveer Abbas, Builder of Clario
         </p>
       </div>
