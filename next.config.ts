@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['youtubei.js'],
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
