@@ -12,6 +12,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { BarChart2 } from "lucide-react";
+import Link from "next/link";
 
 interface TrendData {
   date: string;
@@ -60,7 +62,27 @@ export function AnalyticsCharts() {
   }
 
   if (!data || data.trendData.length === 0) {
-    return null;
+    return (
+      <div className="analytics-mini-grid">
+        <div className="analytics-mini-card">
+          <div className="analytics-mini-header">
+            <h4 className="analytics-mini-title">Activity</h4>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-3 py-10 px-4 text-center">
+            <BarChart2 className="h-10 w-10 text-muted-foreground opacity-60" />
+            <p className="text-sm text-muted-foreground max-w-sm">
+              Your analytics will appear here once you start using Clario.
+            </p>
+            <Link
+              href="/summarizer"
+              className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Open Summarizer
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const last7Days = data.trendData.slice(-7);
@@ -80,7 +102,7 @@ export function AnalyticsCharts() {
           >
             <CartesianGrid
               strokeDasharray="2 2"
-              stroke="var(--border)"
+              stroke="hsl(var(--border))"
               vertical={false}
             />
             <XAxis
@@ -96,8 +118,8 @@ export function AnalyticsCharts() {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
                 borderRadius: "6px",
                 fontSize: "12px",
                 padding: "6px 10px",
@@ -107,7 +129,7 @@ export function AnalyticsCharts() {
             <Line
               type="monotone"
               dataKey="usage"
-              stroke="var(--accent)"
+              stroke="hsl(var(--accent))"
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
@@ -127,7 +149,7 @@ export function AnalyticsCharts() {
           >
             <CartesianGrid
               strokeDasharray="2 2"
-              stroke="var(--border)"
+              stroke="hsl(var(--border))"
               vertical={false}
             />
             <XAxis
@@ -143,8 +165,8 @@ export function AnalyticsCharts() {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "var(--card)",
-                border: "1px solid var(--border)",
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
                 borderRadius: "6px",
                 fontSize: "12px",
                 padding: "6px 10px",
@@ -153,7 +175,7 @@ export function AnalyticsCharts() {
             />
             <Bar
               dataKey="value"
-              fill="var(--accent)"
+              fill="hsl(var(--accent))"
               radius={[4, 4, 0, 0]}
               isAnimationActive={false}
             />

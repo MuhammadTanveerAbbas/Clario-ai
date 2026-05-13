@@ -44,8 +44,8 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, var(--accent), #fb923c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", color: "#fff", fontWeight: 600, flexShrink: 0 }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, hsl(var(--accent)), #fb923c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", color: "#fff", fontWeight: 600, flexShrink: 0 }}>
           {initials}
         </div>
         <div>
@@ -54,7 +54,7 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
         </div>
       </div>
 
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Profile Information</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Update your display name and account details</div>
@@ -67,8 +67,8 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
               value={name}
               onChange={e => setName(e.target.value)}
               disabled={loading}
-              style={{ background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text)", fontSize: ".85rem", fontFamily: "inherit", outline: "none", transition: "border-color .15s" }}
-              onFocus={e => e.target.style.borderColor = "var(--accent)"}
+              style={{ background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text)", fontSize: ".85rem", fontFamily: "inherit", outline: "none", transition: "border-color .15s" }}
+              onFocus={e => e.target.style.borderColor = "hsl(var(--accent))"}
               onBlur={e => e.target.style.borderColor = "var(--input-b)"}
             />
           </div>
@@ -79,7 +79,7 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
               type="email"
               value={profile.email}
               disabled
-              style={{ background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text3)", fontSize: ".85rem", fontFamily: "inherit", opacity: 0.6, cursor: "not-allowed" }}
+              style={{ background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text3)", fontSize: ".85rem", fontFamily: "inherit", opacity: 0.6, cursor: "not-allowed" }}
             />
             <span style={{ fontSize: ".75rem", color: "var(--text3)" }}>Email cannot be changed. Contact support if needed.</span>
           </div>
@@ -87,7 +87,7 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
             <button
               type="submit"
               disabled={loading}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit", transition: "opacity .15s" }}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "hsl(var(--accent))", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit", transition: "opacity .15s" }}
             >
               {loading && <Loader2 size={14} className="animate-spin" />}
               {loading ? "Saving..." : "Save Changes"}

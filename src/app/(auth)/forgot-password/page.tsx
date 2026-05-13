@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
 
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
   body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
   @keyframes fu{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -14,27 +13,27 @@ const STYLES = `
   .fp-wrap{min-height:100vh;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px 5%}
   .fp-card{width:100%;max-width:400px;animation:fu .5s ease both}
   .fp-logo{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;margin-bottom:40px}
-  .fp-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .fp-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .fp-h1{font-family:var(--serif);font-size:1.9rem;font-weight:300;color:var(--text);letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
-  .fp-h1 em{font-style:italic;color:var(--accent)}
+  .fp-h1 em{font-style:italic;color:hsl(var(--accent))}
   .fp-sub{font-size:.85rem;color:var(--text3);margin-bottom:28px;line-height:1.5}
   .fp-form{display:flex;flex-direction:column;gap:14px}
   .fp-field{display:flex;flex-direction:column;gap:5px}
   .fp-label{font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.02em}
-  .fp-input{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:11px 14px;font-size:.88rem;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .18s,box-shadow .18s;width:100%}
-  .fp-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,.12)}
+  .fp-input{background:var(--bg2);border:1px solid hsl(var(--border));border-radius:9px;padding:11px 14px;font-size:.88rem;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .18s,box-shadow .18s;width:100%}
+  .fp-input:focus{border-color:hsl(var(--accent));box-shadow:0 0 0 3px rgba(249,115,22,.12)}
   .fp-input::placeholder{color:var(--text3)}
-  .fp-btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--sans);width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s}
+  .fp-btn{background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--sans);width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s}
   .fp-btn:hover:not(:disabled){background:#ea6c0a}
   .fp-btn:disabled{opacity:.6;cursor:not-allowed}
   .fp-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:10px 13px;font-size:.8rem;color:var(--error);margin-bottom:4px}
   .fp-success-icon{width:52px;height:52px;border-radius:50%;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
   .fp-sent-text{font-size:.85rem;color:var(--text3);line-height:1.65;margin-top:8px}
   .fp-footer{text-align:center;margin-top:20px;font-size:.8rem;color:var(--text3)}
-  .fp-footer a{color:var(--accent);text-decoration:none;font-weight:500}
+  .fp-footer a{color:hsl(var(--accent));text-decoration:none;font-weight:500}
   .fp-footer a:hover{text-decoration:underline}
   .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-  .theme-toggle{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .theme-toggle{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:8px;background:var(--bg2);border:1px solid hsl(var(--border));color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
   .theme-toggle:hover{color:var(--text)}
 `;
 

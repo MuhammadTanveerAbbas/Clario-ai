@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { LoadingPage } from "@/components/ui/loading-page";
 
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 interface CalEvent {
@@ -19,7 +20,7 @@ interface CalEvent {
 }
 
 const PLATFORMS = ["Twitter", "LinkedIn", "Instagram", "YouTube", "Newsletter", "Podcast", "Blog", "TikTok", "Other"];
-const COLORS = ["var(--accent)", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
+const COLORS = ["hsl(var(--accent))", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
 const STATUSES = ["Draft", "Scheduled", "Published", "Cancelled"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -61,7 +62,7 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
   return (
     <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000, display: "flex", flexDirection: "column", gap: 8 }}>
       {toasts.map(t => (
-        <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "var(--card)", border: "1px solid var(--border)", borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "var(--accent)"}`, borderRadius: 10, padding: "11px 14px", boxShadow: "0 8px 24px rgba(0,0,0,.2)", animation: "fu .3s ease both", maxWidth: 320, fontFamily: "var(--sans)" }}>
+        <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "hsl(var(--accent))"}`, borderRadius: 10, padding: "11px 14px", boxShadow: "0 8px 24px rgba(0,0,0,.2)", animation: "fu .3s ease both", maxWidth: 320, fontFamily: "var(--sans)" }}>
           <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>{t.message}</span>
           <button onClick={() => dismiss(t.id)} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: ".75rem", padding: 0 }}>✕</button>
         </div>
@@ -95,7 +96,7 @@ function CalendarPageInner() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalEvent | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [userProfile, setUserProfile] = useState<{ full_name?: string; plan?: string } | null>(null);
+  const [userProfile, setUserProfile] = useState<{ full_name?: string; subscription_tier?: string } | null>(null);
 
   const [formData, setFormData] = useState({
     title: "", scheduled_at: "", platform: "Other", content: "", color: COLORS[0], status: "Draft"
@@ -114,7 +115,7 @@ function CalendarPageInner() {
   useEffect(() => {
     if (authLoading) return;
     if (!user) return;
-    supabase.from("profiles").select("full_name, plan").eq("id", user.id).single()
+    supabase.from("profiles").select("full_name, subscription_tier").eq("id", user.id).single()
       .then(({ data }) => { if (data) setUserProfile(data); });
   }, [user, authLoading]);
 
@@ -223,14 +224,14 @@ function CalendarPageInner() {
       const isToday = dateStr === new Date().toISOString().split("T")[0];
       days.push(
         <div key={day} onClick={() => openAddModal(date)}
-          style={{ background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 8, minHeight: 90, padding: 8, cursor: "pointer", transition: "all .2s" }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = "var(--accent)"}
+          style={{ background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 8, minHeight: 90, padding: 8, cursor: "pointer", transition: "all .2s" }}
+          onMouseEnter={(e) => e.currentTarget.style.borderColor = "hsl(var(--accent))"}
           onMouseLeave={(e) => e.currentTarget.style.borderColor = "var(--card-b)"}
         >
-          <div style={{ fontSize: ".75rem", color: isToday ? "var(--accent)" : "var(--text3)", fontWeight: isToday ? 600 : 400, marginBottom: 4 }}>{day}</div>
+          <div style={{ fontSize: ".75rem", color: isToday ? "hsl(var(--accent))" : "var(--text3)", fontWeight: isToday ? 600 : 400, marginBottom: 4 }}>{day}</div>
           {dayEvents.slice(0, 2).map(event => (
             <div key={event.id} onClick={(e) => { e.stopPropagation(); openEditModal(event); }}
-              style={{ background: event.color || "var(--accent)", color: "#fff", fontSize: ".7rem", padding: "2px 6px", borderRadius: 4, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              style={{ background: event.color || "hsl(var(--accent))", color: "#fff", fontSize: ".7rem", padding: "2px 6px", borderRadius: 4, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {event.title}
             </div>
           ))}
@@ -241,12 +242,14 @@ function CalendarPageInner() {
     return days;
   };
 
+  if (authLoading) return <LoadingPage />;
+  if (!user) return null;
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
+        :root{--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
         body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
@@ -257,7 +260,7 @@ function CalendarPageInner() {
 
         .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
         .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
         .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
 
@@ -265,12 +268,12 @@ function CalendarPageInner() {
         .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
         .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
         .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
-        .sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
+        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
+        .sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
 
         .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
         .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+        .sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
         .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
 
         .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
@@ -280,12 +283,12 @@ function CalendarPageInner() {
         .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
         .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
 
-        .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
+        .sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
         .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
         .sb-upgrade:hover{background:#ea6c0a}
 
-        .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
+        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
+        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
         @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
@@ -312,52 +315,6 @@ function CalendarPageInner() {
       {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
       <div className="dash-layout">
-        <aside className="sidebar" data-collapsed={String(sidebarCollapsed)} data-mobile-open={String(mobileSidebarOpen)}>
-          <div className="sb-logo">
-            <div className="sb-logo-mark">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-              </svg>
-            </div>
-            <span className="sb-logo-text">Clario</span>
-          </div>
-          <nav className="sb-nav">
-            {NAV_ITEMS.map(item => (
-              <Link key={item.href} href={item.href} className={`sb-item${pathname === item.href ? " active" : ""}`} title={sidebarCollapsed ? item.label : undefined}>
-                <NavIcon type={item.icon} />
-                <span className="sb-lbl">{item.label}</span>
-                {item.badge && <span className="sb-badge">{item.badge}</span>}
-              </Link>
-            ))}
-          </nav>
-          <div className="sb-bottom">
-            {userProfile?.plan === "free" && (
-              <button className="sb-upgrade" onClick={() => router.push("/pricing")}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                Upgrade to Pro
-              </button>
-            )}
-            <button className="sb-btn" onClick={toggleTheme} title={sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined}>
-              {isDark
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              }
-              <span className="sb-btn-lbl">{isDark ? "Light mode" : "Dark mode"}</span>
-            </button>
-            <button className="sb-btn" onClick={async () => { await signOut(); router.push("/sign-in"); }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              <span className="sb-btn-lbl">Sign out</span>
-            </button>
-            <button className="sb-btn" onClick={() => setSidebarCollapsed(!sidebarCollapsed)} title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
-              {sidebarCollapsed
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
-              }
-              <span className="sb-btn-lbl">Collapse</span>
-            </button>
-          </div>
-        </aside>
-
         <div className="main-area">
           <div className="topbar">
             <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
@@ -373,21 +330,18 @@ function CalendarPageInner() {
           </div>
 
           <div className="page-content">
-            {!user ? (
-              <div style={{ textAlign: "center", padding: 60, color: "var(--text2)" }}>Please sign in to view your calendar</div>
-            ) : (
-              <>
+            <>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
                   <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", margin: 0 }}>
                     {MONTHS[month]} {year}
                   </h1>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <button onClick={() => setMonth(m => m === 0 ? (setYear(y => y - 1), 11) : m - 1)}
-                      style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>←</button>
+                      style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>←</button>
                     <button onClick={() => setMonth(m => m === 11 ? (setYear(y => y + 1), 0) : m + 1)}
-                      style={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>→</button>
+                      style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>→</button>
                     <button onClick={() => openAddModal()}
-                      style={{ background: "var(--accent)", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
+                      style={{ background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
                       Add Event
                     </button>
                   </div>
@@ -416,13 +370,12 @@ function CalendarPageInner() {
                     <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Your content schedule, at a glance</h2>
                     <p style={{ color: "var(--text2)", marginBottom: 24 }}>Plan and track every post across every platform in one place</p>
                     <button onClick={() => openAddModal()}
-                      style={{ background: "var(--accent)", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
+                      style={{ background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
                       Add your first event
                     </button>
                   </div>
                 )}
               </>
-            )}
           </div>
         </div>
       </div>
@@ -431,7 +384,7 @@ function CalendarPageInner() {
         <div onClick={() => setModalOpen(false)}
           style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()}
-            style={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 18, padding: 24, maxWidth: 480, width: "100%", maxHeight: "90vh", overflow: "auto" }}>
+            style={{ background: "var(--bg2)", border: "1px solid hsl(var(--border))", borderRadius: 18, padding: 24, maxWidth: 480, width: "100%", maxHeight: "90vh", overflow: "auto" }}>
             <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.3rem", fontWeight: 300, color: "var(--text)", marginBottom: 20 }}>
               {editingEvent ? "Edit Event" : "Add Event"}
             </h2>
@@ -439,29 +392,29 @@ function CalendarPageInner() {
               <div>
                 <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Title *</label>
                 <input type="text" value={formData.title} onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  style={{ width: "100%", background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} placeholder="Event title" />
+                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} placeholder="Event title" />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Date & Time *</label>
                 <input type="datetime-local" value={formData.scheduled_at} onChange={(e) => setFormData(prev => ({ ...prev, scheduled_at: e.target.value }))}
-                  style={{ width: "100%", background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} />
+                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Platform</label>
                 <select value={formData.platform} onChange={(e) => setFormData(prev => ({ ...prev, platform: e.target.value }))}
-                  style={{ width: "100%", background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
+                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
                   {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
               </div>
               <div>
                 <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Content</label>
                 <textarea value={formData.content} onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  style={{ width: "100%", background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem", minHeight: 100, resize: "vertical" }} placeholder="Post content..." />
+                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem", minHeight: 100, resize: "vertical" }} placeholder="Post content..." />
               </div>
               <div>
                 <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Status</label>
                 <select value={formData.status} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  style={{ width: "100%", background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
+                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
                   {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </div>
@@ -470,19 +423,19 @@ function CalendarPageInner() {
                 <div style={{ display: "flex", gap: 8 }}>
                   {COLORS.map(color => (
                     <button key={color} onClick={() => setFormData(prev => ({ ...prev, color }))}
-                      style={{ width: 32, height: 32, borderRadius: 6, background: color, border: formData.color === color ? "2px solid var(--text)" : "1px solid var(--border)", cursor: "pointer" }} />
+                      style={{ width: 32, height: 32, borderRadius: 6, background: color, border: formData.color === color ? "2px solid var(--text)" : "1px solid hsl(var(--border))", cursor: "pointer" }} />
                   ))}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
                 <button onClick={() => setModalOpen(false)}
-                  style={{ flex: 1, background: "var(--bg3)", border: "1px solid var(--border)", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "var(--text)", fontWeight: 500 }}>Cancel</button>
+                  style={{ flex: 1, background: "var(--bg3)", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "var(--text)", fontWeight: 500 }}>Cancel</button>
                 {editingEvent && (
                   <button onClick={() => { handleDeleteEvent(editingEvent.id); setModalOpen(false); }}
                     style={{ background: "var(--error)", border: "none", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>Delete</button>
                 )}
                 <button onClick={handleSaveEvent}
-                  style={{ flex: 1, background: "var(--accent)", border: "none", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
+                  style={{ flex: 1, background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
                   {editingEvent ? "Update" : "Add"}
                 </button>
               </div>

@@ -1,12 +1,22 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { MarkdownRenderer } from "@/components/markdown-renderer";
+import { LoadingPage } from "@/components/ui/loading-page";
+import { Pencil } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ChatMessage {
   id: string;
@@ -27,90 +37,6 @@ interface Toast {
   id: string;
   type: "success" | "error" | "info";
   message: string;
-}
-
-const NAV_ITEMS: {
-  label: string;
-  href: string;
-  icon: string;
-  badge?: string;
-}[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "grid" },
-  { label: "AI Chat", href: "/chat", icon: "chat" },
-  { label: "Summarizer", href: "/summarizer", icon: "doc" },
-  { label: "Remix Studio", href: "/remix", icon: "remix" },
-  { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Settings", href: "/settings", icon: "settings" },
-];
-
-function NavIcon({ type }: { type: string }) {
-  const p = {
-    width: 16,
-    height: 16,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "1.8",
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-  switch (type) {
-    case "grid":
-      return (
-        <svg {...p}>
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-          <rect x="14" y="14" width="7" height="7" />
-        </svg>
-      );
-    case "chat":
-      return (
-        <svg {...p}>
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      );
-    case "doc":
-      return (
-        <svg {...p}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14,2 14,8 20,8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-      );
-    case "remix":
-      return (
-        <svg {...p}>
-          <polyline points="23 4 23 10 17 10" />
-          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-        </svg>
-      );
-    case "voice":
-      return (
-        <svg {...p}>
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-      );
-    case "cal":
-      return (
-        <svg {...p}>
-          <rect x="3" y="4" width="18" height="18" rx="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      );
-    case "settings":
-      return (
-        <svg {...p}>
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
 }
 
 function ToastContainer({
@@ -139,9 +65,9 @@ function ToastContainer({
             display: "flex",
             alignItems: "center",
             gap: 10,
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--accent)"}`,
+            background: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))"}`,
             borderRadius: 10,
             padding: "11px 14px",
             boxShadow: "0 8px 24px rgba(0,0,0,.2)",
@@ -172,218 +98,29 @@ function ToastContainer({
   );
 }
 
-function Sidebar({
-  user,
-  pathname,
-  sidebarCollapsed,
-  setSidebarCollapsed,
-  mobileSidebarOpen,
-  setMobileSidebarOpen,
-  theme,
-  toggleTheme,
-  signOut,
-  router,
-}: {
-  user: { full_name?: string; plan?: string } | null;
-  pathname: string;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (v: boolean) => void;
-  mobileSidebarOpen: boolean;
-  setMobileSidebarOpen: (v: boolean) => void;
-  theme: string;
-  toggleTheme: () => void;
-  signOut: () => Promise<void>;
-  router: ReturnType<typeof useRouter>;
-}) {
-  const isDark = theme === "dark";
-  return (
-    <aside
-      className="sidebar"
-      data-collapsed={String(sidebarCollapsed)}
-      data-mobile-open={String(mobileSidebarOpen)}
-    >
-      <div className="sb-logo">
-        <div className="sb-logo-mark">
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-          </svg>
-        </div>
-        <span className="sb-logo-text">Clario</span>
-      </div>
-      <nav className="sb-nav">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`sb-item${pathname === item.href ? " active" : ""}`}
-            title={sidebarCollapsed ? item.label : undefined}
-          >
-            <NavIcon type={item.icon} />
-            <span className="sb-lbl">{item.label}</span>
-            {item.badge && <span className="sb-badge">{item.badge}</span>}
-          </Link>
-        ))}
-      </nav>
-      <div className="sb-bottom">
-        {user?.plan === "free" && (
-          <button
-            className="sb-upgrade"
-            onClick={() => router.push("/pricing")}
-          >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-            >
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-            </svg>
-            Upgrade to Pro
-          </button>
-        )}
-        <button
-          className="sb-btn"
-          onClick={toggleTheme}
-          title={
-            sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined
-          }
-        >
-          {isDark ? (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-          <span className="sb-btn-lbl">
-            {isDark ? "Light mode" : "Dark mode"}
-          </span>
-        </button>
-        <button
-          className="sb-btn"
-          onClick={async () => {
-            await signOut();
-            router.push("/sign-in");
-          }}
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          <span className="sb-btn-lbl">Sign out</span>
-        </button>
-        <button
-          className="sb-btn"
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {sidebarCollapsed ? (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          ) : (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          )}
-          <span className="sb-btn-lbl">Collapse</span>
-        </button>
-      </div>
-    </aside>
-  );
-}
-
 export default function ChatPage() {
-  const pathname = usePathname();
-  const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const {
-    collapsed: sidebarCollapsed,
-    setCollapsed: setSidebarCollapsed,
-    mobileOpen: mobileSidebarOpen,
-    setMobileOpen: setMobileSidebarOpen,
-  } = useSidebar();
+  const { mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } =
+    useSidebar();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [sessionTitle, setSessionTitle] = useState("New Chat");
   const [editingTitle, setEditingTitle] = useState(false);
-  const [conversationId] = useState(() => crypto.randomUUID());
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const [activeBrandVoice, setActiveBrandVoice] = useState<BrandVoice | null>(
     null,
   );
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [showSessions, setShowSessions] = useState(false);
-  const [userProfile, setUserProfile] = useState<{
-    full_name?: string;
-    plan?: string;
-  } | null>(null);
+  const [sessions, setSessions] = useState<
+    { id: string; title: string; created_at: string; updated_at: string }[]
+  >([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [clearDialogOpen, setClearDialogOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -411,14 +148,6 @@ export default function ChatPage() {
   useEffect(() => {
     if (!authUser) return;
     supabase
-      .from("profiles")
-      .select("full_name, plan")
-      .eq("id", authUser.id)
-      .single()
-      .then(({ data }) => {
-        if (data) setUserProfile(data);
-      });
-    supabase
       .from("brand_voices")
       .select(
         "id, name, tone, vocabulary, personality, description, is_active, created_at",
@@ -429,7 +158,23 @@ export default function ChatPage() {
       .then(({ data }) => {
         if (data) setActiveBrandVoice(data);
       });
-  }, [authUser]);
+  }, [authUser, supabase]);
+
+  const loadSessions = useCallback(async () => {
+    if (!authUser) return;
+    setSessionsLoading(true);
+    const { data, error } = await supabase
+      .from("chat_sessions")
+      .select("id, title, created_at, updated_at")
+      .eq("user_id", authUser.id)
+      .order("updated_at", { ascending: false });
+    if (!error && data) setSessions(data);
+    setSessionsLoading(false);
+  }, [authUser, supabase]);
+
+  useEffect(() => {
+    void loadSessions();
+  }, [loadSessions]);
 
   const adjustTextarea = () => {
     const ta = textareaRef.current;
@@ -446,6 +191,38 @@ export default function ChatPage() {
       .eq("id", activeBrandVoice.id);
     setActiveBrandVoice(null);
     addToast("Brand voice deactivated", "info");
+  };
+
+  const openSession = async (id: string, title: string) => {
+    setConversationId(id);
+    setSessionTitle(title);
+    const { data } = await supabase
+      .from("chat_messages")
+      .select("id, role, content, created_at")
+      .eq("session_id", id)
+      .order("created_at", { ascending: true });
+    if (data?.length) {
+      setMessages(
+        data.map((row) => ({
+          id: row.id,
+          role: row.role as "user" | "assistant",
+          content: row.content,
+        })),
+      );
+    } else {
+      setMessages([]);
+    }
+  };
+
+  const deleteSession = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await supabase.from("chat_sessions").delete().eq("id", id);
+    if (conversationId === id) {
+      setConversationId(null);
+      setMessages([]);
+      setSessionTitle("New Chat");
+    }
+    void loadSessions();
   };
 
   const sendMessage = async (text?: string) => {
@@ -479,7 +256,13 @@ export default function ChatPage() {
         history,
       };
       if (activeBrandVoice) {
-        body.message = `${content}\n\n[Write in this style: ${activeBrandVoice.tone || ""}. Personality: ${activeBrandVoice.personality || ""}.]`;
+        body.brandVoice = [
+          activeBrandVoice.tone && `Tone: ${activeBrandVoice.tone}`,
+          activeBrandVoice.personality &&
+            `Personality: ${activeBrandVoice.personality}`,
+        ]
+          .filter(Boolean)
+          .join(". ");
       }
 
       const res = await fetch("/api/chat", {
@@ -493,23 +276,17 @@ export default function ChatPage() {
       }
       const data = await res.json();
       const aiContent: string = data.response || "";
-
+      if (data.conversationId && typeof data.conversationId === "string") {
+        setConversationId(data.conversationId);
+      }
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === assistantMsg.id ? { ...m, content: "", pending: false } : m,
+          m.id === assistantMsg.id
+            ? { ...m, content: aiContent, pending: false }
+            : m,
         ),
       );
-      const words = aiContent.split(" ");
-      for (let i = 0; i < words.length; i++) {
-        await new Promise((r) => setTimeout(r, 18));
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantMsg.id
-              ? { ...m, content: words.slice(0, i + 1).join(" ") }
-              : m,
-          ),
-        );
-      }
+      void loadSessions();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       addToast(msg, "error");
@@ -531,109 +308,58 @@ export default function ChatPage() {
 
   const isDark = theme === "dark";
 
+  if (authLoading) return <LoadingPage />;
+  if (!authUser) return null;
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
         body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-        @keyframes dotPulse{0%,80%,100%{transform:scale(0);opacity:.5}40%{transform:scale(1);opacity:1}}
+        @keyframes pulse-dot{0%,80%,100%{opacity:0.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
 
         .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
-        .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
-        .sidebar[data-collapsed="true"]{width:60px}
-        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
-        .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
-        .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
-        .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
-        .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
-        .sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
-        .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
-        .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-        .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
-        .sb-btn:hover{background:var(--bg3);color:var(--text2)}
-        .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
-        .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
-        .sb-upgrade:hover{background:#ea6c0a}
-        .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
+        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
+        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
         @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
         .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-        @media(max-width:768px){
-          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
-          .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
-          .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
-          .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
-        }
-        .mobile-overlay{display:none}
-        @media(max-width:768px){.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}}
         .chat-layout{display:flex;flex:1;height:calc(100vh - 56px);overflow:hidden}
-        .sessions-panel{width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;background:var(--bg2);transition:width .22s cubic-bezier(.4,0,.2,1),opacity .22s}
+        .sessions-panel{width:260px;border-right:1px solid hsl(var(--border));display:flex;flex-direction:column;flex-shrink:0;background:var(--bg2);transition:width .22s cubic-bezier(.4,0,.2,1),opacity .22s}
         .sessions-panel[data-collapsed="true"]{width:0;opacity:0;overflow:hidden;border-right:none}
-        @media(max-width:768px){.sessions-panel{display:none}.sessions-panel.open{display:flex;position:fixed;left:0;top:56px;bottom:0;z-index:100;width:260px;background:var(--bg2);opacity:1;border-right:1px solid var(--border)}}
+        @media(max-width:768px){.sessions-panel{display:none}.sessions-panel.open{display:flex;position:fixed;left:0;top:56px;bottom:0;z-index:100;width:260px;background:var(--bg2);opacity:1;border-right:1px solid hsl(var(--border))}}
         .chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
-        .chat-header{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
-        .messages-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+        .chat-header{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+        .messages-area{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.15) transparent}
+        .messages-area::-webkit-scrollbar{width:4px}
+        .messages-area::-webkit-scrollbar-track{background:transparent}
+        .messages-area::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:2px}
+        .messages-area::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.25)}
         @media(max-width:480px){.messages-area{padding:12px;gap:8px}}
-        .msg-user{align-self:flex-end;background:var(--accent);color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:85%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
-        .msg-assistant{align-self:flex-start;background:var(--card);border:1px solid var(--card-b);border-radius:4px 16px 16px 16px;padding:10px 14px;max-width:88%;font-size:.88rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-        .input-area{border-top:1px solid var(--border);padding:16px;flex-shrink:0;background:var(--bg)}
+        .msg-user{align-self:flex-end;background:hsl(var(--accent));color:#fff;border-radius:16px 16px 4px 16px;padding:10px 14px;max-width:85%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+        .msg-assistant{align-self:flex-start;background:hsl(var(--card));border:1px solid var(--card-b);border-radius:4px 16px 16px 16px;padding:10px 14px;max-width:88%;font-size:.88rem;line-height:1.6;white-space:normal;word-break:break-word}
+        .input-area{border-top:1px solid hsl(var(--border));padding:16px;flex-shrink:0;background:var(--bg)}
         @media(max-width:480px){.input-area{padding:10px}}
         .input-row{display:flex;gap:10px;align-items:flex-end}
-        .chat-textarea{flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;font-family:var(--sans);font-size:.88rem;color:var(--text);resize:none;min-height:44px;max-height:144px;outline:none;transition:border-color .15s;line-height:1.5}
-        .chat-textarea:focus{border-color:var(--accent)}
-        .send-btn{width:40px;height:40px;border-radius:50%;background:var(--accent);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+        .chat-textarea{flex:1;background:var(--bg2);border:1px solid hsl(var(--border));border-radius:12px;padding:10px 14px;font-family:var(--sans);font-size:.88rem;color:var(--text);resize:none;min-height:44px;max-height:144px;outline:none;transition:border-color .15s;line-height:1.5}
+        .chat-textarea:focus{border-color:hsl(var(--accent))}
+        .send-btn{width:40px;height:40px;border-radius:50%;background:hsl(var(--accent));border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
         .send-btn:disabled{opacity:.4;cursor:not-allowed}
         .send-btn:not(:disabled):hover{background:#ea6c0a}
-        .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;animation:dotPulse 1.4s ease-in-out infinite}
+        .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;animation:pulse-dot 1.2s ease-in-out infinite}
         .starter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
         @media(max-width:600px){.starter-grid{grid-template-columns:1fr}}
-        .starter-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;font-size:.82rem;color:var(--text2);transition:all .15s;text-align:left}
-        .starter-card:hover{border-color:var(--accent);color:var(--accent)}
+        .starter-card{background:var(--bg3);border:1px solid hsl(var(--border));border-radius:10px;padding:14px;cursor:pointer;font-size:.82rem;color:var(--text2);transition:all .15s;text-align:left}
+        .starter-card:hover{border-color:hsl(var(--accent));color:hsl(var(--accent))}
       `}</style>
 
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      {mobileSidebarOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
 
       <div className="dash-layout">
-        <Sidebar
-          user={userProfile}
-          pathname={pathname}
-          sidebarCollapsed={sidebarCollapsed}
-          setSidebarCollapsed={setSidebarCollapsed}
-          mobileSidebarOpen={mobileSidebarOpen}
-          setMobileSidebarOpen={setMobileSidebarOpen}
-          theme={theme}
-          toggleTheme={toggleTheme}
-          signOut={signOut}
-          router={router}
-        />
-
         <div className="main-area">
           <div className="topbar">
             <button
@@ -708,7 +434,7 @@ export default function ChatPage() {
               <div
                 style={{
                   padding: "12px 14px",
-                  borderBottom: "1px solid var(--border)",
+                  borderBottom: "1px solid hsl(var(--border))",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -727,11 +453,12 @@ export default function ChatPage() {
                 </span>
                 <button
                   onClick={() => {
+                    setConversationId(null);
                     setMessages([]);
                     setSessionTitle("New Chat");
                   }}
                   style={{
-                    background: "var(--accent)",
+                    background: "hsl(var(--accent))",
                     color: "#fff",
                     border: "none",
                     borderRadius: 7,
@@ -744,42 +471,138 @@ export default function ChatPage() {
                   + New
                 </button>
               </div>
-              <div style={{ flex: 1, padding: "8px", overflowY: "auto" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 8,
-                    padding: "32px 16px",
-                    color: "var(--text3)",
-                    textAlign: "center",
-                  }}
-                >
-                  <svg
-                    width="28"
-                    height="28"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                  <span
+              <div
+                className="scrollable-sessions"
+                style={{
+                  flex: 1,
+                  padding: "8px",
+                  overflowY: "auto",
+                }}
+              >
+                {sessionsLoading ? (
+                  <div
                     style={{
-                      fontSize: ".8rem",
-                      fontWeight: 500,
-                      color: "var(--text2)",
+                      padding: 16,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 10,
                     }}
                   >
-                    No conversations yet
-                  </span>
-                  <span style={{ fontSize: ".74rem" }}>
-                    Start a new chat below
-                  </span>
-                </div>
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        style={{
+                          height: 44,
+                          borderRadius: 8,
+                          background: "var(--bg3)",
+                          animation: "pulse 1.2s ease-in-out infinite",
+                        }}
+                      />
+                    ))}
+                  </div>
+                ) : sessions.length === 0 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "32px 16px",
+                      color: "var(--text3)",
+                      textAlign: "center",
+                    }}
+                  >
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                    >
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    </svg>
+                    <span
+                      style={{
+                        fontSize: ".8rem",
+                        fontWeight: 500,
+                        color: "var(--text2)",
+                      }}
+                    >
+                      No conversations yet
+                    </span>
+                    <span style={{ fontSize: ".74rem" }}>
+                      Start a new chat below
+                    </span>
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {sessions.map((s) => (
+                      <div
+                        key={s.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => void openSession(s.id, s.title)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ")
+                            void openSession(s.id, s.title);
+                        }}
+                        style={{
+                          padding: "10px 12px",
+                          borderRadius: 10,
+                          background:
+                            conversationId === s.id
+                              ? "var(--accent-l)"
+                              : "var(--bg3)",
+                          border: `1px solid ${conversationId === s.id ? "var(--accent-m)" : "hsl(var(--border))"}`,
+                          cursor: "pointer",
+                          textAlign: "left",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: ".82rem",
+                            fontWeight: 600,
+                            color: "var(--text2)",
+                            marginBottom: 4,
+                          }}
+                        >
+                          {s.title}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: ".68rem",
+                            color: "var(--text3)",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            gap: 8,
+                          }}
+                        >
+                          <span>
+                            {new Date(s.updated_at).toLocaleString(undefined, {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={(e) => void deleteSession(s.id, e)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              color: "#ef4444",
+                              cursor: "pointer",
+                              fontSize: ".68rem",
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -816,7 +639,7 @@ export default function ChatPage() {
                     style={{
                       flex: 1,
                       background: "var(--bg2)",
-                      border: "1px solid var(--accent)",
+                      border: "1px solid hsl(var(--accent))",
                       borderRadius: 7,
                       padding: "4px 10px",
                       fontFamily: "var(--sans)",
@@ -826,28 +649,41 @@ export default function ChatPage() {
                     }}
                   />
                 ) : (
-                  <span
-                    onDoubleClick={() => setEditingTitle(true)}
-                    style={{
-                      flex: 1,
-                      fontSize: ".88rem",
-                      fontWeight: 500,
-                      color: "var(--text2)",
-                      cursor: "text",
-                    }}
-                    title="Double-click to edit"
+                  <div
+                    className="group relative flex flex-1 items-center gap-1"
+                    style={{ minWidth: 0, flex: 1 }}
                   >
-                    {sessionTitle}
-                  </span>
+                    <span
+                      onDoubleClick={() => setEditingTitle(true)}
+                      style={{
+                        flex: 1,
+                        fontSize: ".88rem",
+                        fontWeight: 500,
+                        color: "var(--text2)",
+                        cursor: "text",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {sessionTitle}
+                    </span>
+                    <button
+                      type="button"
+                      className="opacity-0 transition-opacity group-hover:opacity-100 p-1 rounded-md hover:bg-white/10 text-[var(--text3)]"
+                      aria-label="Edit title"
+                      onClick={() => setEditingTitle(true)}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 )}
                 <button
                   className="topbar-btn"
                   title="Clear chat"
+                  type="button"
                   onClick={() => {
-                    if (messages.length > 0 && confirm("Clear this chat?")) {
-                      setMessages([]);
-                      addToast("Chat cleared", "info");
-                    }
+                    if (messages.length > 0) setClearDialogOpen(true);
                   }}
                 >
                   <svg
@@ -868,7 +704,7 @@ export default function ChatPage() {
                 </button>
               </div>
 
-              <div className="messages-area">
+              <div className="messages-area scrollable">
                 {messages.length === 0 ? (
                   <div
                     style={{
@@ -929,7 +765,9 @@ export default function ChatPage() {
                         msg.role === "user" ? "msg-user" : "msg-assistant"
                       }
                     >
-                      {msg.pending ? (
+                      {msg.role === "user" ? (
+                        msg.content
+                      ) : msg.pending ? (
                         <div
                           style={{
                             display: "flex",
@@ -955,7 +793,7 @@ export default function ChatPage() {
                           ))}
                         </div>
                       ) : (
-                        msg.content
+                        <MarkdownRenderer content={msg.content} />
                       )}
                     </div>
                   ))
@@ -977,7 +815,7 @@ export default function ChatPage() {
                       style={{
                         fontSize: ".74rem",
                         background: "var(--accent-l)",
-                        color: "var(--accent)",
+                        color: "hsl(var(--accent))",
                         border: "1px solid var(--accent-m)",
                         borderRadius: 100,
                         padding: "2px 10px",
@@ -992,7 +830,7 @@ export default function ChatPage() {
                         style={{
                           background: "none",
                           border: "none",
-                          color: "var(--accent)",
+                          color: "hsl(var(--accent))",
                           cursor: "pointer",
                           fontSize: ".7rem",
                           padding: 0,
@@ -1059,6 +897,30 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      <AlertDialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear this conversation?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+              onClick={() => {
+                setMessages([]);
+                setClearDialogOpen(false);
+                addToast("Chat cleared", "info");
+              }}
+            >
+              Clear Chat
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

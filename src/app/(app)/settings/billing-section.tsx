@@ -24,6 +24,7 @@ const PLAN_LIMITS = {
 export function BillingSection({ profile }: BillingSectionProps) {
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -70,13 +71,42 @@ export function BillingSection({ profile }: BillingSectionProps) {
     }
   };
 
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Checkout failed",
+          description: data.error || "Could not start checkout.",
+        });
+      }
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Checkout failed",
+        description: "Something went wrong. Try again or visit Pricing.",
+      });
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <style>{`.billing-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}@media(max-width:380px){.billing-stats{grid-template-columns:1fr}}.billing-actions{display:flex;gap:10px;flex-wrap:wrap}.billing-actions button{flex:1;min-width:120px}`}</style>
       <div
         style={{
           padding: "24px",
-          background: "var(--card)",
+          background: "hsl(var(--card))",
           border: "1px solid var(--card-b)",
           borderRadius: 14,
           position: "relative",
@@ -130,7 +160,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
               textTransform: "uppercase",
               background: isPaid ? "rgba(245,158,11,.15)" : "var(--bg3)",
               color: plan.color,
-              border: `1px solid ${isPaid ? "rgba(245,158,11,.3)" : "var(--border)"}`,
+              border: `1px solid ${isPaid ? "rgba(245,158,11,.3)" : "hsl(var(--border))"}`,
               whiteSpace: "nowrap",
             }}
           >
@@ -143,7 +173,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
             style={{
               padding: "16px",
               background: "var(--bg2)",
-              border: "1px solid var(--border)",
+              border: "1px solid hsl(var(--border))",
               borderRadius: 10,
             }}
           >
@@ -165,7 +195,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
             style={{
               padding: "16px",
               background: "var(--bg2)",
-              border: "1px solid var(--border)",
+              border: "1px solid hsl(var(--border))",
               borderRadius: 10,
             }}
           >
@@ -193,7 +223,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
               style={{
                 flex: 1,
                 padding: "10px 16px",
-                background: "var(--accent)",
+                background: "hsl(var(--accent))",
                 color: "#fff",
                 border: "none",
                 borderRadius: 9,
@@ -210,10 +240,57 @@ export function BillingSection({ profile }: BillingSectionProps) {
         </div>
       </div>
 
+      {!isPaid && (
+        <div
+          style={{
+            padding: "24px",
+            background: "hsl(var(--card))",
+            border: "1px solid var(--card-b)",
+            borderRadius: 14,
+          }}
+        >
+          <div style={{ marginBottom: 12 }}>
+            <div
+              style={{
+                fontSize: ".95rem",
+                fontWeight: 600,
+                color: "var(--text)",
+                marginBottom: 6,
+              }}
+            >
+              Upgrade to Pro
+            </div>
+            <p style={{ fontSize: ".84rem", color: "var(--text3)", lineHeight: 1.6 }}>
+              Unlock unlimited summaries, Remix Studio, AI chat, and brand voice
+              tools. Free plan includes {plan.requests} AI requests per month.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={handleUpgrade}
+            disabled={checkoutLoading}
+            style={{
+              width: "100%",
+              padding: "12px 16px",
+              background: "hsl(var(--accent))",
+              color: "#fff",
+              border: "none",
+              borderRadius: 9,
+              fontSize: ".88rem",
+              fontWeight: 600,
+              cursor: checkoutLoading ? "not-allowed" : "pointer",
+              opacity: checkoutLoading ? 0.75 : 1,
+            }}
+          >
+            {checkoutLoading ? "Starting checkout…" : "Upgrade to Pro"}
+          </button>
+        </div>
+      )}
+
       <div
         style={{
           padding: "24px",
-          background: "var(--card)",
+          background: "hsl(var(--card))",
           border: "1px solid var(--card-b)",
           borderRadius: 14,
         }}
@@ -251,7 +328,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
                 justifyContent: "space-between",
                 padding: "12px 14px",
                 background: "var(--bg2)",
-                border: "1px solid var(--border)",
+                border: "1px solid hsl(var(--border))",
                 borderRadius: 9,
               }}
             >

@@ -71,12 +71,12 @@ export function PrivacySection() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Data & Privacy</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Control your data and privacy settings</div>
         </div>
-        <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+        <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid hsl(var(--border))", borderRadius: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div>
             <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500, marginBottom: 3 }}>Export Your Data</div>
             <div style={{ fontSize: ".78rem", color: "var(--text3)" }}>Download all your summaries, chats, and documents as JSON</div>
@@ -91,7 +91,7 @@ export function PrivacySection() {
         </div>
       </div>
 
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid rgba(248,113,113,.2)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid rgba(248,113,113,.2)", borderRadius: 14 }}>
         <div style={{ marginBottom: 16 }}>
           <div style={{ fontSize: ".9rem", color: "var(--error)", fontWeight: 500, marginBottom: 4 }}>Danger Zone</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Irreversible actions  proceed with caution</div>

@@ -20,23 +20,23 @@ const AUTH_STYLES = `
   @media(max-width:820px){.auth-right{display:none}}
   .auth-card{width:100%;max-width:400px;animation:fu .5s ease both}
   .auth-logo{font-family:var(--serif);font-size:1.4rem;font-weight:300;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px;letter-spacing:-.02em;margin-bottom:40px}
-  .auth-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .auth-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .auth-h1{font-family:var(--serif);font-size:1.9rem;font-weight:300;color:var(--text);letter-spacing:-.03em;line-height:1.15;margin-bottom:6px}
-  .auth-h1 em{font-style:italic;color:var(--accent)}
+  .auth-h1 em{font-style:italic;color:hsl(var(--accent))}
   .auth-sub{font-size:.85rem;color:var(--text3);margin-bottom:28px;line-height:1.5}
   .auth-form{display:flex;flex-direction:column;gap:14px}
   .field-group{display:flex;flex-direction:column;gap:5px}
   .field-label{font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.02em}
   .field-input{
-    background:var(--bg2);border:1px solid var(--border);border-radius:9px;
+    background:var(--bg2);border:1px solid hsl(var(--border));border-radius:9px;
     padding:11px 14px;font-size:.88rem;color:var(--text);font-family:var(--sans);
     outline:none;transition:border-color .18s,box-shadow .18s;width:100%;
   }
-  .field-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(249,115,22,.12)}
+  .field-input:focus{border-color:hsl(var(--accent));box-shadow:0 0 0 3px rgba(249,115,22,.12)}
   .field-input::placeholder{color:var(--text3)}
   .field-input.error{border-color:var(--error)}
   .btn-primary{
-    background:var(--accent);color:#fff;border:none;border-radius:9px;
+    background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;
     padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;
     font-family:var(--sans);letter-spacing:-.01em;width:100%;
     display:flex;align-items:center;justify-content:center;gap:8px;
@@ -45,23 +45,23 @@ const AUTH_STYLES = `
   .btn-primary:hover:not(:disabled){background:#ea6c0a;transform:translateY(-1px)}
   .btn-primary:disabled{opacity:.6;cursor:not-allowed}
   .btn-google{
-    background:var(--bg2);color:var(--text2);border:1px solid var(--border);
+    background:var(--bg2);color:var(--text2);border:1px solid hsl(var(--border));
     border-radius:9px;padding:11px;font-size:.86rem;font-weight:500;cursor:pointer;
     font-family:var(--sans);width:100%;display:flex;align-items:center;
     justify-content:center;gap:9px;transition:all .18s;
   }
   .btn-google:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
   .divider{display:flex;align-items:center;gap:12px;margin:4px 0}
-  .divider-line{flex:1;height:1px;background:var(--border)}
+  .divider-line{flex:1;height:1px;background:hsl(var(--border))}
   .divider-text{font-size:.72rem;color:var(--text3);white-space:nowrap}
   .auth-footer{text-align:center;margin-top:20px;font-size:.8rem;color:var(--text3)}
-  .auth-footer a{color:var(--accent);text-decoration:none;font-weight:500}
+  .auth-footer a{color:hsl(var(--accent));text-decoration:none;font-weight:500}
   .auth-footer a:hover{text-decoration:underline}
   .global-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:10px 13px;font-size:.8rem;color:var(--error);margin-bottom:4px}
   .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
   .forgot-link{font-size:.75rem;color:var(--text3);text-decoration:none;text-align:right;transition:color .15s}
-  .forgot-link:hover{color:var(--accent)}
-  .theme-toggle{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid var(--border);color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+  .forgot-link:hover{color:hsl(var(--accent))}
+  .theme-toggle{position:fixed;top:14px;right:14px;z-index:100;width:34px;height:34px;border-radius:8px;background:var(--bg3);border:1px solid hsl(var(--border));color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
   .theme-toggle:hover{color:var(--text);border-color:var(--border2)}
 `;
 

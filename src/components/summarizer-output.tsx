@@ -437,7 +437,7 @@ export function SummarizerOutput({
     return (
       <div className="mt-8">
         <Card
-          style={{ background: "var(--card)", borderColor: "var(--border)" }}
+          style={{ background: "hsl(var(--card))", borderColor: "hsl(var(--border))" }}
         >
           <CardContent className="p-6 sm:p-10">
             <div className="space-y-4 animate-pulse">
@@ -451,7 +451,7 @@ export function SummarizerOutput({
             </div>
             <div
               className="flex items-center justify-center mt-8 gap-2"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             >
               <Loader2 className="h-5 w-5 animate-spin" />
               <span className="text-sm">Generating your summary...</span>
@@ -498,7 +498,7 @@ export function SummarizerOutput({
           >
             <History
               className="mr-0 sm:mr-2 h-4 w-4"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             />
             <span className="hidden sm:inline">History ({history.length})</span>
           </Button>
@@ -511,7 +511,7 @@ export function SummarizerOutput({
           >
             <ClipboardCopy
               className="mr-0 sm:mr-2 h-4 w-4"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             />
             <span className="hidden sm:inline">Copy</span>
           </Button>
@@ -528,7 +528,7 @@ export function SummarizerOutput({
             ) : (
               <Sparkles
                 className="mr-0 sm:mr-2 h-4 w-4"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "hsl(var(--accent))" }}
               />
             )}
             <span className="hidden sm:inline">Summarize</span>
@@ -542,7 +542,7 @@ export function SummarizerOutput({
           >
             <Download
               className="mr-0 sm:mr-2 h-4 w-4"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             />
             <span className="hidden sm:inline">Download</span>
           </Button>
@@ -555,7 +555,7 @@ export function SummarizerOutput({
           >
             <RefreshCw
               className="mr-0 sm:mr-2 h-4 w-4"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             />
             <span className="hidden sm:inline">Regenerate</span>
           </Button>
@@ -564,7 +564,7 @@ export function SummarizerOutput({
         <div className="text-center text-gray-400 py-12">
           <Sparkles
             className="h-12 w-12 mx-auto mb-4"
-            style={{ color: "var(--accent)" }}
+            style={{ color: "hsl(var(--accent))" }}
           />
           <p className="text-base">Your summary will appear here</p>
           <p className="text-sm mt-2 text-gray-500">
@@ -584,7 +584,7 @@ export function SummarizerOutput({
         style={{
           background:
             "linear-gradient(to right, var(--accent-l), var(--accent-l))",
-          borderColor: "var(--accent)",
+          borderColor: "hsl(var(--accent))",
         }}
       >
         <div className="flex items-center gap-3">
@@ -639,7 +639,7 @@ export function SummarizerOutput({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
-              style={{ background: "var(--bg2)", borderColor: "var(--border)" }}
+              style={{ background: "var(--bg2)", borderColor: "hsl(var(--border))" }}
             >
               <DropdownMenuItem
                 onClick={handleDownloadPdf}
@@ -677,7 +677,7 @@ export function SummarizerOutput({
               <DropdownMenuContent
                 style={{
                   background: "var(--bg2)",
-                  borderColor: "var(--border)",
+                  borderColor: "hsl(var(--border))",
                 }}
                 className="max-h-[300px] overflow-y-auto"
               >
@@ -698,7 +698,7 @@ export function SummarizerOutput({
 
       {/* Summary Content - New Modern Design */}
       <Card
-        style={{ background: "var(--card)", borderColor: "var(--border)" }}
+        style={{ background: "hsl(var(--card))", borderColor: "hsl(var(--border))" }}
         className="shadow-2xl overflow-hidden"
       >
         <CardContent className="p-0">
@@ -710,7 +710,7 @@ export function SummarizerOutput({
                 h1: ({ node, ...props }) => (
                   <h1
                     className="text-3xl font-bold mb-6 pb-3 text-white"
-                    style={{ borderBottom: "1px solid var(--border)" }}
+                    style={{ borderBottom: "1px solid hsl(var(--border))" }}
                     {...props}
                   />
                 ),
@@ -752,7 +752,7 @@ export function SummarizerOutput({
                   <blockquote
                     className="pl-4 py-2 my-4 italic"
                     style={{
-                      borderLeft: "4px solid var(--accent)",
+                      borderLeft: "4px solid hsl(var(--accent))",
                       background: "var(--accent-l)",
                       color: "var(--text2)",
                     }}
@@ -768,7 +768,7 @@ export function SummarizerOutput({
                       className="px-1.5 py-0.5 rounded text-sm"
                       style={{
                         background: "var(--accent-l)",
-                        color: "var(--accent)",
+                        color: "hsl(var(--accent))",
                       }}
                       {...props}
                     />
@@ -785,7 +785,7 @@ export function SummarizerOutput({
                 hr: ({ node, ...props }) => (
                   <hr
                     className="my-6"
-                    style={{ borderColor: "var(--border)" }}
+                    style={{ borderColor: "hsl(var(--border))" }}
                     {...props}
                   />
                 ),
@@ -798,7 +798,7 @@ export function SummarizerOutput({
                   <th
                     className="px-4 py-2 text-left font-semibold text-white"
                     style={{
-                      border: "1px solid var(--border)",
+                      border: "1px solid hsl(var(--border))",
                       background: "var(--bg3)",
                     }}
                     {...props}
@@ -808,7 +808,7 @@ export function SummarizerOutput({
                   <td
                     className="px-4 py-2"
                     style={{
-                      border: "1px solid var(--border)",
+                      border: "1px solid hsl(var(--border))",
                       color: "var(--text2)",
                     }}
                     {...props}

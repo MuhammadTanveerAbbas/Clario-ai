@@ -51,14 +51,14 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
   };
 
   const inputStyle: React.CSSProperties = {
-    background: "var(--input)", border: "1px solid var(--input-b)", borderRadius: 10,
+    background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 10,
     padding: "10px 14px", color: "var(--text)", fontSize: ".85rem", fontFamily: "inherit",
     outline: "none", width: "100%", transition: "border-color .15s",
   };
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Change Password</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Update your password to keep your account secure</div>
@@ -79,7 +79,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
                 minLength={field.id !== "currentPassword" ? 8 : undefined}
                 disabled={loading}
                 style={inputStyle}
-                onFocus={e => e.target.style.borderColor = "var(--accent)"}
+                onFocus={e => e.target.style.borderColor = "hsl(var(--accent))"}
                 onBlur={e => e.target.style.borderColor = "var(--input-b)"}
               />
             </div>
@@ -88,7 +88,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
             <button
               type="submit"
               disabled={loading}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "var(--accent)", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit" }}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "hsl(var(--accent))", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit" }}
             >
               {loading && <Loader2 size={14} className="animate-spin" />}
               {loading ? "Updating..." : "Update Password"}
@@ -97,7 +97,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
         </form>
       </div>
 
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Account Security</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Manage active sessions and security options</div>
@@ -107,7 +107,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
             { label: "Two-Factor Authentication", desc: "Add an extra layer of security", action: "Enable", color: "var(--success)" },
             { label: "Login Sessions", desc: "Manage active sessions", action: "View All", color: "var(--text2)" },
           ].map(item => (
-            <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 10, gap: 12, flexWrap: "wrap" }}>
+            <div key={item.label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", background: "var(--bg2)", border: "1px solid hsl(var(--border))", borderRadius: 10, gap: 12, flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500 }}>{item.label}</div>
                 <div style={{ fontSize: ".78rem", color: "var(--text3)", marginTop: 2 }}>{item.desc}</div>
@@ -117,7 +117,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
               </button>
             </div>
           ))}
-          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 14, marginTop: 4 }}>
+          <div style={{ borderTop: "1px solid hsl(var(--border))", paddingTop: 14, marginTop: 4 }}>
             <button
               onClick={onSignOut}
               style={{ width: "100%", padding: "10px", background: "rgba(248,113,113,.1)", border: "1px solid rgba(248,113,113,.25)", borderRadius: 9, color: "var(--error)", fontSize: ".84rem", fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}

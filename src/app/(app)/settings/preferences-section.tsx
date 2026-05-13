@@ -36,7 +36,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
       onClick={onChange}
       style={{
         width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-        background: checked ? "var(--accent)" : "var(--border2)",
+        background: checked ? "hsl(var(--accent))" : "var(--border2)",
         position: "relative", transition: "background .2s", flexShrink: 0,
       }}
     >
@@ -56,7 +56,7 @@ export function PreferencesSection({ preferences, onPreferencesChange }: Prefere
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "24px", background: "var(--card)", border: "1px solid var(--card-b)", borderRadius: 14 }}>
+      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
         <div style={{ marginBottom: 20 }}>
           <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Preferences</div>
           <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Customize your Clario experience</div>
@@ -76,7 +76,7 @@ export function PreferencesSection({ preferences, onPreferencesChange }: Prefere
                 </div>
                 <Toggle checked={preferences[opt.key]} onChange={() => toggle(opt.key)} />
               </div>
-              {i < OPTIONS.length - 1 && <div style={{ height: 1, background: "var(--border)" }} />}
+              {i < OPTIONS.length - 1 && <div style={{ height: 1, background: "hsl(var(--border))" }} />}
             </div>
           ))}
         </div>

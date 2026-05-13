@@ -1,11 +1,15 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { LoadingPage } from "@/components/ui/loading-page";
 import Link from "next/link";
+import { getMarkdownDarkComponents } from "@/lib/markdown-dark-components";
 
 interface Toast {
   id: string;
@@ -118,7 +122,7 @@ function Skeleton({
         height: h,
         borderRadius: r,
         background:
-          "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)",
+          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.5s infinite",
       }}
@@ -152,9 +156,9 @@ function ToastContainer({
             display: "flex",
             alignItems: "center",
             gap: 10,
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--accent)"}`,
+            background: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))"}`,
             borderRadius: 10,
             padding: "11px 14px",
             boxShadow: "0 8px 24px rgba(0,0,0,.2)",
@@ -295,7 +299,7 @@ export default function RemixPage() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, signOut, loading: authLoading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const {
     collapsed: sidebarCollapsed,
@@ -317,7 +321,7 @@ export default function RemixPage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [userProfile, setUserProfile] = useState<{
     full_name?: string;
-    plan?: string;
+    subscription_tier?: string;
   } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const isDark = theme === "dark";
@@ -342,7 +346,7 @@ export default function RemixPage() {
     if (!authUser) return;
     supabase
       .from("profiles")
-      .select("full_name, plan")
+      .select("full_name, subscription_tier")
       .eq("id", authUser.id)
       .single()
       .then(({ data }) => {
@@ -380,7 +384,10 @@ export default function RemixPage() {
       const res = await fetch("/api/remix", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: content.trim() }),
+        body: JSON.stringify({
+          content: content.trim(),
+          formats: Array.from(selectedFormats),
+        }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: "Request failed" }));
@@ -424,12 +431,14 @@ export default function RemixPage() {
 
   const hasOutputs = Object.keys(outputs).length > 0;
 
+  if (authLoading) return <LoadingPage />;
+  if (!authUser) return null;
+
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400&family=Geist:wght@300;400;500;600&display=swap');
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
+        :root{--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
         body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
         @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -438,18 +447,18 @@ export default function RemixPage() {
         .sidebar[data-collapsed="true"]{width:60px}
         .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
         .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
         .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
         .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
         .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
         .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
         .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
-        .sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
+        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
+        .sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
         .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
         .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+        .sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
         .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
         .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
         .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
@@ -457,11 +466,11 @@ export default function RemixPage() {
         .sb-btn:hover{background:var(--bg3);color:var(--text2)}
         .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
         .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
+        .sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
         .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
         .sb-upgrade:hover{background:#ea6c0a}
-        .topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
+        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
+        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
         .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
         .topbar-hamburger{display:none}
         @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
@@ -471,8 +480,8 @@ export default function RemixPage() {
         .page-content{flex:1;padding:24px;overflow:auto}
         @media(max-width:768px){.page-content{padding:16px}}
         @media(max-width:480px){.page-content{padding:12px}}
-        .card{background:var(--card);border:1px solid var(--card-b);border-radius:14px;overflow:visible}
-        textarea{color:var(--text)!important;background:var(--bg2)!important;border:1px solid var(--border)!important}
+        .card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:14px;overflow:visible}
+        textarea{color:var(--text)!important;background:var(--bg2)!important;border:1px solid hsl(var(--border))!important}
         .remix-layout{display:flex;gap:20px;min-height:0}
         .remix-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
         .remix-right{width:280px;flex-shrink:0}
@@ -481,10 +490,10 @@ export default function RemixPage() {
         @media(max-width:1024px){.format-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:768px){.format-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:480px){.format-grid{grid-template-columns:1fr}}
-        .format-card{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
-        .format-card:hover{background:var(--bg3);border-color:var(--border)}
-        .format-card.selected{border-color:var(--accent);background:var(--accent-l)}
-        .format-card.selected svg{color:var(--accent)}
+        .format-card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+        .format-card:hover{background:var(--bg3);border-color:hsl(var(--border))}
+        .format-card.selected{border-color:hsl(var(--accent));background:var(--accent-l)}
+        .format-card.selected svg{color:hsl(var(--accent))}
         @media(max-width:768px){
           .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
           .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
@@ -499,175 +508,7 @@ export default function RemixPage() {
       `}</style>
 
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      {mobileSidebarOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
       <div className="dash-layout">
-        <aside
-          className="sidebar"
-          data-collapsed={String(sidebarCollapsed)}
-          data-mobile-open={String(mobileSidebarOpen)}
-        >
-          <div className="sb-logo">
-            <div className="sb-logo-mark">
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="sb-logo-text">Clario</span>
-          </div>
-          <nav className="sb-nav">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`sb-item${pathname === item.href ? " active" : ""}`}
-              >
-                <NavIcon type={item.icon} />
-                <span className="sb-lbl">{item.label}</span>
-                {item.badge && <span className="sb-badge">{item.badge}</span>}
-              </Link>
-            ))}
-          </nav>
-          <div className="sb-bottom">
-            {userProfile?.plan === "free" && (
-              <button
-                className="sb-upgrade"
-                onClick={() => router.push("/pricing")}
-              >
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                >
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                Upgrade to Pro
-              </button>
-            )}
-            <button
-              className="sb-btn"
-              onClick={toggleTheme}
-              title={
-                sidebarCollapsed
-                  ? isDark
-                    ? "Light mode"
-                    : "Dark mode"
-                  : undefined
-              }
-            >
-              {isDark ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" />
-                  <line x1="12" y1="21" x2="12" y2="23" />
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                  <line x1="1" y1="12" x2="3" y2="12" />
-                  <line x1="21" y1="12" x2="23" y2="12" />
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-              <span className="sb-btn-lbl">
-                {isDark ? "Light mode" : "Dark mode"}
-              </span>
-            </button>
-            <button
-              className="sb-btn"
-              onClick={async () => {
-                await signOut();
-                router.push("/sign-in");
-              }}
-              title={sidebarCollapsed ? "Sign out" : undefined}
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              <span className="sb-btn-lbl">Sign out</span>
-            </button>
-            <button
-              className="sb-btn"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {sidebarCollapsed ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              )}
-              <span className="sb-btn-lbl">Collapse</span>
-            </button>
-          </div>
-        </aside>
-
         <div className="main-area">
           <div className="topbar">
             <button
@@ -767,7 +608,7 @@ export default function RemixPage() {
                           style={{
                             fontSize: ".74rem",
                             background: "var(--accent-l)",
-                            color: "var(--accent)",
+                            color: "hsl(var(--accent))",
                             border: "1px solid var(--accent-m)",
                             borderRadius: 100,
                             padding: "2px 10px",
@@ -785,7 +626,7 @@ export default function RemixPage() {
                         width: "100%",
                         height: 160,
                         background: "var(--bg2)",
-                        border: "1px solid var(--border)",
+                        border: "1px solid hsl(var(--border))",
                         borderRadius: 10,
                         padding: "12px 14px",
                         fontFamily: "var(--sans)",
@@ -817,7 +658,7 @@ export default function RemixPage() {
                           }
                           style={{
                             background: "var(--bg3)",
-                            border: "1px solid var(--border)",
+                            border: "1px solid hsl(var(--border))",
                             borderRadius: 8,
                             padding: "7px 14px",
                             fontSize: ".78rem",
@@ -833,7 +674,7 @@ export default function RemixPage() {
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = "var(--bg3)";
-                            e.currentTarget.style.borderColor = "var(--border)";
+                            e.currentTarget.style.borderColor = "hsl(var(--border))";
                           }}
                         >
                           Select All
@@ -842,7 +683,7 @@ export default function RemixPage() {
                           onClick={() => setSelectedFormats(new Set())}
                           style={{
                             background: "var(--bg3)",
-                            border: "1px solid var(--border)",
+                            border: "1px solid hsl(var(--border))",
                             borderRadius: 8,
                             padding: "7px 14px",
                             fontSize: ".78rem",
@@ -858,7 +699,7 @@ export default function RemixPage() {
                           }}
                           onMouseLeave={(e) => {
                             e.currentTarget.style.background = "var(--bg3)";
-                            e.currentTarget.style.borderColor = "var(--border)";
+                            e.currentTarget.style.borderColor = "hsl(var(--border))";
                           }}
                         >
                           Deselect All
@@ -884,7 +725,7 @@ export default function RemixPage() {
                             selectedFormats.size === 0
                           }
                           style={{
-                            background: "var(--accent)",
+                            background: "hsl(var(--accent))",
                             color: "#fff",
                             border: "none",
                             borderRadius: 9,
@@ -1015,7 +856,7 @@ export default function RemixPage() {
                     {FORMATS.filter((f) => outputs[f.id]).map((f) => {
                       const isCollapsed = collapsed.has(f.id);
                       return (
-                        <div key={f.id} className="output-card">
+                        <div key={f.id} className="card">
                           <div
                             style={{
                               padding: "12px 16px",
@@ -1043,7 +884,7 @@ export default function RemixPage() {
                               onClick={() => handleCopy(f.id, outputs[f.id])}
                               style={{
                                 background: "var(--bg3)",
-                                border: "1px solid var(--border)",
+                                border: "1px solid hsl(var(--border))",
                                 borderRadius: 8,
                                 padding: "7px 14px",
                                 fontSize: ".78rem",
@@ -1063,7 +904,7 @@ export default function RemixPage() {
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.background = "var(--bg3)";
                                 e.currentTarget.style.borderColor =
-                                  "var(--border)";
+                                  "hsl(var(--border))";
                               }}
                             >
                               <svg
@@ -1094,7 +935,7 @@ export default function RemixPage() {
                               }
                               style={{
                                 background: "var(--bg3)",
-                                border: "1px solid var(--border)",
+                                border: "1px solid hsl(var(--border))",
                                 borderRadius: 8,
                                 padding: "7px 14px",
                                 fontSize: ".78rem",
@@ -1114,7 +955,7 @@ export default function RemixPage() {
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.background = "var(--bg3)";
                                 e.currentTarget.style.borderColor =
-                                  "var(--border)";
+                                  "hsl(var(--border))";
                               }}
                             >
                               <svg
@@ -1143,7 +984,7 @@ export default function RemixPage() {
                               }
                               style={{
                                 background: "var(--bg3)",
-                                border: "1px solid var(--border)",
+                                border: "1px solid hsl(var(--border))",
                                 borderRadius: 8,
                                 padding: "7px 14px",
                                 fontSize: ".78rem",
@@ -1163,7 +1004,7 @@ export default function RemixPage() {
                               onMouseLeave={(e) => {
                                 e.currentTarget.style.background = "var(--bg3)";
                                 e.currentTarget.style.borderColor =
-                                  "var(--border)";
+                                  "hsl(var(--border))";
                               }}
                             >
                               {isCollapsed ? (
@@ -1202,10 +1043,14 @@ export default function RemixPage() {
                                 fontSize: ".86rem",
                                 color: "var(--text)",
                                 lineHeight: 1.7,
-                                whiteSpace: "pre-wrap",
                               }}
                             >
-                              {outputs[f.id]}
+                              <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={getMarkdownDarkComponents()}
+                              >
+                                {outputs[f.id]}
+                              </ReactMarkdown>
                             </div>
                           )}
                         </div>

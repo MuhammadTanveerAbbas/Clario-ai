@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { AnalyticsCharts } from "@/components/analytics-charts";
+import { LoadingPage } from "@/components/ui/loading-page";
 import "./dashboard.css";
 
 interface UserProfile {
@@ -114,7 +115,7 @@ function Skeleton({
         height: h,
         borderRadius: r,
         background:
-          "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)",
+          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.5s infinite",
       }}
@@ -126,7 +127,7 @@ export default function Dashboard() {
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, signOut, loading: authLoading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const {
     collapsed: sidebarCollapsed,
@@ -157,22 +158,40 @@ export default function Dashboard() {
           return;
         }
 
-        const [profileRes, usageRes, brandVoiceRes] = await Promise.all([
-          supabase
-            .from("profiles")
-            .select(
-              "id, full_name, avatar_url, subscription_tier, requests_used_this_month",
-            )
-            .eq("id", uid)
-            .single(),
-          supabase
-            .from("usage_tracking")
-            .select("created_at, type")
-            .eq("user_id", uid)
-            .order("created_at", { ascending: false })
-            .limit(60),
-          supabase.from("brand_voices").select("id").eq("user_id", uid),
-        ]);
+        const start = new Date();
+        start.setDate(1);
+        start.setHours(0, 0, 0, 0);
+        const startIso = start.toISOString();
+
+        const [profileRes, sumRes, chatRes, remixRes, brandVoiceRes] =
+          await Promise.all([
+            supabase
+              .from("profiles")
+              .select(
+                "id, full_name, avatar_url, subscription_tier, requests_used_this_month",
+              )
+              .eq("id", uid)
+              .single(),
+            supabase
+              .from("usage_tracking")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", uid)
+              .eq("type", "summarize")
+              .gte("created_at", startIso),
+            supabase
+              .from("usage_tracking")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", uid)
+              .eq("type", "chat")
+              .gte("created_at", startIso),
+            supabase
+              .from("usage_tracking")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", uid)
+              .eq("type", "remix")
+              .gte("created_at", startIso),
+            supabase.from("brand_voices").select("id").eq("user_id", uid),
+          ]);
 
         const profileData = profileRes.data;
         const tier = profileData?.subscription_tier || "free";
@@ -185,18 +204,12 @@ export default function Dashboard() {
           plan: (tier === "pro" ? "pro" : "free") as "free" | "pro",
         });
 
-        const usageData = usageRes.data || [];
         setStats({
-          summaries: usageData.filter(
-            (r: { type: string }) => r.type === "summary",
-          ).length,
-          chats: usageData.filter((r: { type: string }) => r.type === "chat")
-            .length,
-          remixes: usageData.filter((r: { type: string }) => r.type === "remix")
-            .length,
+          summaries: sumRes.count ?? 0,
+          chats: chatRes.count ?? 0,
+          remixes: remixRes.count ?? 0,
           brand_voices: brandVoiceRes.data?.length ?? 0,
-          requests_used:
-            profileData?.requests_used_this_month || usageData.length,
+          requests_used: profileData?.requests_used_this_month ?? 0,
           requests_limit: tier === "pro" ? 1000 : 100,
         });
       } catch {
@@ -233,6 +246,9 @@ export default function Dashboard() {
     ? Math.round((stats.requests_used / stats.requests_limit) * 100)
     : 0;
   const isDark = theme === "dark";
+
+  if (authLoading) return <LoadingPage />;
+  if (!authUser) return null;
 
   const STAT_CARDS = [
     {
@@ -316,156 +332,7 @@ export default function Dashboard() {
 
   return (
     <>
-      {mobileSidebarOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
       <div className="dash-layout">
-        {/* ── Sidebar ── */}
-        <aside
-          className="sidebar"
-          data-collapsed={String(sidebarCollapsed)}
-          data-mobile-open={String(mobileSidebarOpen)}
-        >
-          <div className="sb-logo">
-            <div className="sb-logo-mark">
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="sb-logo-text">Clario</span>
-          </div>
-
-          <nav className="sb-nav">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`sb-item${pathname === item.href ? " active" : ""}`}
-                title={sidebarCollapsed ? item.label : undefined}
-              >
-                <NavIcon type={item.icon} />
-                <span className="sb-lbl">{item.label}</span>
-              </Link>
-            ))}
-          </nav>
-
-          <div className="sb-bottom">
-            <button
-              className="sb-btn"
-              onClick={toggleTheme}
-              title={
-                sidebarCollapsed
-                  ? isDark
-                    ? "Light mode"
-                    : "Dark mode"
-                  : undefined
-              }
-            >
-              {isDark ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" />
-                  <line x1="12" y1="21" x2="12" y2="23" />
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                  <line x1="1" y1="12" x2="3" y2="12" />
-                  <line x1="21" y1="12" x2="23" y2="12" />
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-              <span className="sb-btn-lbl">
-                {isDark ? "Light mode" : "Dark mode"}
-              </span>
-            </button>
-
-            <button className="sb-btn" onClick={handleSignOut}>
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              <span className="sb-btn-lbl">Sign out</span>
-            </button>
-
-            <button
-              className="sb-btn"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              {sidebarCollapsed ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <polyline points="15 18 9 12 15 6" />
-                </svg>
-              )}
-              <span className="sb-btn-lbl">Collapse</span>
-            </button>
-          </div>
-        </aside>
-
-        {/* ── Main ── */}
         <div className="main-area">
           {/* Topbar */}
           <div className="topbar">

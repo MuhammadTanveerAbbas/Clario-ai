@@ -164,7 +164,7 @@ export function AppearanceSection() {
   }
 
   const card: React.CSSProperties = {
-    background: "var(--card)",
+    background: "hsl(var(--card))",
     border: "1px solid var(--card-b)",
     borderRadius: 14,
     padding: "22px 24px",
@@ -185,32 +185,32 @@ export function AppearanceSection() {
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       <style>{`
         .ap-theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .ap-theme-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .18s;font-family:var(--sans);color:var(--text3);font-size:.75rem;font-weight:500}
+        .ap-theme-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 12px;border-radius:12px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;font-family:var(--sans);color:var(--text3);font-size:.75rem;font-weight:500}
         .ap-theme-btn:hover{border-color:var(--border2);color:var(--text2);background:var(--bg3)}
-        .ap-theme-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-l)}
-        .ap-theme-preview{width:100%;height:44px;border-radius:8px;border:1px solid var(--border);overflow:hidden;display:flex;gap:3px;padding:5px}
+        .ap-theme-btn.active{border-color:hsl(var(--accent));color:hsl(var(--accent));background:var(--accent-l)}
+        .ap-theme-preview{width:100%;height:44px;border-radius:8px;border:1px solid hsl(var(--border));overflow:hidden;display:flex;gap:3px;padding:5px}
         .ap-font-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-        .ap-font-btn{padding:14px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .18s;text-align:left}
+        .ap-font-btn{padding:14px 16px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;text-align:left}
         .ap-font-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-font-btn.active{border-color:var(--accent);background:var(--accent-l)}
+        .ap-font-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
         .ap-font-name{font-size:.75rem;font-weight:600;color:var(--text3);margin-bottom:4px}
-        .ap-font-btn.active .ap-font-name{color:var(--accent)}
+        .ap-font-btn.active .ap-font-name{color:hsl(var(--accent))}
         .ap-font-sample{font-size:.95rem;color:var(--text2);line-height:1.3}
         .ap-radius-row{display:flex;gap:8px;align-items:center}
-        .ap-radius-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .18s}
+        .ap-radius-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s}
         .ap-radius-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-radius-btn.active{border-color:var(--accent);background:var(--accent-l)}
+        .ap-radius-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
         .ap-radius-box{width:28px;height:28px;background:var(--border2)}
         .ap-radius-lbl{font-size:.68rem;font-weight:500;color:var(--text3)}
-        .ap-radius-btn.active .ap-radius-lbl{color:var(--accent)}
+        .ap-radius-btn.active .ap-radius-lbl{color:hsl(var(--accent))}
         .ap-density-row{display:flex;gap:8px}
-        .ap-density-btn{flex:1;padding:12px 10px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .18s;text-align:center}
+        .ap-density-btn{flex:1;padding:12px 10px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;text-align:center}
         .ap-density-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-density-btn.active{border-color:var(--accent);background:var(--accent-l)}
+        .ap-density-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
         .ap-density-title{font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:2px}
-        .ap-density-btn.active .ap-density-title{color:var(--accent)}
+        .ap-density-btn.active .ap-density-title{color:hsl(var(--accent))}
         .ap-density-desc{font-size:.68rem;color:var(--text3)}
-        .ap-save-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s;margin-top:4px}
+        .ap-save-btn{width:100%;padding:12px;border-radius:10px;border:none;background:hsl(var(--accent));color:#fff;font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s;margin-top:4px}
         .ap-save-btn:hover{background:#ea6c0a}
         .ap-save-btn.saved{background:var(--success);color:#fff}
         @media(max-width:640px){

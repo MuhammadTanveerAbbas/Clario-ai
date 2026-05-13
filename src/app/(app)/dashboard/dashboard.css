@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Geist:wght@300;400;500;600&display=swap");
-
 @keyframes shimmer {
   0% {
     background-position: 200% 0;
@@ -67,7 +65,7 @@
 .sb-logo-mark {
   width: 28px;
   height: 28px;
-  background: var(--accent);
+  background: hsl(var(--accent));
   border-radius: 7px;
   display: flex;
   align-items: center;
@@ -128,14 +126,14 @@
 .sb-item:hover {
   background: var(--bg3);
   color: var(--text2);
-  border-color: var(--border);
+  border-color: hsl(var(--border));
 }
 
 .sb-item.active {
   background: var(--accent-l);
-  color: var(--accent);
+  color: hsl(var(--accent));
   font-weight: 500;
-  border-color: var(--accent);
+  border-color: hsl(var(--accent));
 }
 
 .sb-lbl {
@@ -203,7 +201,7 @@
 
 .topbar {
   height: 56px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid hsl(var(--border));
   display: flex;
   align-items: center;
   padding: 0 20px;
@@ -236,7 +234,7 @@
   width: 34px;
   height: 34px;
   border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 1px solid hsl(var(--border));
   background: var(--bg2);
   color: var(--text3);
   cursor: pointer;
@@ -265,9 +263,9 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid hsl(var(--border));
   background: var(--accent-l);
-  color: var(--accent);
+  color: hsl(var(--accent));
   font-size: 0.72rem;
   font-weight: 700;
   display: flex;
@@ -279,7 +277,7 @@
 }
 
 .avatar-btn:hover {
-  border-color: var(--accent);
+  border-color: hsl(var(--accent));
 }
 
 /* ── Main area ── */
@@ -330,7 +328,7 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, var(--border), transparent);
+  background: linear-gradient(90deg, hsl(var(--border)), transparent);
 }
 
 .section-block {
@@ -346,9 +344,9 @@
 }
 
 .overview-card {
-  background: linear-gradient(145deg, var(--card), var(--bg2));
+  background: linear-gradient(145deg, hsl(var(--card)), var(--bg2));
   border: 1px solid var(--card-b);
-  border-left: 4px solid var(--ov-color, var(--accent));
+  border-left: 4px solid var(--ov-color, hsl(var(--accent)));
   border-radius: 16px;
   padding: 22px 24px;
   display: flex;
@@ -417,7 +415,7 @@
   padding: 16px 20px;
   border-radius: 16px;
   border: 1px solid var(--card-b);
-  background: linear-gradient(145deg, var(--card), var(--bg2));
+  background: linear-gradient(145deg, hsl(var(--card)), var(--bg2));
   text-decoration: none;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
@@ -484,7 +482,7 @@
 
 /* ── Usage meter ── */
 .usage-meter-card {
-  background: linear-gradient(145deg, var(--card), var(--bg2));
+  background: linear-gradient(145deg, hsl(var(--card)), var(--bg2));
   border: 1px solid var(--card-b);
   border-radius: 16px;
   padding: 24px;
@@ -532,14 +530,14 @@
   border-radius: 100px;
   background: var(--bg3);
   color: var(--text3);
-  border: 1px solid var(--border);
+  border: 1px solid hsl(var(--border));
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .um-plan[data-pro="true"] {
   background: var(--accent-l);
-  color: var(--accent);
+  color: hsl(var(--accent));
   border-color: var(--accent-m);
 }
 
@@ -553,7 +551,7 @@
 .um-bar-fill {
   height: 100%;
   border-radius: 100px;
-  background: var(--accent);
+  background: hsl(var(--accent));
   transition: width 1s ease;
 }
 
@@ -599,7 +597,7 @@
   gap: 6px;
   padding: 10px 14px;
   border-radius: 9px;
-  background: var(--accent);
+  background: hsl(var(--accent));
   color: #fff;
   font-family: var(--sans);
   font-size: 0.76rem;
@@ -625,7 +623,7 @@
 }
 
 .analytics-mini-card {
-  background: linear-gradient(145deg, var(--card), var(--bg2));
+  background: linear-gradient(145deg, hsl(var(--card)), var(--bg2));
   border: 1px solid var(--card-b);
   border-radius: 16px;
   padding: 20px;

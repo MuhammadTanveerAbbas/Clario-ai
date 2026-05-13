@@ -11,7 +11,7 @@ export function UniqueLoader() {
         <div 
           className="absolute inset-0 h-20 w-20 animate-spin rounded-full border-2 border-transparent"
           style={{ 
-            borderTopColor: "var(--accent)",
+            borderTopColor: "hsl(var(--accent))",
             boxShadow: "0 0 20px rgba(249,115,22,0.5)"
           }}
         ></div>
@@ -28,7 +28,7 @@ export function UniqueLoader() {
             viewBox="0 0 24 24"
             stroke="currentColor"
             style={{ 
-              color: "var(--accent)",
+              color: "hsl(var(--accent))",
               filter: 'drop-shadow(0 0 8px rgba(249,115,22,0.6))' 
             }}
           >
@@ -45,7 +45,7 @@ export function UniqueLoader() {
         <div 
           className="absolute inset-0 h-20 w-20 rounded-full animate-ping"
           style={{ 
-            background: "var(--accent)",
+            background: "hsl(var(--accent))",
             opacity: 0.1
           }}
         ></div>

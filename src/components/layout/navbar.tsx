@@ -47,7 +47,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center space-x-2">
             <StickyNote
               className="h-6 w-6"
-              style={{ color: "var(--accent)" }}
+              style={{ color: "hsl(var(--accent))" }}
             />
             <span className="font-bold text-white sm:inline-block text-lg">
               Clario
@@ -77,7 +77,7 @@ export function Navbar() {
                 >
                   <Avatar className="h-9 w-9">
                     <AvatarFallback
-                      style={{ background: "var(--accent)", color: "#fff" }}
+                      style={{ background: "hsl(var(--accent))", color: "#fff" }}
                       className="flex items-center justify-center"
                     >
                       <User className="h-5 w-5" />
@@ -121,7 +121,7 @@ export function Navbar() {
           ) : (
             <Link href="/sign-up">
               <Button
-                style={{ background: "var(--accent)", color: "#fff" }}
+                style={{ background: "hsl(var(--accent))", color: "#fff" }}
                 className="hover:opacity-90 font-semibold shadow-lg transition-all px-4 sm:px-6 text-sm h-10"
               >
                 Create Account
@@ -141,7 +141,7 @@ export function Navbar() {
                 >
                   <Menu
                     className="h-5 w-5"
-                    style={{ color: "var(--accent)" }}
+                    style={{ color: "hsl(var(--accent))" }}
                   />
                   <span className="sr-only">Open Menu</span>
                 </Button>
@@ -159,7 +159,7 @@ export function Navbar() {
                     >
                       <StickyNote
                         className="h-5 w-5"
-                        style={{ color: "var(--accent)" }}
+                        style={{ color: "hsl(var(--accent))" }}
                       />
                       <span className="font-bold text-white">Clario</span>
                     </Link>

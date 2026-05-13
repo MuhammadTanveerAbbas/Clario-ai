@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { LoadingPage } from "@/components/ui/loading-page";
 import { ProfileSection } from "./profile-section";
 import { SecuritySection } from "./security-section";
 import { BillingSection } from "./billing-section";
@@ -212,7 +213,7 @@ function Skeleton({
         height: h,
         borderRadius: r,
         background:
-          "linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%)",
+          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
         backgroundSize: "200% 100%",
         animation: "shimmer 1.5s infinite",
       }}
@@ -246,9 +247,9 @@ function ToastContainer({
             display: "flex",
             alignItems: "center",
             gap: 10,
-            background: "var(--card)",
-            border: "1px solid var(--border)",
-            borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "var(--accent)"}`,
+            background: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
+            borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "hsl(var(--accent))"}`,
             borderRadius: 10,
             padding: "11px 14px",
             boxShadow: "0 8px 24px rgba(0,0,0,.2)",
@@ -279,177 +280,9 @@ function ToastContainer({
   );
 }
 
-function Sidebar({
-  user,
-  pathname,
-  sidebarCollapsed,
-  setSidebarCollapsed,
-  mobileSidebarOpen,
-  setMobileSidebarOpen,
-  theme,
-  toggleTheme,
-  signOut,
-  router,
-}: {
-  user: { full_name?: string; plan?: string } | null;
-  pathname: string;
-  sidebarCollapsed: boolean;
-  setSidebarCollapsed: (v: boolean) => void;
-  mobileSidebarOpen: boolean;
-  setMobileSidebarOpen: (v: boolean) => void;
-  theme: string;
-  toggleTheme: () => void;
-  signOut: () => Promise<void>;
-  router: ReturnType<typeof useRouter>;
-}) {
-  const isDark = theme === "dark";
-  return (
-    <aside
-      className="sidebar"
-      data-collapsed={String(sidebarCollapsed)}
-      data-mobile-open={String(mobileSidebarOpen)}
-    >
-      <div className="sb-logo">
-        <div className="sb-logo-mark">
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          >
-            <path d="M12 2L2 7l10 5 10-5-10-5z" />
-            <path d="M2 17l10 5 10-5" />
-            <path d="M2 12l10 5 10-5" />
-          </svg>
-        </div>
-        <span className="sb-logo-text">Clario</span>
-      </div>
-      <nav className="sb-nav">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`sb-item${pathname === item.href || pathname.startsWith(item.href + "/") ? " active" : ""}`}
-            title={sidebarCollapsed ? item.label : undefined}
-          >
-            <NavIcon type={item.icon} />
-            <span className="sb-lbl">{item.label}</span>
-            {item.badge && <span className="sb-badge">{item.badge}</span>}
-          </Link>
-        ))}
-      </nav>
-      <div className="sb-bottom">
-        <button
-          className="sb-btn"
-          onClick={toggleTheme}
-          title={
-            sidebarCollapsed ? (isDark ? "Light mode" : "Dark mode") : undefined
-          }
-        >
-          {isDark ? (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-          <span className="sb-btn-lbl">
-            {isDark ? "Light mode" : "Dark mode"}
-          </span>
-        </button>
-        <button
-          className="sb-btn"
-          onClick={async () => {
-            await signOut();
-            window.location.href = "/sign-in";
-          }}
-          title={sidebarCollapsed ? "Sign out" : undefined}
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          <span className="sb-btn-lbl">Sign out</span>
-        </button>
-        <button
-          className="sb-btn"
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {sidebarCollapsed ? (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          ) : (
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          )}
-          <span className="sb-btn-lbl">Collapse</span>
-        </button>
-      </div>
-    </aside>
-  );
-}
-
 const SHARED_CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300&family=Geist:wght@300;400;500;600&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--accent:#f97316;--serif:'Fraunces',Georgia,serif;--sans:'Geist',system-ui,sans-serif}
+:root{--accent:#f97316;--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -458,18 +291,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .sidebar[data-collapsed="true"]{width:60px}
 .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
 .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-.sb-logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
 .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
 .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
 .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
 .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-.sb-item:hover{background:var(--bg3);color:var(--text2);border-color:var(--border)}
-.sb-item.active{background:var(--accent-l);color:var(--accent);font-weight:500;border-color:var(--accent)}
+.sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
+.sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
 .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
 .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-.sb-badge{font-size:.56rem;font-weight:700;background:var(--accent);color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
+.sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
 .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
 .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
@@ -477,11 +310,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font
 .sb-btn:hover{background:var(--bg3);color:var(--text2)}
 .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
 .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-.sb-upgrade{margin:0 2px 4px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
+.sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
 .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
 .sb-upgrade:hover{background:#ea6c0a}
-.topbar{height:56px;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-.topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
+.topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
+.topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
 .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
 .topbar-hamburger{display:none}
 @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
@@ -600,33 +433,13 @@ export default function SettingsPage() {
     addToast("info", "Preferences saved.");
   };
 
+  if (authLoading) return <LoadingPage />;
+  if (!authUser) return null;
+
   return (
     <div className="dash-layout" style={{ fontFamily: "var(--sans)" }}>
       <style>{SHARED_CSS}</style>
-
-      {mobileSidebarOpen && (
-        <div
-          className="mobile-overlay"
-          onClick={() => setMobileSidebarOpen(false)}
-        />
-      )}
-
-      <Sidebar
-        user={
-          profile ? { full_name: profile.full_name, plan: profile.plan } : null
-        }
-        pathname={pathname}
-        sidebarCollapsed={sidebarCollapsed}
-        setSidebarCollapsed={setSidebarCollapsed}
-        mobileSidebarOpen={mobileSidebarOpen}
-        setMobileSidebarOpen={setMobileSidebarOpen}
-        theme={theme}
-        toggleTheme={toggleTheme}
-        signOut={signOut}
-        router={router}
-      />
-
-      <div className="main-area">
+        <div className="main-area">
         <header className="topbar">
           <button
             className="topbar-btn topbar-hamburger"
@@ -712,9 +525,9 @@ export default function SettingsPage() {
             .settings-header h1{font-family:Fraunces,Georgia,serif;font-size:1.8rem;font-weight:300;color:var(--text);margin-bottom:6px}
             .settings-header p{font-size:.85rem;color:var(--text3)}
             .tabs-container{display:flex;justify-content:center;margin-bottom:32px;flex-wrap:wrap;gap:8px}
-            .tab-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;color:var(--text3);cursor:pointer;font-size:.82rem;font-family:var(--sans);font-weight:500;transition:all .2s;white-space:nowrap}
+            .tab-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;background:var(--bg2);border:1px solid hsl(var(--border));border-radius:20px;color:var(--text3);cursor:pointer;font-size:.82rem;font-family:var(--sans);font-weight:500;transition:all .2s;white-space:nowrap}
             .tab-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
-            .tab-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 4px 12px rgba(249,115,22,.3)}
+            .tab-btn.active{background:hsl(var(--accent));color:#fff;border-color:hsl(var(--accent));box-shadow:0 4px 12px rgba(249,115,22,.3)}
             .tab-btn svg{width:15px;height:15px}
             @media(max-width:768px){
               .settings-header h1{font-size:1.4rem}

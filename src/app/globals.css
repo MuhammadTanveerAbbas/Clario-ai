@@ -10,19 +10,15 @@
   --bg: #ffffff;
   --bg2: #fafaf9;
   --bg3: #f5f5f4;
-  --border: #e7e5e4;
   --border2: #d6d3d1;
   --text: #0c0a09;
   --text2: #44403c;
   --text3: #78716c;
-  --accent: #f97316;
   --accent-l: #fff7ed;
   --accent-m: #fed7aa;
   --sidebar: #fafaf9;
   --sidebar-b: #e7e5e4;
-  --card: #ffffff;
   --card-b: #e7e5e4;
-  --input: #fafaf9;
   --input-b: #e7e5e4;
   --success: #15803d;
   --error: #be123c;
@@ -33,19 +29,15 @@
   --bg: #0c0a09;
   --bg2: #111110;
   --bg3: #1c1917;
-  --border: #292524;
   --border2: #3d3935;
   --text: #fafaf9;
   --text2: #d6d3d1;
   --text3: #78716c;
-  --accent: #f97316;
   --accent-l: #1a0f07;
   --accent-m: #431407;
   --sidebar: #111110;
   --sidebar-b: #292524;
-  --card: #1c1917;
   --card-b: #292524;
-  --input: #111110;
   --input-b: #292524;
   --success: #4ade80;
   --error: #f87171;
@@ -67,16 +59,6 @@ img, video, svg {
   height: auto;
 }
 
-/* Hide scrollbar globally while keeping scroll functionality */
-* {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* Internet Explorer 10+ */
-}
-
-*::-webkit-scrollbar {
-  display: none; /* WebKit */
-}
-
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -84,9 +66,21 @@ img, video, svg {
   }
 
   input:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: inherit !important;
+    outline: none;
+    border-color: hsl(var(--accent)) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, hsl(var(--accent)) 25%, transparent) !important;
+  }
+
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: hsl(var(--accent)) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, hsl(var(--accent)) 25%, transparent) !important;
+  }
+
+  button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px color-mix(in srgb, hsl(var(--accent)) 35%, transparent) !important;
   }
 
   :root {
@@ -102,12 +96,12 @@ img, video, svg {
     --secondary-foreground: 0 0% 9%;
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
+    --border: 30 11% 91%;
+    --input: 60 9% 98%;
     --ring: 0 0% 3.9%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -127,7 +121,7 @@ img, video, svg {
   .dark {
     --background: 0 0% 7.1%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 7.1%;
+    --card: 30 11% 10%;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 7.1%;
     --popover-foreground: 0 0% 98%;
@@ -137,12 +131,12 @@ img, video, svg {
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
     --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 25.9%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 25.9%;
-    --input: 0 0% 14.9%;
+    --border: 24 6% 17%;
+    --input: 20 6% 7%;
     --ring: 0 0% 83.1%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -168,6 +162,38 @@ img, video, svg {
     background-color: var(--bg) !important;
     color: var(--text) !important;
   }
+}
+
+/* Thin scrollbars for main scroll regions (chat, summarizer, etc.) */
+.scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+}
+
+.scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.app-sidebar-nav {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.app-sidebar-nav::-webkit-scrollbar {
+  display: none;
 }
 
 @layer components {
