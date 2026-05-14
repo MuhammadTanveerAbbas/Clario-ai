@@ -259,11 +259,7 @@ export default function Dashboard() {
   useEffect(() => {
     async function loadData() {
       try {
-        const uid = authUser?.id;
-        if (!uid) {
-          router.push("/sign-in");
-          return;
-        }
+        const uid = authUser.id;
 
         const [profileRes, usageRes, brandVoiceRes] = await Promise.all([
           supabase
@@ -342,12 +338,13 @@ export default function Dashboard() {
         setLoading(false);
       }
     }
-    if (!authUser && !loading) {
+    if (authLoading) return;
+    if (!authUser) {
       router.push("/sign-in");
       return;
     }
     loadData();
-  }, [authUser]);
+  }, [authUser, authLoading]);
 
   const handleSignOut = async () => {
     await signOut();
