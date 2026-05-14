@@ -1,17 +1,11 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { cn } from "@/lib/utils";
 
 export function AppAppShell({ children }: { children: React.ReactNode }) {
   const { collapsed } = useSidebar();
-  const pathname = usePathname();
-  // Dashboard has its own built-in sidebar
-  const isDashboard = pathname === "/dashboard";
-
-  if (isDashboard) return <>{children}</>;
 
   return (
     <>
