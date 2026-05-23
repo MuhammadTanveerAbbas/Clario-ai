@@ -105,12 +105,12 @@ export async function POST(req: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single();
 
-    const tier = (profile?.subscription_tier ?? 'free') as 'free' | 'pro';
-    const currentUsage = profile?.requests_used_this_month ?? 0;
+    const tier = (profile?.plan ?? 'free') as 'free' | 'pro';
+    const currentUsage = profile?.requests_used ?? 0;
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const { checkUsageLimit } = await import('@/lib/usage-limits');
@@ -177,22 +177,33 @@ export async function POST(req: NextRequest) {
     const urlForDb = sanitizeYoutubeUrl(trimmedUrl);
 
     supabase
-      .from('ai_summaries')
+      .from('summarizer_history')
       .insert({
         user_id: user.id,
-        summary_text: summaryForDb,
-        original_text: previewForDb,
-        mode: 'youtube_analysis',
-        youtube_url: urlForDb,
+        source_type: 'youtube_url',
+        source_url: urlForDb,
+        input_text: previewForDb,
+        output_text: summaryForDb,
+        summary_mode: 'youtube_analysis',
       })
       .then(({ error }) => {
         if (error) console.error('[youtube-analyze] DB insert error:', error.message);
       });
 
     supabase
-      .rpc('track_usage', { p_user_id: user.id, p_type: 'summary', p_count: 1 })
+      .from('usage_tracking')
+      .insert({
+        user_id: user.id,
+        type: 'summary',
+      })
       .then(({ error }) => {
         if (error) console.error('[youtube-analyze] Track usage error:', error.message);
+      });
+
+    supabase
+      .rpc('increment_usage', { p_user_id: user.id, p_type: 'summary' })
+      .then(({ error }) => {
+        if (error) console.error('[youtube-analyze] Increment usage error:', error.message);
       });
 
     return NextResponse.json(result);

@@ -31,7 +31,7 @@ Clario is a production-ready SaaS platform built for YouTubers, podcasters, blog
 
 ## ✨ Features
 
-- 🧠 **AI Summarizer** 11 summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, Brutal Roast, and Decisions. Export to `.md` or `.txt`.
+- 🧠 **AI Summarizer** 10 summary modes: Executive Brief, Action Items, Bullet Summary, Full Breakdown, SWOT, Meeting Minutes, Key Quotes, Sentiment, ELI5, and Decisions. Export to `.md` or `.txt`.
 - 📺 **YouTube Summarizer** Paste any YouTube URL and get an instant AI summary. Supports `watch`, `shorts`, `live`, and `youtu.be` formats with multi-language transcript fallback.
 - 💬 **AI Chat** Creator-focused conversational AI with persistent session history and brand voice injection.
 - 🎛️ **Content Remix Studio** Turn one piece of content into 10 platform-native formats in parallel: Twitter/X thread, LinkedIn post, email newsletter, Instagram captions, YouTube description, blog outline, podcast notes, pull quotes, short-form scripts, and LinkedIn carousel.

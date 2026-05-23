@@ -6,7 +6,6 @@
   --serif: var(--font-fraunces), Georgia, serif;
   --sans: var(--font-inter), system-ui, sans-serif;
   --geist: var(--font-inter), system-ui, sans-serif;
-  /* Light mode custom tokens (default) */
   --bg: #ffffff;
   --bg2: #fafaf9;
   --bg3: #f5f5f4;
@@ -22,9 +21,15 @@
   --input-b: #e7e5e4;
   --success: #15803d;
   --error: #be123c;
+  --gradient-1: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #f59e0b 100%);
+  --gradient-2: linear-gradient(135deg, #0c0a09 0%, #292524 100%);
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.1);
+  --shadow-strong: 0 24px 72px rgba(0, 0, 0, 0.12);
 }
 
-/* Dark mode custom tokens */
 .dark {
   --bg: #0c0a09;
   --bg2: #111110;
@@ -41,6 +46,13 @@
   --input-b: #292524;
   --success: #4ade80;
   --error: #f87171;
+  --gradient-1: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #f59e0b 100%);
+  --gradient-2: linear-gradient(135deg, #1c1917 0%, #292524 100%);
+  --glass: rgba(12, 10, 9, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 8px 40px rgba(0, 0, 0, 0.3);
+  --shadow-strong: 0 24px 72px rgba(0, 0, 0, 0.4);
 }
 
 /* Prevent horizontal overflow on all screens */
@@ -607,6 +619,113 @@ img, video, svg {
 }
 
 @layer utilities {
+    .text-gradient {
+        background: var(--gradient-1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .glass {
+        background: var(--glass);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--glass-border);
+    }
+
+    .card-hover {
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .card-hover:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+
+    .scale-in {
+        animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    .slide-in-right {
+        animation: slideInRight 0.4s ease-out forwards;
+        opacity: 0;
+        transform: translateX(12px);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(12px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    .shimmer {
+        background: linear-gradient(
+            90deg,
+            var(--bg3) 25%,
+            var(--bg2) 50%,
+            var(--bg3) 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+    }
+
+    .animated-gradient-bg {
+        background: linear-gradient(
+            135deg,
+            #f97316 0%,
+            #fb923c 25%,
+            #f59e0b 50%,
+            #fb923c 75%,
+            #f97316 100%
+        );
+        background-size: 200% 200%;
+        animation: gradientShift 6s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .glow-orange {
+        box-shadow: 0 0 24px rgba(249, 115, 22, 0.15), 0 0 60px rgba(249, 115, 22, 0.08);
+    }
+
+    .divide-border > :not([hidden]) ~ :not([hidden]) {
+        border-color: hsl(var(--border));
+    }
+
     /* Custom Elegant Scrollbar */
     .custom-scrollbar::-webkit-scrollbar {
         width: 10px;

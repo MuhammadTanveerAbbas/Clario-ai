@@ -36,7 +36,7 @@ export async function GET() {
     // Aggregate data by date
     const dailyUsage: Record<string, number> = {};
     const featureUsage: Record<string, number> = {
-      summarize: 0,
+      summary: 0,
       chat: 0,
       remix: 0,
       brand_voice: 0,

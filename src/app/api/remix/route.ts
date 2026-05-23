@@ -373,12 +373,12 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
@@ -433,13 +433,18 @@ Rules:
       })
     );
 
-    // Track usage (non-blocking)
-    supabase.rpc('track_usage', {
-      p_user_id: user.id,
-      p_type: 'remix',
-      p_count: 1,
+    void supabase.from('usage_tracking').insert({
+      user_id: user.id,
+      type: 'remix',
     }).then(({ error }) => {
       if (error) console.error('[Remix API] Track usage error:', error.message)
+    })
+
+    void supabase.rpc('increment_usage', {
+      p_user_id: user.id,
+      p_type: 'remix',
+    }).then(({ error }) => {
+      if (error) console.error('[Remix API] Increment usage error:', error.message)
     })
 
     return NextResponse.json({ results });

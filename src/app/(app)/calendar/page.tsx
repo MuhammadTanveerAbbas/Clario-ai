@@ -140,14 +140,29 @@ function CalendarPageInner() {
       const startDate = new Date(year, month, 1).toISOString();
       const endDate = new Date(year, month + 1, 0, 23, 59, 59).toISOString();
       const { data, error } = await supabase
-        .from("calendar_events").select("id, title, content, platform, scheduled_at, status, created_at").eq("user_id", user.id)
+        .from("calendar_events").select("id, title, content_text, platform, scheduled_at, color, status, created_at").eq("user_id", user.id)
         .gte("scheduled_at", startDate).lte("scheduled_at", endDate)
         .order("scheduled_at", { ascending: true });
-      if (error) throw error;
-      setEvents(data || []);
+      if (error) {
+        console.error('Calendar fetch error:', error);
+        throw error;
+      }
+      // Map the data to match CalEvent interface
+      const mappedEvents: CalEvent[] = (data || []).map(event => ({
+        id: event.id,
+        title: event.title,
+        scheduled_at: event.scheduled_at,
+        platform: event.platform,
+        content_text: event.content_text,
+        color: event.color,
+        status: event.status,
+      }));
+      setEvents(mappedEvents);
     } catch (error: unknown) {
-      showToast("Failed to load events", "error");
-      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load events';
+      showToast(errorMessage, "error");
+      console.error('Calendar error:', error);
+      setEvents([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -161,41 +176,60 @@ function CalendarPageInner() {
     try {
       if (editingEvent) {
         const { error } = await supabase.from("calendar_events").update({
-          title: formData.title, scheduled_at: formData.scheduled_at,
-          platform: formData.platform?.toLowerCase(), content_text: formData.content,
-          color: formData.color, status: formData.status?.toLowerCase()
-        }).eq("id", editingEvent.id);
-        if (error) throw error;
+          title: formData.title, 
+          scheduled_at: formData.scheduled_at,
+          platform: formData.platform?.toLowerCase(), 
+          content_text: formData.content,
+          color: formData.color, 
+          status: formData.status?.toLowerCase()
+        }).eq("id", editingEvent.id).eq("user_id", user.id);
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         showToast("Event updated", "success");
       } else {
         const { error } = await supabase.from("calendar_events").insert({
-          user_id: user.id, title: formData.title, scheduled_at: formData.scheduled_at,
-          platform: formData.platform?.toLowerCase(), content_text: formData.content,
-          color: formData.color, status: formData.status?.toLowerCase()
+          user_id: user.id, 
+          title: formData.title, 
+          scheduled_at: formData.scheduled_at,
+          platform: formData.platform?.toLowerCase(), 
+          content_text: formData.content,
+          color: formData.color, 
+          status: formData.status?.toLowerCase()
         });
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
         showToast("Event added", "success");
       }
       setModalOpen(false);
       setEditingEvent(null);
       setFormData({ title: "", scheduled_at: "", platform: "Other", content: "", color: COLORS[0], status: "Draft" });
       fetchEvents();
-    } catch (error) {
-      console.error(error);
-      showToast("Failed to save event", "error");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save event';
+      console.error('Save error:', error);
+      showToast(errorMessage, "error");
     }
   };
 
   const handleDeleteEvent = async (id: string) => {
     if (!confirm("Delete this event?")) return;
+    if (!user) return;
     try {
-      const { error } = await supabase.from("calendar_events").delete().eq("id", id);
-      if (error) throw error;
+      const { error } = await supabase.from("calendar_events").delete().eq("id", id).eq("user_id", user.id);
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
       showToast("Event deleted", "success");
       fetchEvents();
-    } catch (error) {
-      console.error(error);
-      showToast("Failed to delete event", "error");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete event';
+      console.error('Delete error:', error);
+      showToast(errorMessage, "error");
     }
   };
 

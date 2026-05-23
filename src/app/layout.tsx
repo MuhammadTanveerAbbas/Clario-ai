@@ -80,6 +80,14 @@ export const metadata: Metadata = {
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
       "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice. Built for YouTubers and podcasters.",
+    images: [
+      {
+        url: "https://clario-hub.vercel.app/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Clario - AI Content Repurposing Tool for Creators",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

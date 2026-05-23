@@ -23,6 +23,7 @@ export async function createCheckoutSession(
         quantity: 1,
       },
     ],
+    client_reference_id: userId,
     success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard?success=true`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/pricing?canceled=true`,
     customer_email: userEmail,

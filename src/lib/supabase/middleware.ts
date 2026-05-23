@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { COOKIE_CONFIG, SECURITY_HEADERS, SESSION_CONFIG } from '../security-config'
+import { COOKIE_CONFIG, SESSION_CONFIG } from '../security-config'
 
 type CookieToSet = {
   name: string
@@ -59,6 +59,12 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Skip all processing for cron jobs — middleware won't even run for these
+  // (the matcher in middleware.ts excludes /api/cron), but guard here too.
+  if (request.nextUrl.pathname.startsWith('/api/cron')) {
+    return supabaseResponse
+  }
+
   const publicPaths = ['/', '/sign-in', '/sign-up', '/pricing', '/privacy', '/terms', '/forgot-password']
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname) ||
     request.nextUrl.pathname.startsWith('/api') ||
@@ -82,11 +88,6 @@ export async function updateSession(request: NextRequest) {
     url.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(url)
   }
-
-  // Add security headers
-  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
-    supabaseResponse.headers.set(key, value)
-  })
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

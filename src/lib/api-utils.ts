@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
  * Returns a typed result object instead of throwing, so callers can handle
  * malformed payloads without try/catch boilerplate.
  */
-export async function parseRequestJSON<T = any>(request: Request): Promise<{
+export async function parseRequestJSON<T = unknown>(request: Request): Promise<{
   success: boolean
   data?: T
   error?: NextResponse
@@ -41,7 +41,7 @@ export async function parseRequestJSON<T = any>(request: Request): Promise<{
  * Returns a 400 response listing missing fields if validation fails.
  */
 export function validateRequiredFields(
-  data: any,
+  data: Record<string, unknown>,
   fields: string[]
 ): { valid: boolean; error?: NextResponse } {
   const missing = fields.filter(field => !data[field])

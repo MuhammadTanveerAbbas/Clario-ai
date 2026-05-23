@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit } from '@/middleware/rate-limit';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
+const ActivateVoiceSchema = z.object({
+  id: z.string().uuid('Invalid voice ID'),
+});
+
 export async function POST(request: NextRequest) {
   try {
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response!
+    }
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -12,18 +22,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    let body;
+    let body: unknown;
     try {
       body = await request.json();
     } catch {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { id } = body;
-
-    if (!id) {
-      return NextResponse.json({ error: 'Voice ID required' }, { status: 400 });
+    const parsed = ActivateVoiceSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid input', details: parsed.error.issues }, { status: 400 });
     }
+
+    const { id } = parsed.data;
 
     // Deactivate all voices before activating the selected one (only one active at a time)
     await supabase

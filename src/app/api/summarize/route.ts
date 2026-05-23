@@ -14,7 +14,6 @@ const SummarizeSchema = z.object({
   mode: z.enum([
     'action-items',
     'decisions',
-    'brutal-roast',
     'executive-brief',
     'full-breakdown',
     'key-quotes',
@@ -109,42 +108,6 @@ Format your response exactly like this:
 ---
 
 **Total decisions:** [X] | **Open questions:** [X]`,
-
-  'brutal-roast': `You are a brutally honest critic who gives real, actionable feedback. Be witty but constructive.
-
-Format your response exactly like this:
-
-## 🔥 The Brutal Truth
-
-[2-3 sentences of honest, sharp commentary on the overall content]
-
----
-
-## What's Actually Wrong
-
-**1. [Problem Title]**
-> [Witty but accurate critique]
-Fix: [Specific, actionable solution]
-
-**2. [Problem Title]**
-> [Witty but accurate critique]
-Fix: [Specific, actionable solution]
-
-**3. [Problem Title]**
-> [Witty but accurate critique]
-Fix: [Specific, actionable solution]
-
----
-
-## What's Surprisingly Good
-- [Genuine strength]
-- [Genuine strength]
-
----
-
-## The Verdict
-**Score:** [X/10]
-[One punchy closing sentence]`,
 
   'executive-brief': `You are a C-suite advisor writing a concise executive brief. Every word must earn its place.
 
@@ -456,12 +419,12 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
@@ -502,23 +465,28 @@ CRITICAL RULES:
       return NextResponse.json({ error: aiError.message || 'Failed to generate summary' }, { status: 500 })
     }
 
-    // Save to database (non-blocking)
-    supabase.from('ai_summaries').insert({
+    void supabase.from('summarizer_history').insert({
       user_id: user.id,
-      summary_text: summary,
-      original_text: sanitizedText.substring(0, 10000),
-      mode,
+      source_type: 'paste_text',
+      input_text: sanitizedText.substring(0, 10000),
+      output_text: summary,
+      summary_mode: mode,
     }).then(({ error }) => {
       if (error) console.error('[Summarize API] DB insert error:', error.message)
     })
 
-    // Track usage (non-blocking)
-    supabase.rpc('track_usage', {
-      p_user_id: user.id,
-      p_type: 'summary',
-      p_count: 1,
+    void supabase.from('usage_tracking').insert({
+      user_id: user.id,
+      type: 'summary',
     }).then(({ error }) => {
       if (error) console.error('[Summarize API] Track usage error:', error.message)
+    })
+
+    void supabase.rpc('increment_usage', {
+      p_user_id: user.id,
+      p_type: 'summary',
+    }).then(({ error }) => {
+      if (error) console.error('[Summarize API] Increment usage error:', error.message)
     })
 
     return NextResponse.json({ summary })

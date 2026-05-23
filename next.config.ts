@@ -33,7 +33,9 @@ const nextConfig: NextConfig = {
     ],
   },
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn', 'info'],
+    } : false,
   },
   compress: true,
   poweredByHeader: false,
@@ -59,8 +61,8 @@ const nextConfig: NextConfig = {
             value: 'nosniff'
           },
           {
-            key: 'X-XSS-Protection',
-            value: '0'
+          key: 'X-XSS-Protection',
+          value: '1; mode=block'
           },
           {
             key: 'Referrer-Policy',

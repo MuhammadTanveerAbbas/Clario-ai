@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkRateLimit } from "@/middleware/rate-limit";
+import { getPriceId } from "@/config/plans";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-02-25.clover" });
@@ -8,6 +10,11 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   try {
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response!
+    }
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -21,9 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
     }
 
-    const priceId = billing === "annual"
-      ? process.env.STRIPE_PRICE_PRO_ANNUAL
-      : process.env.STRIPE_PRICE_PRO_MONTHLY;
+    const priceId = getPriceId(billing);
 
     if (!priceId) {
       return NextResponse.json({ error: "Price ID not configured" }, { status: 500 });
@@ -35,6 +40,7 @@ export async function POST(request: Request) {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
+      client_reference_id: user.id,
       metadata: { userId: user.id },
       customer_email: user.email,
       success_url: `${origin}/dashboard?upgrade=success`,

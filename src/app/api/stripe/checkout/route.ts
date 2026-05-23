@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/middleware/rate-limit'
 import { createCheckoutSession } from '@/lib/stripe'
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response!
+    }
+
     const supabase = await createClient()
     const {
       data: { user },
@@ -15,15 +21,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { priceId } = await request.json()
-
-    const effectivePriceId = priceId || process.env.NEXT_PUBLIC_STRIPE_PRICE_ID
-
-    if (!effectivePriceId) {
-      return NextResponse.json({ error: 'Price ID required' }, { status: 400 })
+    const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID
+    if (!priceId) {
+      return NextResponse.json({ error: 'Price ID not configured' }, { status: 500 })
     }
 
-    const session = await createCheckoutSession(user.id, user.email!, effectivePriceId)
+    const session = await createCheckoutSession(user.id, user.email!, priceId)
 
     return NextResponse.json({ url: session.url })
   } catch (error: any) {

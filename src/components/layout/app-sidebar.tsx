@@ -14,7 +14,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  Sparkles,
+  PanelLeftClose,
+  PanelLeft,
   Mic,
   Zap,
   Calendar,
@@ -97,7 +98,9 @@ export function AppSidebar() {
                   className="h-7 w-7 rounded-lg flex items-center justify-center"
                   style={{ background: "hsl(var(--accent))" }}
                 >
-                  <Sparkles className="h-4 w-4 text-white" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
                 </div>
                 <span
                   className="font-semibold text-[15px] tracking-tight"
@@ -120,7 +123,9 @@ export function AppSidebar() {
                   className="h-7 w-7 rounded-lg flex items-center justify-center"
                   style={{ background: "hsl(var(--accent))" }}
                 >
-                  <Sparkles className="h-4 w-4 text-white" />
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                  </svg>
                 </div>
               </motion.div>
             )}
@@ -144,7 +149,7 @@ export function AppSidebar() {
                 onClick={closeMobile}
               >
                 <div
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150"
+                  className={`flex items-center gap-3 py-2 rounded-lg transition-all duration-150 ${collapsed ? "justify-center px-0" : "px-3"}`}
                   style={{
                     background: isActive ? "var(--accent-l)" : "transparent",
                     color: isActive ? "hsl(var(--accent))" : "var(--text3)",
@@ -210,7 +215,7 @@ export function AppSidebar() {
 
           <Link href="/settings" onClick={closeMobile}>
             <div
-              className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150"
+              className={`flex items-center gap-3 py-2 rounded-lg transition-all duration-150 ${collapsed ? "justify-center px-0" : "px-3"}`}
               style={{
                 background:
                   pathname === "/settings" ||
@@ -264,7 +269,7 @@ export function AppSidebar() {
           </Link>
 
           <button
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150 text-[13px] font-medium"
+            className={`block w-full flex items-center gap-3 py-2 rounded-lg transition-all duration-150 ${collapsed ? "justify-center px-0" : "px-3"}`}
             style={{ color: "var(--text3)", background: "transparent" }}
             onMouseEnter={(e) => {
               (e.currentTarget as HTMLButtonElement).style.background =
@@ -298,7 +303,7 @@ export function AppSidebar() {
 
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="w-full flex items-center justify-center rounded-lg h-9 transition-all duration-150 text-[13px]"
+            className={`w-full flex items-center rounded-lg h-9 transition-all duration-150 text-[13px] ${collapsed ? "justify-center px-0" : "gap-3 px-3"}`}
             style={{
               color: "var(--text3)",
               background: "transparent",
@@ -315,16 +320,14 @@ export function AppSidebar() {
               (e.currentTarget as HTMLButtonElement).style.color = "var(--text3)";
             }}
           >
-            <motion.div
-              animate={{ rotate: collapsed ? 0 : 180 }}
-              transition={{ duration: 0.2 }}
-            >
-              {collapsed ? (
-                <ChevronRight className="h-4 w-4" />
-              ) : (
-                <ChevronLeft className="h-4 w-4" />
-              )}
-            </motion.div>
+            {collapsed ? (
+              <PanelLeft className="h-4 w-4" />
+            ) : (
+              <>
+                <PanelLeftClose className="h-4 w-4" />
+                <span>Collapse</span>
+              </>
+            )}
           </button>
         </div>
       </motion.aside>

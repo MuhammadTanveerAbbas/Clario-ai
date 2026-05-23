@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/middleware/rate-limit'
 import { generateWithFallback } from '@/lib/ai-fallback'
 
 export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimitCheck = checkRateLimit(request as any, 'api')
+    if (!rateLimitCheck.allowed) {
+      return rateLimitCheck.response!
+    }
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -16,8 +21,8 @@ export async function GET() {
 
     // Fetch recent summaries to generate insights from
     const { data: summaries, error: summariesError } = await supabase
-      .from('ai_summaries')
-      .select('id, summary_text, mode, created_at')
+      .from('summarizer_history')
+      .select('id, output_text, summary_mode, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(10)
@@ -34,7 +39,7 @@ export async function GET() {
     }
 
     const contentSummary = summaries
-      .map((s, i) => `[${i + 1}] (${s.mode}): ${s.summary_text?.substring(0, 400)}`)
+      .map((s, i) => `[${i + 1}] (${s.summary_mode}): ${s.output_text?.substring(0, 400)}`)
       .join('\n\n')
 
     const insightText = await generateWithFallback(

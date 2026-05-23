@@ -669,9 +669,11 @@ export default function LandingPage() {
           <li><a href="/pricing">Pricing</a></li>
           <li><a href="/privacy">Privacy</a></li>
           <li><a href="/terms">Terms</a></li>
-          <li><a href="https://twitter.com" target="_blank" rel="noreferrer">Twitter</a></li>
+          <li><a href="https://github.com/MuhammadTanveerAbbas/Clario-ai" target="_blank" rel="noreferrer">GitHub</a></li>
+          <li><a href="https://x.com/themvpguy" target="_blank" rel="noreferrer">Twitter</a></li>
+          <li><a href="https://linkedin.com/in/muhammadtanveerabbas" target="_blank" rel="noreferrer">LinkedIn</a></li>
         </ul>
-        <p className="f-copy">© 2025 Clario · Built for creators.</p>
+        <p className="f-copy">© {new Date().getFullYear()} Clario · Built by <a href="https://themvpguy.vercel.app" target="_blank" rel="noreferrer" style={{ color: "var(--o)", textDecoration: "none" }}>The MVP Guy</a></p>
       </footer>
     </>
   );

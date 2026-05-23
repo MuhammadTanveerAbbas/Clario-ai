@@ -111,7 +111,7 @@ CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXEC
 CREATE TABLE usage_tracking (
   id         UUID        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id    UUID        NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  type       TEXT        NOT NULL CHECK (type IN ('summarize','chat','remix','brand_voice','image_prompt','calendar_event','export_notion','export_gdocs')),
+  type       TEXT        NOT NULL CHECK (type IN ('summary','chat','remix','brand_voice','image_prompt','calendar_event','export_notion','export_gdocs')),
   metadata   JSONB       NOT NULL DEFAULT '{}'::JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

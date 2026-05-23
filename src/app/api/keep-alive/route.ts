@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
 import { headers } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,14 +18,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.json({ error: 'Supabase configuration missing' }, { status: 500 })
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('profiles')

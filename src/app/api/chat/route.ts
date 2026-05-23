@@ -80,12 +80,12 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
@@ -142,9 +142,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Fire-and-forget: message persistence and usage tracking don't block the response
     if (finalConversationId) {
-      supabase.from('chat_messages').insert([
+      void supabase.from('chat_messages').insert([
         { session_id: finalConversationId, user_id: user.id, role: 'user', content: sanitizedMessage },
         { session_id: finalConversationId, user_id: user.id, role: 'assistant', content: aiResponse },
       ]).then(({ error }) => {
@@ -152,16 +151,18 @@ export async function POST(request: Request) {
       })
     }
 
-    supabase.rpc('track_usage', {
+    void supabase.from('usage_tracking').insert({
+      user_id: user.id,
+      type: 'chat',
+    }).then(({ error }) => {
+      if (error) console.error('[Chat API] Track usage error:', error.message)
+    })
+
+    void supabase.rpc('increment_usage', {
       p_user_id: user.id,
       p_type: 'chat',
-      p_count: 1,
     }).then(({ error }) => {
-      if (error) {
-        // Fallback for deployments using the older increment_usage RPC
-        supabase.rpc('increment_usage', { p_user_id: user.id, p_type: 'chat' })
-          .then(({ error: e2 }) => { if (e2) console.error('[Chat API] Track usage error:', e2.message) })
-      }
+      if (error) console.error('[Chat API] Increment usage error:', error.message)
     })
 
     return NextResponse.json({ response: aiResponse, conversationId: finalConversationId })
