@@ -1,5 +1,5 @@
 export const COOKIE_CONFIG = {
-  httpOnly: true,
+  httpOnly: false,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
   maxAge: 60 * 60 * 24 * 365,

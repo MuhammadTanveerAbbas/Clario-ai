@@ -432,7 +432,7 @@ export default function RemixPage() {
   const hasOutputs = Object.keys(outputs).length > 0;
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   return (
     <>

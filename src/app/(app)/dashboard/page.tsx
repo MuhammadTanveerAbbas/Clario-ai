@@ -160,7 +160,8 @@ export default function Dashboard() {
           requests_limit: tier === "pro" ? 1000 : 100,
         });
 
-      } catch {
+      } catch (e) {
+        console.error('[Dashboard] Failed to load dashboard data:', e);
         setUser({ id: authUser?.id || "", email: authUser?.email || "", plan: "free" });
         setStats({ summaries: 0, chats: 0, remixes: 0, brand_voices: 0, requests_used: 0, requests_limit: 100 });
       } finally {
@@ -178,7 +179,7 @@ export default function Dashboard() {
   const firstName = user?.full_name?.split(" ")[0] || "there";
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   const isPro = user?.plan === "pro";
   const trends = [

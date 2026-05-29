@@ -60,7 +60,8 @@ export function BillingSection({ profile }: BillingSectionProps) {
           description: data.error || "Failed to open billing portal.",
         });
       }
-    } catch {
+    } catch (e) {
+      console.error('[Billing] Failed to open portal:', e);
       toast({
         variant: "destructive",
         title: "Error",
@@ -89,7 +90,8 @@ export function BillingSection({ profile }: BillingSectionProps) {
           description: data.error || "Could not start checkout.",
         });
       }
-    } catch {
+    } catch (e) {
+      console.error('[Billing] Checkout failed:', e);
       toast({
         variant: "destructive",
         title: "Checkout failed",

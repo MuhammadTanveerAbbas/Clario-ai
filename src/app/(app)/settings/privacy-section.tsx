@@ -37,7 +37,8 @@ export function PrivacySection() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch {
+    } catch (e) {
+      console.error('[Privacy] Failed to export data:', e);
       alert("Failed to export data. Please try again.");
     } finally {
       setExporting(false);
@@ -62,7 +63,8 @@ export function PrivacySection() {
       await supabase.from("profiles").delete().eq("id", user.id);
       await supabase.auth.signOut();
       window.location.href = "/";
-    } catch {
+    } catch (e) {
+      console.error('[Privacy] Failed to delete account:', e);
       alert("Failed to delete account. Please contact support at support@clario.ai.");
     } finally {
       setDeleting(false);

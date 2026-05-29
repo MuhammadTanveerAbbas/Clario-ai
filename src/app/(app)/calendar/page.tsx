@@ -277,7 +277,7 @@ function CalendarPageInner() {
   };
 
   if (authLoading) return <LoadingPage />;
-  if (!user) return null;
+  if (!user) return <LoadingPage />;
 
   return (
     <>

@@ -524,8 +524,8 @@ export default function SummarizerPage() {
           ),
         );
       }
-    } catch {
-      /* ignore */
+    } catch (e) {
+      console.error('[Summarizer] Failed to load history:', e);
     }
     setHistoryLoading(false);
   };
@@ -622,7 +622,7 @@ export default function SummarizerPage() {
   };
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   return (
     <>

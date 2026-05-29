@@ -309,7 +309,7 @@ export default function ChatPage() {
   const isDark = theme === "dark";
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   return (
     <>

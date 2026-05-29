@@ -399,7 +399,8 @@ export default function SettingsPage() {
           current_period_end: data?.current_period_end,
           stripe_customer_id: data?.stripe_customer_id,
         });
-      } catch {
+      } catch (e) {
+        console.error('[Settings] Failed to load profile:', e);
         // Fall back to auth user data so the profile tab still renders
         setProfile({
           id: authUser.id,
@@ -434,7 +435,7 @@ export default function SettingsPage() {
   };
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   return (
     <div className="dash-layout" style={{ fontFamily: "var(--sans)" }}>

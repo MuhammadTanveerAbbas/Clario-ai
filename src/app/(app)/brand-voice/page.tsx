@@ -136,7 +136,7 @@ export default function BrandVoicePage() {
   };
 
   if (authLoading) return <LoadingPage />;
-  if (!authUser) return null;
+  if (!authUser) return <LoadingPage />;
 
   return (
     <>

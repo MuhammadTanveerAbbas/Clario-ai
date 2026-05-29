@@ -30,7 +30,6 @@ export async function updateSession(request: NextRequest) {
             try {
               supabaseResponse.cookies.set(name, value, {
                 ...options,
-                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax',
                 path: '/',
