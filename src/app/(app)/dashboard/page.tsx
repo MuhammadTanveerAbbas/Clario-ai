@@ -445,7 +445,7 @@ export default function Dashboard() {
                     {loading
                       ? "Loading your workspace..."
                       : isPro
-                      ? "Pro plan active — unlimited requests, priority processing."
+                      ? "Pro plan active unlimited requests, priority processing."
                       : `You've used ${stats?.requests_used ?? 0} of ${stats?.requests_limit ?? 100} requests this month.`}
                   </p>
                 </div>
@@ -539,8 +539,8 @@ export default function Dashboard() {
                         className="h-full rounded-full transition-all duration-1000 ease-out"
                         style={{
                           width: `${Math.max(usagePercent, 2)}%`,
-                          background: usagePercent > 85 
-                            ? "linear-gradient(90deg, #ef4444, #f87171)" 
+                          background: usagePercent > 85
+                            ? "linear-gradient(90deg, #ef4444, #f87171)"
                             : usagePercent > 70
                             ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
                             : "linear-gradient(90deg, hsl(var(--accent)), hsl(var(--accent)) 80%, #10b981)",

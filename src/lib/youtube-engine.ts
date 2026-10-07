@@ -1,9 +1,9 @@
 /**
- * YouTube transcript engine — always returns something.
+ * YouTube transcript engine always returns something.
  * Strategy (in order):
  *  1. Timedtext JSON via caption tracks (fastest, most reliable)
  *  2. Innertube engagement panel transcript
- *  3. YouTube page scrape — description + chapters from ytInitialData
+ *  3. YouTube page scrape description + chapters from ytInitialData
  *  4. Minimal stub from oEmbed metadata (last resort, never throws)
  */
 
@@ -255,11 +255,11 @@ export async function fetchTranscript(videoId: string): Promise<TranscriptResult
     if (t2) return t2;
   }
 
-  // Innertube failed or no captions — try page scrape
+  // Innertube failed or no captions try page scrape
   const t3 = await viaPageScrape(videoId);
   if (t3) return t3;
 
-  // Absolute last resort — always succeeds
+  // Absolute last resort always succeeds
   return viaStub(videoId);
 }
 

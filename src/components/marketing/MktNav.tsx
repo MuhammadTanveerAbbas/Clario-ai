@@ -86,7 +86,7 @@ export function MktNav() {
         <nav className="relative mx-auto flex h-[64px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <ClarioLogo />
 
-          {/* Center nav — underline tab style */}
+          {/* Center nav underline tab style */}
           <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2">
             <ul className="flex items-center list-none m-0 p-0">
               {NAV_LINKS.map(({ href, label }) => {

@@ -1,4 +1,4 @@
-/* Clario — no-op service worker (satisfies legacy registrations, no caching) */
+/* Clario no-op service worker (satisfies legacy registrations, no caching) */
 self.addEventListener('install', () => {
   self.skipWaiting()
 })

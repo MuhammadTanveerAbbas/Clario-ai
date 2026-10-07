@@ -6,7 +6,7 @@ export function sanitizePlainText(text: string, maxLen = 200_000): string {
     .slice(0, maxLen);
 }
 
-/** YouTube watch / short URL for storage — strips control chars and caps length. */
+/** YouTube watch / short URL for storage strips control chars and caps length. */
 export function sanitizeYoutubeUrl(url: string, maxLen = 2048): string {
   return sanitizePlainText(url.trim(), maxLen);
 }

@@ -22,7 +22,7 @@ const ChatSchema = z.object({
   brandVoice: z.string().optional(),
 })
 
-const SYSTEM_PROMPT = `You are Clario, an expert AI assistant for content creators — YouTubers, podcasters, bloggers, and newsletter writers.
+const SYSTEM_PROMPT = `You are Clario, an expert AI assistant for content creators YouTubers, podcasters, bloggers, and newsletter writers.
 
 Your expertise:
 - Content strategy, ideation, and planning

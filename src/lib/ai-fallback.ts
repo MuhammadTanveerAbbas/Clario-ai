@@ -20,7 +20,7 @@ const groqApiKey = process.env.GROQ_API_KEY
 let groq: Groq | null = null
 if (groqApiKey) {
   try {
-    // maxRetries: 0 — the reliability layer below owns retry behavior.
+    // maxRetries: 0 the reliability layer below owns retry behavior.
     groq = new Groq({ apiKey: groqApiKey, maxRetries: 0, timeout: 60000 })
   } catch (e) {
     console.error('[AI] Failed to initialize Groq:', e)

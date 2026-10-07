@@ -461,9 +461,9 @@ export async function POST(request: Request) {
     const systemPrompt = `${modePrompt}
 
 CRITICAL RULES:
-- Write all words normally — never add spaces between letters of a word
+- Write all words normally never add spaces between letters of a word
 - Use proper markdown: ## for headers, **bold**, - for bullets, > for quotes, --- for dividers
-- Extract REAL facts, names, numbers, dates, and quotes directly from the source text — never invent or use placeholder text like "[Point title]" or "[Detail]"
+- Extract REAL facts, names, numbers, dates, and quotes directly from the source text never invent or use placeholder text like "[Point title]" or "[Detail]"
 - Write at least ${modeConfig.minWords} words. Be thorough and substantive, not generic
 - Every bullet and section must reference specific content from the source
 - If information is missing (e.g. no date mentioned), write "Not specified" instead of guessing

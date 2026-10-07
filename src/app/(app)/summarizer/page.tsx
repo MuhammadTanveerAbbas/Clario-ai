@@ -162,15 +162,21 @@ function ToastContainer({
             gap: 10,
             background: "hsl(var(--card))",
             border: "1px solid hsl(var(--border))",
-            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))"}`,
             borderRadius: 10,
             padding: "11px 14px",
-            boxShadow: "0 8px 24px rgba(0,0,0,.2)",
+            boxShadow: "0 4px 16px rgba(0,0,0,.12)",
             animation: "fu .3s ease both",
             maxWidth: 320,
             fontFamily: "var(--sans)",
           }}
         >
+          <span style={{
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            flexShrink: 0,
+            background: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))",
+          }} />
           <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>
             {t.message}
           </span>
@@ -533,7 +539,7 @@ export default function SummarizerPage() {
       return;
     }
     if (text && text.length < 10) {
-      addToast("Text is too short — need at least 10 characters", "error");
+      addToast("Text is too short need at least 10 characters", "error");
       return;
     }
 
@@ -702,7 +708,7 @@ export default function SummarizerPage() {
         .mode-card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:12px;padding:14px;cursor:pointer;transition:all .18s;position:relative}
         .mode-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
         .mode-card.selected{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .history-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--bg2);border-left:1px solid hsl(var(--border));z-index:300;display:flex;flex-direction:column;transition:transform .25s}
+        .history-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:hsl(var(--card));border-left:1px solid hsl(var(--border));z-index:300;display:flex;flex-direction:column;transition:transform .25s;box-shadow:-8px 0 32px rgba(0,0,0,.08)}
         .history-panel.closed{transform:translateX(100%)}
         @media(max-width:480px){.history-panel{width:100%}}
         @media(max-width:768px){
@@ -1463,11 +1469,17 @@ export default function SummarizerPage() {
           <button
             onClick={() => setShowHistory(false)}
             style={{
-              background: "none",
-              border: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 28,
+              height: 28,
+              background: "var(--bg3)",
+              border: "1px solid hsl(var(--border))",
+              borderRadius: 7,
               color: "var(--text3)",
               cursor: "pointer",
-              fontSize: "1.1rem",
+              fontSize: ".8rem",
             }}
           >
             ✕
@@ -1501,7 +1513,7 @@ export default function SummarizerPage() {
                   setSelectedMode(item.mode as SummarizeMode);
                   setShowHistory(false);
                   addToast(
-                    "History item loaded — edit and re-run or review the output below.",
+                    "History item loaded edit and re-run or review the output below.",
                     "info",
                   );
                   requestAnimationFrame(() =>
@@ -1513,13 +1525,14 @@ export default function SummarizerPage() {
                 }}
                 style={{
                   width: "100%",
-                  background: "var(--bg3)",
+                  background: "transparent",
                   border: "1px solid hsl(var(--border))",
                   borderRadius: 10,
                   padding: 12,
                   marginBottom: 8,
                   cursor: "pointer",
                   textAlign: "left",
+                  transition: "background .15s",
                 }}
               >
                 <div
@@ -1533,9 +1546,10 @@ export default function SummarizerPage() {
                   <span
                     style={{
                       fontSize: ".66rem",
-                      fontWeight: 700,
-                      background: "hsl(var(--accent))",
-                      color: "#fff",
+                      fontWeight: 600,
+                      background: "var(--bg3)",
+                      color: "var(--text3)",
+                      border: "1px solid hsl(var(--border))",
                       padding: "1px 7px",
                       borderRadius: 100,
                     }}

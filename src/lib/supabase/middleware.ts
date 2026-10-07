@@ -58,7 +58,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Skip all processing for cron jobs — middleware won't even run for these
+  // Skip all processing for cron jobs middleware won't even run for these
   // (the matcher in middleware.ts excludes /api/cron), but guard here too.
   if (request.nextUrl.pathname.startsWith('/api/cron')) {
     return supabaseResponse

@@ -65,12 +65,12 @@ Clario is a production-ready SaaS platform built for YouTubers, podcasters, blog
 
 The AI layer (`src/lib/ai-fallback.ts`) is resilient by default:
 
-- **Model discovery** — Available Groq models are fetched via the official SDK and cached server-side for 1 hour (no per-request model calls).
-- **Model fallback** — If the primary model (`llama-3.3-70b-versatile`) is removed, deprecated, or unavailable, the list is refreshed and the next compatible model is used automatically, retried once.
-- **Rate limits** — HTTP 429 responses respect `Retry-After` when provided, otherwise use bounded exponential backoff with jitter (max 3 retries).
-- **Transient errors** — Timeouts, network errors, and 5xx responses are retried a bounded number of times, then fail with a controlled message instead of crashing the app.
-- **Graceful degradation** — A Groq failure never takes down the rest of the app; errors surface to the client as controlled messages and to developers via server-side logs.
-- **Secrets stay server-side** — Groq keys are never sent to the client and are redacted from logged error messages.
+- **Model discovery**: Available Groq models are fetched via the official SDK and cached server-side for 1 hour (no per-request model calls).
+- **Model fallback**: If the primary model (`llama-3.3-70b-versatile`) is removed, deprecated, or unavailable, the list is refreshed and the next compatible model is used automatically, retried once.
+- **Rate limits**: HTTP 429 responses respect `Retry-After` when provided, otherwise use bounded exponential backoff with jitter (max 3 retries).
+- **Transient errors**: Timeouts, network errors, and 5xx responses are retried a bounded number of times, then fail with a controlled message instead of crashing the app.
+- **Graceful degradation**: A Groq failure never takes down the rest of the app; errors surface to the client as controlled messages and to developers via server-side logs.
+- **Secrets stay server-side**: Groq keys are never sent to the client and are redacted from logged error messages.
 
 Supabase failures are contained per-request: the existing route-level error handling returns controlled responses, and `/api/health` performs a lightweight read-only connectivity check using the server-side service-role client.
 

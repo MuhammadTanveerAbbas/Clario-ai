@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const videoId = extractVideoId(url.trim());
     if (!videoId) return NextResponse.json({ error: 'Invalid YouTube URL.' }, { status: 400 });
 
-    // Always run both in parallel — transcript never throws
+    // Always run both in parallel transcript never throws
     const [transcript, metadata] = await Promise.all([
       fetchTranscript(videoId),
       fetchVideoMetadata(videoId),

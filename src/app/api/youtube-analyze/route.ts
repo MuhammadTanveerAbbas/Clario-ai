@@ -1,7 +1,7 @@
 /**
  * POST /api/youtube-analyze
  * Full structured analysis: TLDR, key points, topics, timeline, insights, sentiment.
- * Uses the native youtubei.js engine + Groq for analysis — no external service required.
+ * Uses the native youtubei.js engine + Groq for analysis no external service required.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 const SUMMARIZE_SYSTEM = `You are an expert content analyst for Clario, a platform for YouTubers and content creators.
 
-Analyze the transcript and return ONLY a valid JSON object — no markdown, no backticks, no preamble.
+Analyze the transcript and return ONLY a valid JSON object no markdown, no backticks, no preamble.
 
 Required schema:
 {

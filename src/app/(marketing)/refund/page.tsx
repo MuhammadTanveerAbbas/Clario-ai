@@ -81,7 +81,7 @@ export default function RefundPage() {
           <h2 className="legal-h2">8. Contact Us</h2>
           <p className="legal-p"><strong>Service Provider:</strong> Muhammad Tanveer Abbas</p>
           <p className="legal-p">For refund requests or billing questions: <a href="mailto:support@clario.ai" className="legal-a">support@clario.ai</a> (response within 24 hours).</p>
-          <p className="legal-p"><strong>Payment Processor:</strong> Stripe — <a href="https://support.stripe.com" className="legal-a" target="_blank" rel="noopener noreferrer">support.stripe.com</a></p>
+          <p className="legal-p"><strong>Payment Processor:</strong> Stripe <a href="https://support.stripe.com" className="legal-a" target="_blank" rel="noopener noreferrer">support.stripe.com</a></p>
         </div>
 
         <div className="legal-section">
