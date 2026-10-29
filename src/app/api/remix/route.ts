@@ -373,12 +373,12 @@ export async function POST(request: NextRequest) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
@@ -433,7 +433,7 @@ Rules:
       })
     );
 
-    void supabase.rpc('track_usage', {
+    void supabase.rpc('increment_usage', {
       p_user_id: user.id,
       p_type: 'remix',
     }).then(({ error }) => {

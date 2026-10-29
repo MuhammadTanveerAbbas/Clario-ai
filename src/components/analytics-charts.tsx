@@ -123,8 +123,8 @@ export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
   if (error) {
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center dark:border-red-900/40 dark:bg-red-950/20">
-          <p className="text-[12px] font-medium text-red-700 dark:text-red-400">
+        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+          <p className="text-[12px] font-medium text-red-700">
             Couldn&apos;t load analytics
           </p>
           <button
@@ -135,8 +135,8 @@ export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
             Retry
           </button>
         </div>
-        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center dark:border-red-900/40 dark:bg-red-950/20">
-          <p className="text-[12px] font-medium text-red-700 dark:text-red-400">
+        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+          <p className="text-[12px] font-medium text-red-700">
             Couldn&apos;t load analytics
           </p>
           <button

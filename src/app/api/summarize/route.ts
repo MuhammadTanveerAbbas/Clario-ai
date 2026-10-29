@@ -434,12 +434,12 @@ export async function POST(request: Request) {
 
     const { data: profile } = await supabase
       .from('profiles')
-      .select('subscription_tier, requests_used_this_month, email')
+      .select('plan, requests_used, email')
       .eq('id', user.id)
       .single()
 
-    const tier = (profile?.subscription_tier || 'free') as 'free' | 'pro'
-    const currentUsage = profile?.requests_used_this_month || 0
+    const tier = (profile?.plan || 'free') as 'free' | 'pro'
+    const currentUsage = profile?.requests_used || 0
 
     if (profile?.email !== process.env.ADMIN_EMAIL) {
       const usageCheck = checkUsageLimit(tier, currentUsage)
@@ -461,20 +461,24 @@ export async function POST(request: Request) {
     const systemPrompt = `${modePrompt}
 
 CRITICAL RULES:
-- Write all words normally never add spaces between letters of a word
+- Write all words normally — never add spaces between individual letters of a word
 - Use proper markdown: ## for headers, **bold**, - for bullets, > for quotes, --- for dividers
-- Extract REAL facts, names, numbers, dates, and quotes directly from the source text never invent or use placeholder text like "[Point title]" or "[Detail]"
+- Extract REAL facts, names, numbers, dates, and quotes DIRECTLY from the source text — never invent or hallucinate anything
+- Replace all placeholder text like "[Point title]", "[Detail]", "[Owner]" with ACTUAL content from the source
 - Write at least ${modeConfig.minWords} words. Be thorough and substantive, not generic
 - Every bullet and section must reference specific content from the source
-- If information is missing (e.g. no date mentioned), write "Not specified" instead of guessing
+- If information is genuinely missing (e.g. no date mentioned), write "Not specified" — never guess
+- If a source URL or title was provided in the source metadata, reference it naturally (e.g. "According to [Title]...")
 - Keep formatting clean and consistent throughout`
 
     const sourceParts: string[] = []
     if (sourceTitle) sourceParts.push(`Title: ${sourceTitle}`)
-    if (youtubeUrl) sourceParts.push(`YouTube: ${youtubeUrl}`)
-    else if (sourceUrl) sourceParts.push(`URL: ${sourceUrl}`)
-    const contextNote = sourceParts.length ? `\n\n[Source metadata]\n${sourceParts.join('\n')}` : ''
-    const userPrompt = `Analyze and summarize the following content. Use ONLY information present in the text below.${contextNote}\n\n---\n\n${sanitizedText}`
+    if (youtubeUrl) sourceParts.push(`YouTube URL: ${youtubeUrl}`)
+    else if (sourceUrl) sourceParts.push(`Source URL: ${sourceUrl}`)
+    const contextNote = sourceParts.length
+      ? `\n\n[Source metadata — include title and URL in your output where relevant]\n${sourceParts.join('\n')}`
+      : ''
+    const userPrompt = `Analyze and summarize the following content. Use ONLY information present in the text below — do not invent facts, statistics, quotes, or names that are not in the source.${contextNote}\n\n---\n\n${sanitizedText}`
 
     let summary: string;
     try {
@@ -503,7 +507,7 @@ CRITICAL RULES:
       if (error) console.error('[Summarize API] DB insert error:', error.message)
     })
 
-    void supabase.rpc('track_usage', {
+    void supabase.rpc('increment_usage', {
       p_user_id: user.id,
       p_type: 'summary',
     }).then(({ error }) => {

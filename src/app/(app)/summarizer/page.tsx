@@ -6,11 +6,11 @@ import remarkGfm from "remark-gfm";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
 import Link from "next/link";
 import { Scale } from "lucide-react";
 import { LoadingPage } from "@/components/ui/loading-page";
+import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
 
 interface Toast {
   id: string;
@@ -439,7 +439,6 @@ export default function SummarizerPage() {
   const router = useRouter();
   const supabase = createClient();
   const { user: authUser, signOut, loading: authLoading } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const {
     collapsed: sidebarCollapsed,
     setCollapsed: setSidebarCollapsed,
@@ -474,7 +473,6 @@ export default function SummarizerPage() {
     full_name?: string;
     subscription_tier?: string;
   } | null>(null);
-  const isDark = theme === "dark";
 
   const addToast = useCallback(
     (message: string, type: Toast["type"] = "info") => {
@@ -733,24 +731,6 @@ export default function SummarizerPage() {
       <div className="dash-layout">
         <div className="main-area">
           <div className="topbar">
-            <button
-              className="topbar-btn topbar-hamburger"
-              onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
-            >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
             <span
               style={{
                 fontFamily: "var(--serif)",
@@ -783,35 +763,7 @@ export default function SummarizerPage() {
                 <polyline points="12 6 12 12 16 14" />
               </svg>
             </button>
-            <button className="topbar-btn" onClick={toggleTheme}>
-              {isDark ? (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <circle cx="12" cy="12" r="5" />
-                  <line x1="12" y1="1" x2="12" y2="3" />
-                  <line x1="12" y1="21" x2="12" y2="23" />
-                </svg>
-              ) : (
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-            </button>
+            <TopbarUserMenu />
           </div>
 
           <div className="page-content">

@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/components/ThemeProvider";
-import { useSidebar } from "@/contexts/SidebarContext";
 import { LoadingPage } from "@/components/ui/loading-page";
+import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Plus, X, Trash2, CalendarDays } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 interface CalEvent {
@@ -23,31 +24,7 @@ const PLATFORMS = ["Twitter", "LinkedIn", "Instagram", "YouTube", "Newsletter", 
 const COLORS = ["hsl(var(--accent))", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
 const STATUSES = ["Draft", "Scheduled", "Published", "Cancelled"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: "grid" },
-  { label: "AI Chat", href: "/chat", icon: "chat" },
-  { label: "Summarizer", href: "/summarizer", icon: "doc" },
-  { label: "Remix Studio", href: "/remix", icon: "remix" },
-  { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Calendar", href: "/calendar", icon: "cal", badge: "New" },
-  { label: "Settings", href: "/settings", icon: "settings" },
-];
-
-function NavIcon({ type }: { type: string }) {
-  const p = { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
-  switch (type) {
-    case "grid": return <svg {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>;
-    case "chat": return <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>;
-    case "doc": return <svg {...p}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>;
-    case "remix": return <svg {...p}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>;
-    case "voice": return <svg {...p}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>;
-    case "cal": return <svg {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
-    case "settings": return <svg {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>;
-    default: return null;
-  }
-}
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -58,18 +35,288 @@ function getFirstDayOfMonth(year: number, month: number) {
   return day === 0 ? 6 : day - 1;
 }
 
+// ── Toast ─────────────────────────────────────────────────────────────────────
 function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
   return (
-    <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 1000, display: "flex", flexDirection: "column", gap: 8 }}>
-      {toasts.map(t => (
-        <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderLeft: `3px solid ${t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "hsl(var(--accent))"}`, borderRadius: 10, padding: "11px 14px", boxShadow: "0 8px 24px rgba(0,0,0,.2)", animation: "fu .3s ease both", maxWidth: 320, fontFamily: "var(--sans)" }}>
-          <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>{t.message}</span>
-          <button onClick={() => dismiss(t.id)} style={{ background: "none", border: "none", color: "var(--text3)", cursor: "pointer", fontSize: ".75rem", padding: 0 }}>✕</button>
-        </div>
-      ))}
+    <div className="fixed bottom-6 right-6 z-[1000] flex flex-col gap-2">
+      <AnimatePresence>
+        {toasts.map(t => (
+          <motion.div
+            key={t.id}
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center gap-3 rounded-xl border px-4 py-3 text-[12px] font-medium shadow-lg backdrop-blur-md max-w-[320px]"
+            style={{
+              background: "hsl(var(--card))",
+              borderColor: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))",
+              color: "var(--text2)",
+            }}
+          >
+            <span className="flex-1">{t.message}</span>
+            <button
+              onClick={() => dismiss(t.id)}
+              className="flex h-5 w-5 items-center justify-center rounded opacity-50 hover:opacity-100 transition-opacity"
+              style={{ border: "none", background: "transparent", cursor: "pointer", color: "inherit" }}
+            >
+              <X size={11} />
+            </button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
+
+// ── Event Pill ────────────────────────────────────────────────────────────────
+function EventPill({ event, onClick }: { event: CalEvent; onClick: (e: React.MouseEvent) => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full truncate rounded-md px-2 py-0.5 text-left text-[11px] font-medium text-white transition-opacity hover:opacity-80"
+      style={{ background: event.color || "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+    >
+      {event.title}
+    </button>
+  );
+}
+
+// ── Calendar Day Cell ─────────────────────────────────────────────────────────
+function DayCell({
+  day,
+  dateStr,
+  isToday,
+  dayEvents,
+  onAddClick,
+  onEventClick,
+}: {
+  day: number;
+  dateStr: string;
+  isToday: boolean;
+  dayEvents: CalEvent[];
+  onAddClick: (date: Date) => void;
+  onEventClick: (event: CalEvent) => void;
+}) {
+  return (
+    <div
+      onClick={() => onAddClick(new Date(dateStr + "T12:00:00"))}
+      className={cn(
+        "group relative min-h-[90px] cursor-pointer rounded-xl border p-2 transition-all duration-150 hover:border-[hsl(var(--accent)/0.5)] hover:bg-[hsl(var(--accent)/0.02)]",
+        isToday
+          ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent)/0.04)]"
+          : "border-[var(--card-b)] bg-[hsl(var(--card))]"
+      )}
+    >
+      {/* Day number */}
+      <div className={cn(
+        "mb-1.5 flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-medium transition-colors",
+        isToday
+          ? "bg-[hsl(var(--accent))] text-white"
+          : "text-[var(--text3)] group-hover:text-[var(--text2)]"
+      )}>
+        {day}
+      </div>
+
+      {/* Events */}
+      <div className="flex flex-col gap-0.5">
+        {dayEvents.slice(0, 2).map(event => (
+          <EventPill
+            key={event.id}
+            event={event}
+            onClick={(e) => { e.stopPropagation(); onEventClick(event); }}
+          />
+        ))}
+        {dayEvents.length > 2 && (
+          <span className="px-1 text-[10px] font-medium text-[var(--text3)]">
+            +{dayEvents.length - 2} more
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Form Field ────────────────────────────────────────────────────────────────
+function FormField({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[12px] font-medium text-[var(--text2)]">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputClass = "w-full rounded-xl border border-[var(--card-b)] bg-[hsl(var(--input))] px-3 py-2.5 text-[13px] text-[var(--text)] placeholder-[var(--text3)] transition-colors focus:border-[hsl(var(--accent))] focus:outline-none";
+
+// ── Event Modal ───────────────────────────────────────────────────────────────
+function EventModal({
+  open,
+  onClose,
+  formData,
+  setFormData,
+  onSave,
+  onDelete,
+  isEditing,
+}: {
+  open: boolean;
+  onClose: () => void;
+  formData: {
+    title: string; scheduled_at: string; platform: string;
+    content: string; color: string; status: string;
+  };
+  setFormData: React.Dispatch<React.SetStateAction<typeof formData>>;
+  onSave: () => void;
+  onDelete?: () => void;
+  isEditing: boolean;
+}) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          {/* Panel */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 12 }}
+            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed left-1/2 top-1/2 z-50 w-full max-w-[460px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl shadow-2xl"
+            style={{ background: "var(--bg2)", border: "1px solid var(--card-b)" }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-[var(--card-b)] px-5 py-4">
+              <h2 className="font-serif text-[18px] font-light text-[var(--text)]">
+                {isEditing ? "Edit event" : "Add event"}
+              </h2>
+              <button
+                onClick={onClose}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text3)] transition-colors hover:bg-[var(--bg3)] hover:text-[var(--text)]"
+                style={{ border: "none", background: "transparent", cursor: "pointer" }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="max-h-[70vh] overflow-y-auto px-5 py-4">
+              <div className="flex flex-col gap-4">
+                <FormField label="Title *">
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={e => setFormData(p => ({ ...p, title: e.target.value }))}
+                    className={inputClass}
+                    placeholder="Event title"
+                  />
+                </FormField>
+
+                <FormField label="Date & Time *">
+                  <input
+                    type="datetime-local"
+                    value={formData.scheduled_at}
+                    onChange={e => setFormData(p => ({ ...p, scheduled_at: e.target.value }))}
+                    className={inputClass}
+                  />
+                </FormField>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField label="Platform">
+                    <select
+                      value={formData.platform}
+                      onChange={e => setFormData(p => ({ ...p, platform: e.target.value }))}
+                      className={inputClass}
+                    >
+                      {PLATFORMS.map(pl => <option key={pl} value={pl}>{pl}</option>)}
+                    </select>
+                  </FormField>
+
+                  <FormField label="Status">
+                    <select
+                      value={formData.status}
+                      onChange={e => setFormData(p => ({ ...p, status: e.target.value }))}
+                      className={inputClass}
+                    >
+                      {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </FormField>
+                </div>
+
+                <FormField label="Content">
+                  <textarea
+                    value={formData.content}
+                    onChange={e => setFormData(p => ({ ...p, content: e.target.value }))}
+                    className={cn(inputClass, "min-h-[90px] resize-y")}
+                    placeholder="Post content…"
+                  />
+                </FormField>
+
+                <FormField label="Color">
+                  <div className="flex gap-2">
+                    {COLORS.map(color => (
+                      <button
+                        key={color}
+                        onClick={() => setFormData(p => ({ ...p, color }))}
+                        className="h-8 w-8 rounded-lg transition-transform hover:scale-110"
+                        style={{
+                          background: color,
+                          border: formData.color === color ? "2.5px solid var(--text)" : "2px solid transparent",
+                          outline: formData.color === color ? "2px solid hsl(var(--accent)/0.3)" : "none",
+                          cursor: "pointer",
+                        }}
+                      />
+                    ))}
+                  </div>
+                </FormField>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center gap-2 border-t border-[var(--card-b)] px-5 py-4">
+              {isEditing && onDelete && (
+                <button
+                  onClick={onDelete}
+                  className="flex items-center gap-1.5 rounded-xl border border-red-200 px-3 py-2 text-[12px] font-medium text-red-500 transition-colors hover:bg-red-50"
+                  style={{ cursor: "pointer", background: "transparent" }}
+                >
+                  <Trash2 size={13} />
+                  Delete
+                </button>
+              )}
+              <div className="flex flex-1 justify-end gap-2">
+                <button
+                  onClick={onClose}
+                  className="rounded-xl border border-[var(--card-b)] px-4 py-2 text-[12px] font-medium text-[var(--text2)] transition-colors hover:bg-[var(--bg3)]"
+                  style={{ cursor: "pointer", background: "transparent" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onSave}
+                  className="rounded-xl px-5 py-2 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
+                  style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+                >
+                  {isEditing ? "Update" : "Add event"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function CalendarPage() {
   return (
@@ -81,12 +328,8 @@ export default function CalendarPage() {
 
 function CalendarPageInner() {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
   const supabase = createClient();
-  const { user, loading: authLoading, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
+  const { user, loading: authLoading } = useAuth();
 
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -96,13 +339,12 @@ function CalendarPageInner() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<CalEvent | null>(null);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [userProfile, setUserProfile] = useState<{ full_name?: string; subscription_tier?: string } | null>(null);
 
-  const [formData, setFormData] = useState({
-    title: "", scheduled_at: "", platform: "Other", content: "", color: COLORS[0], status: "Draft"
-  });
-
-  const isDark = theme === "dark";
+  const defaultForm = {
+    title: "", scheduled_at: "", platform: "Other",
+    content: "", color: COLORS[0], status: "Draft",
+  };
+  const [formData, setFormData] = useState(defaultForm);
 
   const showToast = (message: string, type: "success" | "error" | "info" = "info") => {
     const id = Math.random().toString(36);
@@ -113,22 +355,16 @@ function CalendarPageInner() {
   const dismissToast = (id: string) => setToasts(prev => prev.filter(t => t.id !== id));
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user) return;
-    supabase.from("profiles").select("full_name, subscription_tier").eq("id", user.id).single()
-      .then(({ data }) => { if (data) setUserProfile(data); });
-  }, [user, authLoading]);
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (user) fetchEvents();
+    if (authLoading || !user) return;
+    fetchEvents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, year, month]);
 
   useEffect(() => {
     const content = searchParams?.get("content");
     const platform = searchParams?.get("platform");
     if (content) {
-      setFormData(prev => ({ ...prev, content: decodeURIComponent(content), platform: platform || "Other" }));
+      setFormData(p => ({ ...p, content: decodeURIComponent(content), platform: platform || "Other" }));
       setModalOpen(true);
     }
   }, [searchParams]);
@@ -137,32 +373,23 @@ function CalendarPageInner() {
     if (!user) return;
     setLoading(true);
     try {
-      const startDate = new Date(year, month, 1);
-      const endDate = new Date(year, month + 1, 0);
-      const startISO = startDate.toISOString().split('T')[0];
-      const endISO = endDate.toISOString().split('T')[0];
+      const startISO = new Date(year, month, 1).toISOString().split("T")[0];
+      const endISO = new Date(year, month + 1, 0).toISOString().split("T")[0];
       const { data, error } = await supabase
-        .from("calendar_events").select("id, title, content_text, platform, scheduled_at, color, status, created_at").eq("user_id", user.id)
-        .gte("scheduled_at", startISO).lte("scheduled_at", endISO)
+        .from("calendar_events")
+        .select("id, title, content_text, platform, scheduled_at, color, status")
+        .eq("user_id", user.id)
+        .gte("scheduled_at", startISO)
+        .lte("scheduled_at", endISO)
         .order("scheduled_at", { ascending: true });
-      if (error) {
-        console.error('Calendar fetch error:', error);
-        throw error;
-      }
-      const mappedEvents: CalEvent[] = (data || []).map(event => ({
-        id: event.id,
-        title: event.title,
-        scheduled_at: event.scheduled_at,
-        platform: event.platform,
-        content_text: event.content_text,
-        color: event.color,
-        status: event.status,
-      }));
-      setEvents(mappedEvents);
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load events';
-      showToast(errorMessage, "error");
-      console.error('Calendar error:', error);
+      if (error) throw error;
+      setEvents((data || []).map(e => ({
+        id: e.id, title: e.title, scheduled_at: e.scheduled_at,
+        platform: e.platform, content_text: e.content_text,
+        color: e.color, status: e.status,
+      })));
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Failed to load events", "error");
       setEvents([]);
     } finally {
       setLoading(false);
@@ -175,351 +402,252 @@ function CalendarPageInner() {
       return;
     }
     try {
+      const payload = {
+        title: formData.title,
+        scheduled_at: formData.scheduled_at,
+        platform: formData.platform?.toLowerCase(),
+        content_text: formData.content,
+        color: formData.color,
+        status: formData.status?.toLowerCase(),
+      };
       if (editingEvent) {
-        const { error } = await supabase.from("calendar_events").update({
-          title: formData.title,
-          scheduled_at: formData.scheduled_at,
-          platform: formData.platform?.toLowerCase(),
-          content_text: formData.content,
-          color: formData.color,
-          status: formData.status?.toLowerCase()
-        }).eq("id", editingEvent.id).eq("user_id", user.id);
-        if (error) {
-          console.error('Update error:', error);
-          throw error;
-        }
+        const { error } = await supabase.from("calendar_events")
+          .update(payload).eq("id", editingEvent.id).eq("user_id", user.id);
+        if (error) throw error;
         showToast("Event updated", "success");
       } else {
-        const { error } = await supabase.from("calendar_events").insert({
-          user_id: user.id,
-          title: formData.title,
-          scheduled_at: formData.scheduled_at,
-          platform: formData.platform?.toLowerCase(),
-          content_text: formData.content,
-          color: formData.color,
-          status: formData.status?.toLowerCase()
-        });
-        if (error) {
-          console.error('Insert error:', error);
-          throw error;
-        }
+        const { error } = await supabase.from("calendar_events")
+          .insert({ ...payload, user_id: user.id });
+        if (error) throw error;
         showToast("Event added", "success");
       }
       setModalOpen(false);
       setEditingEvent(null);
-      setFormData({ title: "", scheduled_at: "", platform: "Other", content: "", color: COLORS[0], status: "Draft" });
+      setFormData(defaultForm);
       fetchEvents();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to save event';
-      console.error('Save error:', error);
-      showToast(errorMessage, "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Failed to save event", "error");
     }
   };
 
   const handleDeleteEvent = async (id: string) => {
-    if (!confirm("Delete this event?")) return;
-    if (!user) return;
+    if (!confirm("Delete this event?") || !user) return;
     try {
-      const { error } = await supabase.from("calendar_events").delete().eq("id", id).eq("user_id", user.id);
-      if (error) {
-        console.error('Delete error:', error);
-        throw error;
-      }
+      const { error } = await supabase.from("calendar_events")
+        .delete().eq("id", id).eq("user_id", user.id);
+      if (error) throw error;
       showToast("Event deleted", "success");
+      setModalOpen(false);
+      setEditingEvent(null);
+      setFormData(defaultForm);
       fetchEvents();
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete event';
-      console.error('Delete error:', error);
-      showToast(errorMessage, "error");
+    } catch (err: unknown) {
+      showToast(err instanceof Error ? err.message : "Failed to delete event", "error");
     }
   };
 
   const openEditModal = (event: CalEvent) => {
     setEditingEvent(event);
-    setFormData({ title: event.title, scheduled_at: event.scheduled_at, platform: event.platform || "Other", content: event.content_text || "", color: event.color || COLORS[0], status: event.status || "Draft" });
+    setFormData({
+      title: event.title,
+      scheduled_at: event.scheduled_at,
+      platform: event.platform || "Other",
+      content: event.content_text || "",
+      color: event.color || COLORS[0],
+      status: event.status || "Draft",
+    });
     setModalOpen(true);
   };
 
   const openAddModal = (date?: Date) => {
     setEditingEvent(null);
-    const scheduledDate = date || new Date();
-    const year = scheduledDate.getFullYear();
-    const month = String(scheduledDate.getMonth() + 1).padStart(2, '0');
-    const day = String(scheduledDate.getDate()).padStart(2, '0');
-    const hours = String(scheduledDate.getHours()).padStart(2, '0');
-    const minutes = String(scheduledDate.getMinutes()).padStart(2, '0');
-    const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    setFormData({ title: "", scheduled_at: localDateTime, platform: "Other", content: "", color: COLORS[0], status: "Draft" });
+    const d = date || new Date();
+    const y = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, "0");
+    const da = String(d.getDate()).padStart(2, "0");
+    const hr = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    setFormData({ ...defaultForm, scheduled_at: `${y}-${mo}-${da}T${hr}:${mi}` });
     setModalOpen(true);
   };
 
-  const renderMonthView = () => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDay = getFirstDayOfMonth(year, month);
-    const days = [];
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-    for (let i = 0; i < firstDay; i++) days.push(<div key={`empty-${i}`} style={{ minHeight: 90 }} />);
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const dayEvents = events.filter(e => e.scheduled_at.startsWith(dateStr));
-      const isToday = dateStr === todayStr;
-      days.push(
-        <div key={day} onClick={() => openAddModal(new Date(year, month, day))}
-          style={{ background: "hsl(var(--card))", border: isToday ? "2px solid hsl(var(--accent))" : "1px solid var(--card-b)", borderRadius: 8, minHeight: 90, padding: 8, cursor: "pointer", transition: "all .2s" }}
-          onMouseEnter={(e) => e.currentTarget.style.borderColor = "hsl(var(--accent))"}
-          onMouseLeave={(e) => e.currentTarget.style.borderColor = isToday ? "2px solid hsl(var(--accent))" : "var(--card-b)"}
-        >
-          <div style={{ fontSize: ".75rem", color: isToday ? "hsl(var(--accent))" : "var(--text3)", fontWeight: isToday ? 600 : 400, marginBottom: 4 }}>{day}</div>
-          {dayEvents.slice(0, 2).map(event => (
-            <div key={event.id} onClick={(e) => { e.stopPropagation(); openEditModal(event); }}
-              style={{ background: event.color || "hsl(var(--accent))", color: "#fff", fontSize: ".7rem", padding: "2px 6px", borderRadius: 4, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {event.title}
-            </div>
-          ))}
-          {dayEvents.length > 2 && <div style={{ fontSize: ".65rem", color: "var(--text3)", marginTop: 2 }}>+{dayEvents.length - 2} more</div>}
-        </div>
-      );
-    }
-    return days;
+  const prevMonth = () => {
+    if (month === 0) { setYear(y => y - 1); setMonth(11); }
+    else setMonth(m => m - 1);
   };
+  const nextMonth = () => {
+    if (month === 11) { setYear(y => y + 1); setMonth(0); }
+    else setMonth(m => m + 1);
+  };
+  const goToday = () => { const t = new Date(); setYear(t.getFullYear()); setMonth(t.getMonth()); };
 
-  if (authLoading) return <LoadingPage />;
-  if (!user) return <LoadingPage />;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+  if (authLoading || !user) return <LoadingPage />;
+
+  // Build calendar grid cells
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month);
 
   return (
     <>
-      <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
-        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-        @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
-
-        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
-
-        .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
-        .sidebar[data-collapsed="true"]{width:60px}
-
-        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
-        .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);letter-spacing:-.02em;white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
-
-        .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
-        .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
-        .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
-        .sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
-
-        .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
-
-        .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-        .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
-        .sb-btn:hover{background:var(--bg3);color:var(--text2)}
-        .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-
-        .sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
-        .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
-        .sb-upgrade:hover{background:#ea6c0a}
-
-        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
-        .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
-        .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
-
-        .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-        .page-content{flex:1;padding:24px;overflow:auto}
-        @media(max-width:768px){.page-content{padding:16px}}
-        @media(max-width:480px){.page-content{padding:12px}}
-
-        @media(max-width:768px){
-          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s cubic-bezier(.4,0,.2,1)}
-          .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
-          .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
-          .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
-        }
-        .mobile-overlay{display:none}
-        @media(max-width:768px){.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}}
-      `}</style>
-
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      {mobileSidebarOpen && <div className="mobile-overlay" onClick={() => setMobileSidebarOpen(false)} />}
 
-      <div className="dash-layout">
-        <div className="main-area">
-          <div className="topbar">
-            <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
-            <span style={{ fontFamily: "var(--serif)", fontSize: "1.1rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>Content Calendar</span>
-            <button className="topbar-btn" onClick={toggleTheme} title={isDark ? "Light mode" : "Dark mode"}>
-              {isDark
-                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              }
-            </button>
+      <div className="flex min-h-screen flex-col bg-[var(--bg)]">
+        {/* Topbar */}
+        <div
+          className="sticky top-0 z-40 flex h-[52px] items-center gap-3 border-b px-4 sm:px-6"
+          style={{
+            background: "var(--glass)",
+            backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
+            borderColor: "hsl(var(--border))",
+          }}
+        >
+          <CalendarDays size={15} style={{ color: "hsl(var(--accent))", flexShrink: 0 }} />
+          <span className="flex-1 text-[14px] font-semibold text-[var(--text)]">Calendar</span>
+          <TopbarUserMenu />
+        </div>
+
+        {/* Content */}
+        <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
+
+          {/* Header row */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <h1 className="font-serif text-2xl font-light text-[var(--text)]">
+                {MONTHS[month]}{" "}
+                <span className="text-[var(--text3)]">{year}</span>
+              </h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={prevMonth}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] text-[var(--text3)] transition-all hover:border-[var(--border2)] hover:text-[var(--text2)]"
+                style={{ cursor: "pointer" }}
+              >
+                <ChevronLeft size={15} />
+              </button>
+              <button
+                onClick={goToday}
+                className="flex h-9 items-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] px-3.5 text-[12px] font-medium text-[var(--text2)] transition-all hover:border-[var(--border2)]"
+                style={{ cursor: "pointer" }}
+              >
+                Today
+              </button>
+              <button
+                onClick={nextMonth}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] text-[var(--text3)] transition-all hover:border-[var(--border2)] hover:text-[var(--text2)]"
+                style={{ cursor: "pointer" }}
+              >
+                <ChevronRight size={15} />
+              </button>
+              <button
+                onClick={() => openAddModal()}
+                className="flex h-9 items-center gap-1.5 rounded-xl px-4 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+              >
+                <Plus size={14} />
+                Add event
+              </button>
+            </div>
           </div>
 
-          <div className="page-content">
-            <>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 16 }}>
-                  <h1 style={{ fontFamily: "var(--serif)", fontSize: "1.8rem", fontWeight: 300, color: "var(--text)", margin: 0 }}>
-                    {MONTHS[month]} {year}
-                  </h1>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <button onClick={() => {
-                      if (month === 0) {
-                        setYear(year - 1);
-                        setMonth(11);
-                      } else {
-                        setMonth(month - 1);
-                      }
-                    }}
-                      style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>←</button>
-                    <button onClick={() => {
-                      const today = new Date();
-                      setYear(today.getFullYear());
-                      setMonth(today.getMonth());
-                    }}
-                      style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)", fontSize: ".8rem" }}>
-                      Today
-                    </button>
-                    <button onClick={() => {
-                      if (month === 11) {
-                        setYear(year + 1);
-                        setMonth(0);
-                      } else {
-                        setMonth(month + 1);
-                      }
-                    }}
-                      style={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "8px 12px", cursor: "pointer", color: "var(--text)" }}>➜</button>
-                    <button onClick={() => openAddModal()}
-                      style={{ background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "8px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
-                      Add Event
-                    </button>
+          {/* Calendar grid */}
+          <div className="overflow-x-auto">
+            <div className="min-w-[560px]">
+              {/* Day headers */}
+              <div className="mb-2 grid grid-cols-7 gap-2">
+                {DAYS.map(day => (
+                  <div
+                    key={day}
+                    className="py-1 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--text3)]"
+                  >
+                    {day}
                   </div>
+                ))}
+              </div>
+
+              {/* Loading skeleton */}
+              {loading ? (
+                <div className="grid grid-cols-7 gap-2">
+                  {Array.from({ length: 35 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="min-h-[90px] animate-pulse rounded-xl border border-[var(--card-b)] bg-[var(--bg3)]"
+                      style={{ animationDelay: `${(i % 7) * 0.04}s` }}
+                    />
+                  ))}
                 </div>
+              ) : (
+                <div className="grid grid-cols-7 gap-2">
+                  {/* Empty cells before first day */}
+                  {Array.from({ length: firstDay }).map((_, i) => (
+                    <div key={`empty-${i}`} className="min-h-[90px]" />
+                  ))}
 
-                {loading ? (
-                  <>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, marginBottom: 8, minWidth: 280 }}>
-                      {DAYS.map(day => (
-                        <div key={day} style={{ height: 14, borderRadius: 4, background: "var(--bg3)", animation: "pulse 1.5s ease-in-out infinite" }} />
-                      ))}
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, minWidth: 280 }}>
-                      {Array.from({ length: 35 }).map((_, i) => (
-                        <div key={i} style={{ minHeight: 90, borderRadius: 8, background: "var(--bg3)", animation: "pulse 1.5s ease-in-out infinite", animationDelay: `${(i % 7) * 0.05}s` }} />
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div style={{ overflowX: "auto" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, marginBottom: 8, minWidth: 280 }}>
-                      {DAYS.map(day => (
-                        <div key={day} style={{ fontSize: ".75rem", color: "var(--text3)", textAlign: "center", fontWeight: 500 }}>{day}</div>
-                      ))}
-                    </div>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(40px, 1fr))", gap: 8, minWidth: 280 }}>
-                      {renderMonthView()}
-                    </div>
-                    </div>
-                  </>
-                )}
-
-                {!loading && events.length === 0 && (
-                  <div style={{ textAlign: "center", padding: 60 }}>
-                    <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>📅</div>
-                    <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.5rem", fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Your content schedule, at a glance</h2>
-                    <p style={{ color: "var(--text2)", marginBottom: 24 }}>Plan and track every post across every platform in one place</p>
-                    <button onClick={() => openAddModal()}
-                      style={{ background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
-                      Add your first event
-                    </button>
-                  </div>
-                )}
-              </>
+                  {/* Day cells */}
+                  {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                    const dayEvents = events.filter(e => e.scheduled_at.startsWith(dateStr));
+                    const isToday = dateStr === todayStr;
+                    return (
+                      <DayCell
+                        key={day}
+                        day={day}
+                        dateStr={dateStr}
+                        isToday={isToday}
+                        dayEvents={dayEvents}
+                        onAddClick={openAddModal}
+                        onEventClick={openEditModal}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
+
+          {/* Empty state */}
+          {!loading && events.length === 0 && (
+            <div className="flex flex-col items-center gap-4 py-16 text-center">
+              <div
+                className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
+                style={{ background: "var(--bg3)" }}
+              >
+                📅
+              </div>
+              <div>
+                <h2 className="font-serif text-xl font-light text-[var(--text)]">
+                  Your content schedule, at a glance
+                </h2>
+                <p className="mt-1 text-[13px] text-[var(--text3)]">
+                  Plan and track every post across every platform in one place
+                </p>
+              </div>
+              <button
+                onClick={() => openAddModal()}
+                className="flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+                style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+              >
+                <Plus size={15} />
+                Add your first event
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {modalOpen && (
-        <div onClick={() => setModalOpen(false)}
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 20 }}>
-          <div onClick={(e) => e.stopPropagation()}
-            style={{ background: "var(--bg2)", border: "1px solid hsl(var(--border))", borderRadius: 18, padding: 24, maxWidth: 480, width: "100%", maxHeight: "90vh", overflow: "auto" }}>
-            <h2 style={{ fontFamily: "var(--serif)", fontSize: "1.3rem", fontWeight: 300, color: "var(--text)", marginBottom: 20 }}>
-              {editingEvent ? "Edit Event" : "Add Event"}
-            </h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Title *</label>
-                <input type="text" value={formData.title} onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} placeholder="Event title" />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Date & Time *</label>
-                <input type="datetime-local" value={formData.scheduled_at} onChange={(e) => setFormData(prev => ({ ...prev, scheduled_at: e.target.value }))}
-                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }} />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Platform</label>
-                <select value={formData.platform} onChange={(e) => setFormData(prev => ({ ...prev, platform: e.target.value }))}
-                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
-                  {PLATFORMS.map(p => <option key={p} value={p}>{p}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Content</label>
-                <textarea value={formData.content} onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem", minHeight: 100, resize: "vertical" }} placeholder="Post content..." />
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Status</label>
-                <select value={formData.status} onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  style={{ width: "100%", background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 8, padding: "10px 12px", color: "var(--text)", fontSize: ".9rem" }}>
-                  {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{ display: "block", fontSize: ".85rem", color: "var(--text2)", marginBottom: 6 }}>Color</label>
-                <div style={{ display: "flex", gap: 8 }}>
-                  {COLORS.map(color => (
-                    <button key={color} onClick={() => setFormData(prev => ({ ...prev, color }))}
-                      style={{ width: 32, height: 32, borderRadius: 6, background: color, border: formData.color === color ? "2px solid var(--text)" : "1px solid hsl(var(--border))", cursor: "pointer" }} />
-                  ))}
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-                <button onClick={() => setModalOpen(false)}
-                  style={{ flex: 1, background: "var(--bg3)", border: "1px solid hsl(var(--border))", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "var(--text)", fontWeight: 500 }}>Cancel</button>
-                {editingEvent && (
-                  <button onClick={() => { handleDeleteEvent(editingEvent.id); setModalOpen(false); }}
-                    style={{ background: "var(--error)", border: "none", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>Delete</button>
-                )}
-                <button onClick={handleSaveEvent}
-                  style={{ flex: 1, background: "hsl(var(--accent))", border: "none", borderRadius: 8, padding: "10px 16px", cursor: "pointer", color: "#fff", fontWeight: 500 }}>
-                  {editingEvent ? "Update" : "Add"}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Event modal */}
+      <EventModal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setEditingEvent(null); setFormData(defaultForm); }}
+        formData={formData}
+        setFormData={setFormData}
+        onSave={handleSaveEvent}
+        onDelete={editingEvent ? () => handleDeleteEvent(editingEvent.id) : undefined}
+        isEditing={!!editingEvent}
+      />
     </>
   );
 }

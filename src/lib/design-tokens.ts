@@ -1,25 +1,3 @@
-export const DARK_TOKENS: Record<string, string> = {
-  "--bg": "#0c0a09",
-  "--bg2": "#111110",
-  "--bg3": "#1c1917",
-  "--border": "24 6% 17%",
-  "--border2": "#3d3935",
-  "--text": "#fafaf9",
-  "--text2": "#d6d3d1",
-  "--text3": "#78716c",
-  "--accent": "25 95% 53%",
-  "--accent-l": "#1a0f07",
-  "--accent-m": "#431407",
-  "--sidebar": "#111110",
-  "--sidebar-b": "#292524",
-  "--card": "30 11% 10%",
-  "--card-b": "#292524",
-  "--input": "#111110",
-  "--input-b": "#292524",
-  "--success": "#4ade80",
-  "--error": "#f87171",
-};
-
 export const LIGHT_TOKENS: Record<string, string> = {
   "--bg": "#ffffff",
   "--bg2": "#fafaf9",
@@ -42,10 +20,9 @@ export const LIGHT_TOKENS: Record<string, string> = {
   "--error": "#be123c",
 };
 
-export function applyTokens(theme: "dark" | "light") {
-  const tokens = theme === "dark" ? DARK_TOKENS : LIGHT_TOKENS;
+export function applyTokens(_theme?: string) {
   const root = document.documentElement;
-  Object.entries(tokens).forEach(([key, value]) => {
+  Object.entries(LIGHT_TOKENS).forEach(([key, value]) => {
     root.style.setProperty(key, value);
   });
 }

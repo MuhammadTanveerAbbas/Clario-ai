@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
-import Script from "next/script";
+import { Cantarell, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -8,9 +7,9 @@ import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ClientProviders } from "@/components/providers/client-providers";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
-const inter = Inter({
+const cantarell = Cantarell({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "700"],
   variable: "--font-inter",
   display: "swap",
   preload: true,
@@ -105,24 +104,9 @@ export default function RootLayout({
       lang="en"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable}`}
+      className={`${cantarell.variable} ${fraunces.variable}`}
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
-        <Script
-          id="theme-script"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                var theme = localStorage.getItem('clario-theme');
-                if (!theme) {
-                  theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                document.documentElement.classList.add(theme);
-              } catch (e) {}
-            `,
-          }}
-        />
         <ClientProviders>
           <AuthProvider>
             <SidebarProvider>

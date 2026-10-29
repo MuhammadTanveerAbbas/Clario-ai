@@ -1,24 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Twitter, Linkedin, Mail, ArrowUpRight, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Sparkles, Zap, DollarSign, BarChart2, Globe, Mail, Shield, FileText } from "lucide-react";
 
 const PRODUCT_LINKS = [
-  { href: "/#features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
-  { href: "/#compare", label: "Compare" },
+  { href: "/#features", label: "Features", icon: Zap },
+  { href: "/pricing", label: "Pricing", icon: DollarSign },
+  { href: "/#compare", label: "Compare", icon: BarChart2 },
 ];
 
 const COMPANY_LINKS = [
-  { href: "https://themvpguy.vercel.app", label: "About", external: true },
-  { href: "mailto:themvpguy.contact@gmail.com", label: "Contact", external: true },
+  { href: "https://themvpguy.vercel.app", label: "About", external: true, icon: Globe },
+  { href: "mailto:themvpguy.contact@gmail.com", label: "Contact", external: true, icon: Mail },
 ];
 
-const SOCIAL_LINKS = [
-  { href: "https://github.com/muhammadtanveerabbas", label: "GitHub", icon: Github },
-  { href: "https://x.com/m_tanveerabbas", label: "Twitter", icon: Twitter },
-  { href: "https://linkedin.com/in/muhammadtanveerabbas", label: "LinkedIn", icon: Linkedin },
-  { href: "mailto:themvpguy.contact@gmail.com", label: "Email", icon: Mail },
+const LEGAL_LINKS = [
+  { href: "/privacy", label: "Privacy Policy", icon: Shield },
+  { href: "/terms", label: "Terms of Service", icon: FileText },
 ];
 
 export function MktFooter() {
@@ -42,7 +40,7 @@ export function MktFooter() {
                   Turn any content into your next hit.
                 </h3>
                 <p className="text-sm text-stone-500 leading-relaxed m-0">
-                  Summarize YouTube videos, articles, and notes. Remix for every platform.
+                  Summarize, remix, and repurpose your content in seconds, in your own voice.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full lg:w-auto">
@@ -66,10 +64,10 @@ export function MktFooter() {
       </div>
 
       {/* Links grid */}
-      <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-2 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-8">
-          {/* Brand column */}
-          <div className="lg:col-span-5">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-12 gap-8 lg:gap-8">
+          {/* Brand column — full width on mobile, 2 cols on sm, 5 cols on lg */}
+          <div className="col-span-2 sm:col-span-4 lg:col-span-5">
             <Link href="/" className="inline-flex items-center gap-2.5 no-underline mb-4 group">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
@@ -86,33 +84,23 @@ export function MktFooter() {
               </span>
             </Link>
             <p className="text-sm text-stone-500 leading-relaxed max-w-xs mb-5">
-              AI-powered content platform for creators. Summarize, remix, and chat with AI that adapts to your brand voice.
+              Summarize, remix, and repurpose your content in seconds, in your own voice.
             </p>
-            <div className="flex flex-wrap items-center gap-2">
-              {SOCIAL_LINKS.map(({ href, label, icon: Icon }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target={href.startsWith("mailto:") ? undefined : "_blank"}
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center w-9 h-9 rounded-lg border border-stone-200 text-stone-500 hover:text-stone-900 hover:border-orange-400 hover:bg-orange-50 transition-all"
-                  aria-label={label}
-                >
-                  <Icon size={15} />
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Product links */}
-          <div className="lg:col-span-2">
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 mb-4">
+          {/* Product links — 1 col on mobile, 1/4 on sm, 2/12 on lg */}
+          <div className="col-span-1 sm:col-span-1 lg:col-span-2">
+            <h4
+              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-500 mb-4"
+              style={{ textShadow: "0 1px 0 #c2410c, 0 2px 0 #9a3412, 0 3px 4px rgba(194,65,12,0.3)" }}
+            >
               Product
             </h4>
             <ul className="space-y-2.5 list-none m-0 p-0">
-              {PRODUCT_LINKS.map(({ href, label }) => (
+              {PRODUCT_LINKS.map(({ href, label, icon: Icon }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors">
+                  <Link href={href} className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors group">
+                    <Icon size={13} className="text-stone-400 group-hover:text-orange-400 transition-colors shrink-0" />
                     {label}
                   </Link>
                 </li>
@@ -120,28 +108,33 @@ export function MktFooter() {
             </ul>
           </div>
 
-          {/* Company links */}
-          <div className="lg:col-span-2">
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 mb-4">
+          {/* Company links — 1 col on mobile, 1/4 on sm, 2/12 on lg */}
+          <div className="col-span-1 sm:col-span-1 lg:col-span-2">
+            <h4
+              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-500 mb-4"
+              style={{ textShadow: "0 1px 0 #c2410c, 0 2px 0 #9a3412, 0 3px 4px rgba(194,65,12,0.3)" }}
+            >
               Company
             </h4>
             <ul className="space-y-2.5 list-none m-0 p-0">
-              {COMPANY_LINKS.map(({ href, label, external }) => (
+              {COMPANY_LINKS.map(({ href, label, external, icon: Icon }) => (
                 <li key={href}>
                   {external ? (
                     <a
                       href={href}
                       target={href.startsWith("mailto:") ? undefined : "_blank"}
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors group"
+                      className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors group"
                     >
+                      <Icon size={13} className="text-stone-400 group-hover:text-orange-400 transition-colors shrink-0" />
                       {label}
                       {!href.startsWith("mailto:") && (
                         <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                       )}
                     </a>
                   ) : (
-                    <Link href={href} className="text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors">
+                    <Link href={href} className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors group">
+                      <Icon size={13} className="text-stone-400 group-hover:text-orange-400 transition-colors shrink-0" />
                       {label}
                     </Link>
                   )}
@@ -150,50 +143,44 @@ export function MktFooter() {
             </ul>
           </div>
 
-          {/* Social column */}
-          <div className="lg:col-span-3 sm:col-span-2">
-            <h4 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone-500 mb-4">
-              Connect
+          {/* Legal links — 1 col on mobile, 1/4 on sm, 3/12 on lg */}
+          <div className="col-span-1 sm:col-span-1 lg:col-span-3">
+            <h4
+              className="text-[11px] font-semibold uppercase tracking-[0.14em] text-orange-500 mb-4"
+              style={{ textShadow: "0 1px 0 #c2410c, 0 2px 0 #9a3412, 0 3px 4px rgba(194,65,12,0.3)" }}
+            >
+              Legal
             </h4>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {SOCIAL_LINKS.map(({ href, label, icon: Icon }) => (
-                <a
-                  key={href}
-                  href={href}
-                  target={href.startsWith("mailto:") ? undefined : "_blank"}
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-stone-200 text-stone-600 hover:text-stone-900 hover:border-orange-400 hover:bg-orange-50 transition-all text-xs font-medium no-underline"
-                  aria-label={label}
-                >
-                  <Icon size={14} />
-                  <span className="hidden sm:inline">{label}</span>
-                </a>
+            <ul className="space-y-2.5 list-none m-0 p-0">
+              {LEGAL_LINKS.map(({ href, label, icon: Icon }) => (
+                <li key={href}>
+                  <Link href={href} className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-orange-500 no-underline transition-colors group">
+                    <Icon size={13} className="text-stone-400 group-hover:text-orange-400 transition-colors shrink-0" />
+                    {label}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
+
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="mt-8 sm:mt-10 pt-6 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-stone-500 m-0 text-center sm:text-left">
-            © {new Date().getFullYear()} Clario. Built by{" "}
+            © {new Date().getFullYear()} Clario. All rights reserved.
+          </p>
+          <p className="text-xs text-stone-500 m-0">
+            Made by{" "}
             <a
-              href="https://themvpguy.vercel.app"
+              href="https://muhammadtanveerabbas.vercel.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-orange-700 hover:text-orange-600 no-underline transition-colors"
+              className="text-stone-700 hover:text-orange-500 no-underline transition-colors font-medium"
             >
-              The MVP Guy
+              Tanveer
             </a>
           </p>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-xs text-stone-500 hover:text-stone-700 no-underline transition-colors">
-              Privacy
-            </Link>
-            <Link href="/terms" className="text-xs text-stone-500 hover:text-stone-700 no-underline transition-colors">
-              Terms
-            </Link>
-          </div>
         </div>
       </div>
     </footer>

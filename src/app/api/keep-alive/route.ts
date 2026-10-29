@@ -24,7 +24,7 @@ export async function GET() {
     .from('profiles')
     .select('id')
     .limit(1)
-    .single()
+    .maybeSingle()
 
   if (error) {
     console.error('Keep-alive query failed:', error)

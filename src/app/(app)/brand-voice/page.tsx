@@ -3,10 +3,10 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/components/ThemeProvider";
 import { useSidebar } from "@/contexts/SidebarContext";
 import { LoadingPage } from "@/components/ui/loading-page";
 import Link from "next/link";
+import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
 
 interface Toast { id: string; type: "success" | "error" | "info"; message: string; }
 interface BrandVoice { id: string; name: string; tone?: string; vocabulary?: string; personality?: string; description?: string; examples?: string; is_active: boolean; created_at: string; }
@@ -56,7 +56,6 @@ export default function BrandVoicePage() {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
   const { user: authUser, loading: authLoading, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
   const { collapsed: sidebarCollapsed, setCollapsed: setSidebarCollapsed, mobileOpen: mobileSidebarOpen, setMobileOpen: setMobileSidebarOpen } = useSidebar();
 
   const [voices, setVoices] = useState<BrandVoice[]>([]);
@@ -68,7 +67,6 @@ export default function BrandVoicePage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [userProfile, setUserProfile] = useState<{ full_name?: string; subscription_tier?: string } | null>(null);
   const [form, setForm] = useState({ name: "", tone: "", vocabulary: "", personality: "", description: "" });
-  const isDark = theme === "dark";
 
   const addToast = useCallback((message: string, type: Toast["type"] = "info") => {
     const id = Math.random().toString(36).slice(2);
@@ -214,15 +212,9 @@ export default function BrandVoicePage() {
       <div className="dash-layout">
         <div className="main-area">
           <div className="topbar">
-            <button className="topbar-btn topbar-hamburger" onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            </button>
             <span style={{ fontFamily: "var(--serif)", fontSize: "1.1rem", fontWeight: 300, color: "var(--text)", flex: 1 }}>Brand Voice</span>
             <button onClick={openCreate} style={{ background: "hsl(var(--accent))", color: "#fff", border: "none", borderRadius: 9, padding: "7px 16px", fontFamily: "var(--sans)", fontSize: ".82rem", fontWeight: 600, cursor: "pointer" }}>+ Create Voice</button>
-            <button className="topbar-btn" onClick={toggleTheme}>
-              {isDark ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/></svg>
-                : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
-            </button>
+            <TopbarUserMenu />
           </div>
 
           <div className="page-content" style={{ maxWidth: 860, margin: "0 auto" }}>

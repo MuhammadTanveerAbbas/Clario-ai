@@ -42,7 +42,8 @@ Rules:
 
 async function summarizeWithGroq(
   transcript: string,
-  title: string
+  title: string,
+  method: string
 ): Promise<Record<string, unknown>> {
   const MAX_CHARS = 24_000;
   const truncated =
@@ -50,10 +51,17 @@ async function summarizeWithGroq(
       ? transcript.slice(0, MAX_CHARS) + '\n[Truncated for length]'
       : transcript;
 
+  // Warn the model when only metadata is available
+  const qualityNote = method === 'stub'
+    ? '\n\nNOTE: No transcript is available — only title/metadata. Set all text fields to reflect this limitation. Do not invent content.'
+    : method === 'description'
+    ? '\n\nNOTE: Transcript is derived from the video description, not actual captions. Insights may be limited.'
+    : ''
+
   const raw = await generateCompletion(
-    `Video title: ${title}\n\nTranscript:\n${truncated}`,
+    `Video title: ${title}${qualityNote}\n\nTranscript:\n${truncated}`,
     SUMMARIZE_SYSTEM,
-    { model: 'llama-3.3-70b-versatile', maxTokens: 3000, temperature: 0.3 }
+    { model: 'llama-3.3-70b-versatile', maxTokens: 3000, temperature: 0.2 }
   );
   const cleaned = raw.replace(/^```json\s*|^```\s*|```$/gm, '').trim();
   return JSON.parse(cleaned) as Record<string, unknown>;
@@ -141,7 +149,7 @@ export async function POST(req: NextRequest) {
 
     let summary: Record<string, unknown>;
     try {
-      summary = await summarizeWithGroq(transcript.text, title);
+      summary = await summarizeWithGroq(transcript.text, title, transcript.method);
     } catch (err: unknown) {
       console.error('[youtube-analyze] Groq error:', err);
       return NextResponse.json(

@@ -5,42 +5,64 @@ import { checkRateLimit } from '@/middleware/rate-limit'
 export const maxDuration = 30
 export const dynamic = 'force-dynamic'
 
-function extractTextFromHtml(html: string): { title: string; text: string } {
-  const ogTitleMatch = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
-    || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
-  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
-  const title = (ogTitleMatch?.[1] || titleMatch?.[1] || '')
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-
-  // Remove scripts, styles, nav, footer
-  let cleaned = html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<nav[\s\S]*?<\/nav>/gi, ' ')
-    .replace(/<footer[\s\S]*?<\/footer>/gi, ' ')
-    .replace(/<header[\s\S]*?<\/header>/gi, ' ')
-    .replace(/<!--[\s\S]*?-->/g, ' ')
-
-  // Prefer article/main content
-  const articleMatch = cleaned.match(/<article[\s\S]*?<\/article>/i)
-  const mainMatch = cleaned.match(/<main[\s\S]*?<\/main>/i)
-  if (articleMatch) cleaned = articleMatch[0]
-  else if (mainMatch) cleaned = mainMatch[0]
-
-  const text = cleaned
-    .replace(/<[^>]+>/g, ' ')
+function decodeHtmlEntities(text: string): string {
+  return text
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim()
+    .replace(/&#x27;/g, "'")
+    .replace(/&#x2F;/g, '/')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCharCode(parseInt(h, 16)))
+}
+
+function extractTextFromHtml(html: string): { title: string; text: string } {
+  // Extract title — prefer og:title, then <title>
+  const ogTitleMatch =
+    html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i) ||
+    html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)
+  const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+  const rawTitle = ogTitleMatch?.[1] || titleMatch?.[1] || ''
+  const title = decodeHtmlEntities(rawTitle.trim().replace(/\s+/g, ' '))
+
+  // Remove non-content blocks before any other processing
+  let cleaned = html
+    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<nav\b[\s\S]*?<\/nav>/gi, ' ')
+    .replace(/<footer\b[\s\S]*?<\/footer>/gi, ' ')
+    .replace(/<header\b[\s\S]*?<\/header>/gi, ' ')
+    .replace(/<aside\b[\s\S]*?<\/aside>/gi, ' ')
+    .replace(/<form\b[\s\S]*?<\/form>/gi, ' ')
+    .replace(/<noscript\b[\s\S]*?<\/noscript>/gi, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+
+  // Prefer semantic content containers in priority order
+  const selectors = [
+    /<article\b[\s\S]*?<\/article>/i,
+    /<main\b[\s\S]*?<\/main>/i,
+    /<div[^>]+(?:class|id)=["'][^"']*(?:content|post|article|entry|story|body)[^"']*["'][\s\S]*?<\/div>/i,
+  ]
+  for (const re of selectors) {
+    const m = cleaned.match(re)
+    if (m) { cleaned = m[0]; break }
+  }
+
+  // Strip remaining tags, decode entities, normalise whitespace
+  const text = decodeHtmlEntities(
+    cleaned
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<\/p>/gi, '\n')
+      .replace(/<\/li>/gi, '\n')
+      .replace(/<\/h[1-6]>/gi, '\n')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
+  )
 
   return { title, text }
 }
@@ -86,36 +108,46 @@ export async function POST(req: NextRequest) {
     }
 
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 15000)
+    const timeout = setTimeout(() => controller.abort(), 20000)
 
     let html: string
+    let finalUrl = parsed.toString()
     try {
       const res = await fetch(parsed.toString(), {
         signal: controller.signal,
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; ClarioBot/1.0; +https://clario.ai)',
-          Accept: 'text/html,application/xhtml+xml',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Cache-Control': 'no-cache',
         },
         redirect: 'follow',
       })
       clearTimeout(timeout)
 
       if (!res.ok) {
-        return NextResponse.json({ error: `Failed to fetch URL (${res.status})` }, { status: 422 })
+        if (res.status === 403 || res.status === 401) {
+          return NextResponse.json({ error: `This page requires authentication or blocks scrapers (${res.status})` }, { status: 422 })
+        }
+        return NextResponse.json({ error: `Failed to fetch URL (HTTP ${res.status})` }, { status: 422 })
       }
 
       const contentType = res.headers.get('content-type') || ''
-      if (!contentType.includes('text/html') && !contentType.includes('text/plain')) {
+      if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('application/xhtml')) {
         return NextResponse.json({ error: 'URL must point to a web page with readable text' }, { status: 422 })
       }
 
+      finalUrl = res.url || finalUrl
       html = await res.text()
     } catch (err: unknown) {
       clearTimeout(timeout)
-      const msg = err instanceof Error && err.name === 'AbortError'
-        ? 'Request timed out'
-        : 'Could not fetch URL'
-      return NextResponse.json({ error: msg }, { status: 422 })
+      const name = err instanceof Error ? err.name : ''
+      const msg = err instanceof Error ? err.message : ''
+      if (name === 'AbortError' || msg.includes('abort')) {
+        return NextResponse.json({ error: 'Request timed out (20s). The server may be slow or blocking bots.' }, { status: 422 })
+      }
+      return NextResponse.json({ error: 'Could not reach the URL. Check that it is publicly accessible.' }, { status: 422 })
     }
 
     const { title, text } = extractTextFromHtml(html)
@@ -131,7 +163,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       title: title || parsed.hostname,
       text: truncated,
-      url: parsed.toString(),
+      url: finalUrl,
       charCount: truncated.length,
       source: 'web',
     })

@@ -12,7 +12,7 @@ function TypingEffect() {
     if (!del && text.length < full.length) { const t = setTimeout(() => setText(full.slice(0, text.length + 1)), 50); return () => clearTimeout(t); }
     if (!del && text.length === full.length) { const t = setTimeout(() => setDel(true), 2000); return () => clearTimeout(t); }
     if (del && text.length > 0) { const t = setTimeout(() => setText(text.slice(0, -1)), 25); return () => clearTimeout(t); }
-    if (del && text.length === 0) { setDel(false); setIdx((idx + 1) % phrases.length); }
+    if (del && text.length === 0) { const t = setTimeout(() => { setDel(false); setIdx((idx + 1) % phrases.length); }, 0); return () => clearTimeout(t); }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, del, idx]);
   return <span>{text}<span style={{ color: "#f97316", animation: "blink .85s infinite" }}>|</span></span>;
@@ -25,7 +25,7 @@ function useInView(threshold = 0.15) {
     const obs = new IntersectionObserver(([e]) => { setInView(e.isIntersecting); }, { threshold });
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
-  }, []);
+  }, [threshold]);
   return { ref, inView };
 }
 
@@ -157,7 +157,7 @@ function HeroMockup() {
 
   // Resume auto-play whenever the mockup scrolls back into view
   useEffect(() => {
-    if (inView) setPaused(false);
+    if (inView) { const t = setTimeout(() => setPaused(false), 0); return () => clearTimeout(t); }
   }, [inView]);
 
   useEffect(() => {
@@ -458,8 +458,10 @@ const remixFormats = [
         @media(max-width:860px){.hero{padding-top:44px;gap:34px}}
         @media(max-width:480px){.hero{padding:24px 2% 48px;gap:28px}}
         @media(max-width:360px){.hero{padding:20px 0 40px}}
-        .h-badge{display:inline-flex;align-items:center;gap:7px;background:var(--ol);border:1px solid var(--om);color:var(--o);font-size:.72rem;font-weight:600;padding:5px 13px;border-radius:100px;margin-bottom:20px;letter-spacing:.05em;text-transform:uppercase;animation:fu .6s ease both}
-        .h-dot{width:6px;height:6px;background:var(--o);border-radius:50%;animation:pulse 1.5s infinite}
+        .h-badge{display:inline-flex;align-items:center;gap:8px;position:relative;background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 60%,#fed7aa 100%);border:1px solid #fdba74;color:#c2410c;font-size:.7rem;font-weight:700;padding:6px 16px 6px 10px;border-radius:100px;margin-bottom:22px;letter-spacing:.06em;text-transform:uppercase;animation:fu .6s ease both;box-shadow:0 2px 12px -4px rgba(249,115,22,.35),0 1px 0 0 rgba(255,255,255,.8) inset,0 -1px 0 0 rgba(249,115,22,.15) inset;overflow:hidden}
+        .h-badge-icon{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#ffedd5 100%);border:1px solid #fdba74;box-shadow:0 2px 6px -2px rgba(249,115,22,.4),0 1px 2px rgba(0,0,0,.06);flex-shrink:0;position:relative;z-index:1}
+        .h-badge-text{position:relative;z-index:1}
+        .h-badge-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.5) 0%,transparent 70%);pointer-events:none}
         .h-h1{font-family:var(--serif);font-size:clamp(2rem,5vw,3.6rem);line-height:1.04;letter-spacing:-.035em;font-weight:300;margin-bottom:12px;color:var(--bk);animation:fu .6s .1s ease both}
         .h-h1 em{font-style:italic;color:var(--o)}
         .h-h1 strong{font-weight:400}
@@ -741,14 +743,19 @@ const remixFormats = [
         <div className="hero">
           <div className="hero-copy">
             <div className="h-badge">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
-                <path d="M12 2.5l1.9 5.2 5.1 1.9-5.1 1.9-1.9 5.2-1.9-5.2L5 9.6l5.1-1.9L12 2.5z" />
-              </svg>
-              Built for content creators
+              <span className="h-badge-icon" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#f97316" opacity="0.9"/>
+                  <path d="M2 17l10 5 10-5" stroke="#f97316" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M2 12l10 5 10-5" stroke="#ea580c" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </span>
+              <span className="h-badge-text">Built for content creators</span>
+              <span className="h-badge-glow" aria-hidden="true" />
             </div>
             <h1 className="h-h1">Your content,<br /><em>repurposed</em> for<br /><strong>every platform.</strong></h1>
             <p className="h-typ">Turn any idea into a <TypingEffect /></p>
-            <p className="h-sub">Summarize, remix, and repurpose your content in seconds, in your own voice.</p>
+            <p className="h-sub">AI-powered content platform for creators. Summarize videos, remix into multiple formats, chat with AI, and publish in your brand voice all in one place.</p>
             <div className="h-ctas">
               <button className="btn-p" onClick={() => window.location.href="/sign-up"}>
                 Get started

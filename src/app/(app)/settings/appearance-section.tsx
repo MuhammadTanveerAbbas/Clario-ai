@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTheme } from "@/components/ThemeProvider";
 import { applyTokens } from "@/lib/design-tokens";
 
 type FontOption = "geist" | "inter" | "fraunces" | "mono";
@@ -59,66 +58,7 @@ const DENSITIES: { id: DensityOption; label: string; desc: string }[] = [
   { id: "comfortable", label: "Comfortable", desc: "More breathing room" },
 ];
 
-function SunIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    >
-      <circle cx="12" cy="12" r="5" />
-      <line x1="12" y1="1" x2="12" y2="3" />
-      <line x1="12" y1="21" x2="12" y2="23" />
-      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-      <line x1="1" y1="12" x2="3" y2="12" />
-      <line x1="21" y1="12" x2="23" y2="12" />
-      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    >
-      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-    </svg>
-  );
-}
-
-function SystemIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  );
-}
-
 export function AppearanceSection() {
-  const { theme, setTheme } = useTheme();
   const [appearance, setAppearance] = useState<AppearanceData>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -184,11 +124,6 @@ export function AppearanceSection() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
       <style>{`
-        .ap-theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .ap-theme-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 12px;border-radius:12px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;font-family:var(--sans);color:var(--text3);font-size:.75rem;font-weight:500}
-        .ap-theme-btn:hover{border-color:var(--border2);color:var(--text2);background:var(--bg3)}
-        .ap-theme-btn.active{border-color:hsl(var(--accent));color:hsl(var(--accent));background:var(--accent-l)}
-        .ap-theme-preview{width:100%;height:44px;border-radius:8px;border:1px solid hsl(var(--border));overflow:hidden;display:flex;gap:3px;padding:5px}
         .ap-font-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
         .ap-font-btn{padding:14px 16px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;text-align:left}
         .ap-font-btn:hover{border-color:var(--border2);background:var(--bg3)}
@@ -227,134 +162,6 @@ export function AppearanceSection() {
           .ap-density-btn{padding:10px 8px}
         }
       `}</style>
-
-      {/* Theme */}
-      <div style={card}>
-        <span style={label}>Theme</span>
-        <div className="ap-theme-grid">
-          <button
-            className={`ap-theme-btn${theme === "light" ? " active" : ""}`}
-            onClick={() => setTheme("light")}
-          >
-            <div className="ap-theme-preview" style={{ background: "#ffffff" }}>
-              <div
-                style={{
-                  width: "30%",
-                  height: "100%",
-                  background: "#fafaf9",
-                  borderRadius: 4,
-                }}
-              />
-              <div
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 3,
-                }}
-              >
-                <div
-                  style={{ height: 6, background: "#e7e5e4", borderRadius: 3 }}
-                />
-                <div
-                  style={{
-                    height: 6,
-                    background: "#e7e5e4",
-                    borderRadius: 3,
-                    width: "70%",
-                  }}
-                />
-              </div>
-            </div>
-            <SunIcon />
-            Light
-          </button>
-          <button
-            className={`ap-theme-btn${theme === "dark" ? " active" : ""}`}
-            onClick={() => setTheme("dark")}
-          >
-            <div className="ap-theme-preview" style={{ background: "#0c0a09" }}>
-              <div
-                style={{
-                  width: "30%",
-                  height: "100%",
-                  background: "#111110",
-                  borderRadius: 4,
-                }}
-              />
-              <div
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 3,
-                }}
-              >
-                <div
-                  style={{ height: 6, background: "#292524", borderRadius: 3 }}
-                />
-                <div
-                  style={{
-                    height: 6,
-                    background: "#292524",
-                    borderRadius: 3,
-                    width: "70%",
-                  }}
-                />
-              </div>
-            </div>
-            <MoonIcon />
-            Dark
-          </button>
-          <button
-            className={`ap-theme-btn`}
-            style={{ opacity: 0.5, cursor: "not-allowed" }}
-            title="Coming soon"
-          >
-            <div
-              className="ap-theme-preview"
-              style={{
-                background: "linear-gradient(135deg,#fff 50%,#0c0a09 50%)",
-              }}
-            >
-              <div
-                style={{
-                  width: "30%",
-                  height: "100%",
-                  background: "rgba(128,128,128,.3)",
-                  borderRadius: 4,
-                }}
-              />
-              <div
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 3,
-                }}
-              >
-                <div
-                  style={{
-                    height: 6,
-                    background: "rgba(128,128,128,.3)",
-                    borderRadius: 3,
-                  }}
-                />
-                <div
-                  style={{
-                    height: 6,
-                    background: "rgba(128,128,128,.3)",
-                    borderRadius: 3,
-                    width: "70%",
-                  }}
-                />
-              </div>
-            </div>
-            <SystemIcon />
-            System
-          </button>
-        </div>
-      </div>
 
       {/* Font */}
       <div style={card}>

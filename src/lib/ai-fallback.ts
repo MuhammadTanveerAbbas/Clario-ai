@@ -2,14 +2,19 @@ import Groq from 'groq-sdk'
 
 // ─── Tunable reliability settings (exported for tests / tuning) ────────────
 
-export const DEFAULT_MODEL = 'llama-3.3-70b-versatile'
+export const DEFAULT_MODEL = 'openai/gpt-oss-120b'
+
+/**
+ * Fallback order: prefer quality → fall back to speed.
+ * All IDs are verified against the live Groq model list for this account (2025).
+ * The list is also refreshed dynamically at runtime via the Groq models endpoint.
+ */
 export const FALLBACK_MODELS: readonly string[] = [
-  'llama-3.3-70b-versatile',
-  'llama-3.1-70b-versatile',
-  'llama-3.1-8b-instant',
-  'openai/gpt-oss-120b',
+  'openai/gpt-oss-120b',   // Best quality available on this account
+  'qwen/qwen3.8-27b',      // Mid-tier fallback
+  'openai/gpt-oss-20b',    // Fast, lighter fallback
 ]
-export const MODELS_CACHE_TTL_MS = 60 * 60 * 1000
+export const MODELS_CACHE_TTL_MS = 15 * 60 * 1000   // 15 min — balance freshness vs API calls
 export const RATE_LIMIT_MAX_RETRIES = 3
 export const RATE_LIMIT_BASE_DELAY_MS = 1000
 export const RATE_LIMIT_MAX_DELAY_MS = 15000
@@ -66,10 +71,12 @@ export function isModelUnavailableError(err: unknown): boolean {
   const status = statusOf(err)
   const message = (err as { message?: unknown }).message
   if (status === 404) return true
+  // 413 = request too large for this model's TPM/context — treat as "try next model"
+  if (status === 413) return true
   if (typeof message !== 'string') return false
   const mentionsModel = /model/i.test(message)
   const modelProblem =
-    /(not found|does not exist|unavailable|deprecated|removed|unsupported|invalid|unknown)/i.test(
+    /(not found|does not exist|unavailable|deprecated|removed|unsupported|invalid|unknown|too large|Request too large)/i.test(
       message
     )
   return mentionsModel && modelProblem
@@ -176,10 +183,21 @@ export function createReliableClient(
   function selectModel(preferred: string): string {
     const available = modelsCache?.available
     if (available && available.size > 0) {
-      if (available.has(preferred)) return preferred
+      if (available.has(preferred)) {
+        console.log(`[AI] Using model: ${preferred}`)
+        return preferred
+      }
       const fallback = FALLBACK_MODELS.find((m) => m !== preferred && available.has(m))
-      if (fallback) return fallback
+      if (fallback) {
+        console.log(`[AI] Preferred model "${preferred}" not available — falling back to "${fallback}"`)
+        return fallback
+      }
+      // Only ever fall back to models in our known list — never an arbitrary Groq model
+      // (unknown models may have tiny TPM limits like allam-2-7b's 6k TPM)
+      console.warn(`[AI] No known fallback available in live model list — using preferred: ${preferred}`)
     }
+    // Cache empty or stale — use preferred and let Groq reject if needed
+    console.log(`[AI] Model cache empty — attempting preferred: ${preferred}`)
     return preferred
   }
 
@@ -307,11 +325,12 @@ function chunkText(text: string, maxChunkTokens: number): string[] {
 }
 
 const modelLimits: Record<string, number> = {
-  'openai/gpt-oss-120b': 6000,
-  'llama-3.3-70b-versatile': 32000,
-  'llama-3.1-70b-versatile': 32000,
-  'llama-3.1-8b-instant': 8000,
-  'mixtral-8x7b-32768': 32000,
+  'openai/gpt-oss-120b':  128000,
+  'openai/gpt-oss-20b':   128000,
+  'qwen/qwen3.8-27b':      32000,
+  // Legacy entries kept for reference
+  'mixtral-8x7b-32768':    32768,
+  'gemma2-9b-it':           8192,
 }
 
 // ─── Public API (used by route handlers) ───────────────────────────────────

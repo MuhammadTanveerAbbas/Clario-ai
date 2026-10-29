@@ -1,13 +1,13 @@
 {
   "name": "clario",
-  "description": "AI-powered SaaS platform for content creators  summarize, remix, and chat with AI",
+  "description": "AI-powered platform for content creators summarize, remix, and chat with AI",
   "version": "3.0.0",
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "scripts": {
-    "dev": "NODE_NO_WARNINGS=1 next dev",
-    "build": "NODE_NO_WARNINGS=1 next build",
-    "start": "NODE_NO_WARNINGS=1 next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "tsc --noEmit && eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
