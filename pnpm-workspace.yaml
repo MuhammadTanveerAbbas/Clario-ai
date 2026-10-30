@@ -1,3 +1,5 @@
-allowBuilds:
-  core-js: set this to true or false
-  unrs-resolver: set this to true or false
+packages:
+  - "."
+onlyBuiltDependencies:
+  - core-js
+  - unrs-resolver
