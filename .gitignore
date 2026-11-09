@@ -54,3 +54,4 @@ database/credentials.json
 
 # Cursor
 .cursor
+.env*

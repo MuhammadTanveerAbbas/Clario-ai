@@ -111,6 +111,7 @@ const Carousel = React.forwardRef<
         return
       }
 
+      // eslint-disable-next-line
       onSelect(api)
       api.on("reInit", onSelect)
       api.on("select", onSelect)

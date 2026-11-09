@@ -1,15 +1,13 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSidebar } from "@/contexts/SidebarContext";
 import { LoadingPage } from "@/components/ui/loading-page";
-import Link from "next/link";
 import { getMarkdownDarkComponents } from "@/lib/markdown-dark-components";
-import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { Page, PageHeader } from "@/components/layout/page";
+
 
 interface Toast {
   id: string;
@@ -131,14 +129,12 @@ function Skeleton({
 }) {
   return (
     <div
+      className="animate-pulse"
       style={{
         width: w,
         height: h,
         borderRadius: r,
-        background:
-          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
-        backgroundSize: "200% 100%",
-        animation: "shimmer 1.5s infinite",
+        background: "var(--surface-3)",
       }}
     />
   );
@@ -295,16 +291,8 @@ function FormatIcon({ type }: { type: string }) {
 }
 
 export default function RemixPage() {
-  const pathname = usePathname();
-  const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut, loading: authLoading } = useAuth();
-  const {
-    collapsed: sidebarCollapsed,
-    setCollapsed: setSidebarCollapsed,
-    mobileOpen: mobileSidebarOpen,
-    setMobileOpen: setMobileSidebarOpen,
-  } = useSidebar();
+  const { user: authUser, loading: authLoading } = useAuth();
 
   const [content, setContent] = useState("");
   const [selectedFormats, setSelectedFormats] = useState<Set<string>>(
@@ -360,7 +348,7 @@ export default function RemixPage() {
       .then(({ data }) => {
         if (data) setActiveBrandVoice(data);
       });
-  }, [authUser]);
+  }, [authUser, supabase]);
 
   const toggleFormat = (id: string) => {
     setSelectedFormats((prev) => {
@@ -435,51 +423,10 @@ export default function RemixPage() {
   return (
     <>
       <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
-        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
-        .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
-        .sidebar[data-collapsed="true"]{width:60px}
-        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
-        .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
-        .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
-        .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
-        .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
-        .sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
-        .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
-        .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-        .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
-        .sb-btn:hover{background:var(--bg3);color:var(--text2)}
-        .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
-        .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
-        .sb-upgrade:hover{background:#ea6c0a}
-        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
-        .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
-        .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
         .remix-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
         @media(max-width:560px){.remix-feature-grid{grid-template-columns:1fr}}
-        .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-        .page-content{flex:1;padding:24px;overflow:auto}
-        @media(max-width:768px){.page-content{padding:16px}}
-        @media(max-width:480px){.page-content{padding:12px}}
-        .card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:14px;overflow:visible}
-        textarea{color:var(--text)!important;background:var(--bg2)!important;border:1px solid hsl(var(--border))!important}
+        .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:visible}
         .remix-layout{display:flex;gap:20px;min-height:0}
         .remix-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
         .remix-right{width:280px;flex-shrink:0}
@@ -488,66 +435,19 @@ export default function RemixPage() {
         @media(max-width:1024px){.format-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:768px){.format-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:480px){.format-grid{grid-template-columns:1fr}}
-        .format-card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:10px;padding:10px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
-        .format-card:hover{background:var(--bg3);border-color:hsl(var(--border))}
-        .format-card.selected{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .format-card.selected svg{color:hsl(var(--accent))}
-        @media(max-width:768px){
-          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
-          .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
-          .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
-          .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
-        }
-        .mobile-overlay{display:none}
-        @media(max-width:768px){.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}}
+        .format-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;text-align:center}
+        .format-card:hover{background:var(--surface-2);border-color:var(--line-strong)}
+        .format-card.selected{border-color:var(--brand);background:var(--brand-soft)}
+        .format-card.selected svg{color:var(--brand)}
       `}</style>
 
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      <div className="dash-layout">
-        <div className="main-area">
-          <div className="topbar">
-            <span
-              style={{
-                fontFamily: "var(--serif)",
-                fontSize: "1.1rem",
-                fontWeight: 300,
-                color: "var(--text)",
-                flex: 1,
-              }}
-            >
-              Remix Studio
-            </span>
-            <TopbarUserMenu />
-          </div>
-
-          <div className="page-content">
-            <div
-              style={{
-                animation: "fu .4s ease both",
-                marginBottom: 20,
-                textAlign: "center",
-              }}
-            >
-              <h1
-                style={{
-                  fontFamily: "var(--serif)",
-                  fontSize: "1.8rem",
-                  fontWeight: 300,
-                  color: "var(--text)",
-                  marginBottom: 6,
-                }}
-              >
-                Remix Studio
-              </h1>
-              <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>
-                One input. Ten formats. Instantly.
-              </p>
-            </div>
-
-            <div className="remix-layout">
+      <Page wide>
+        <PageHeader
+          title="Remix Studio"
+          description="One input, ten formats. Adapt a single idea for every channel."
+        />
+        <div className="remix-layout">
               <div className="remix-left">
                 <div
                   className="card"
@@ -1012,9 +912,7 @@ export default function RemixPage() {
                 )}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+      </Page>
     </>
   );
 }

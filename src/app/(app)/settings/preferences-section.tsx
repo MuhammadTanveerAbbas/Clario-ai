@@ -1,14 +1,7 @@
 "use client";
 
-function BellIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>;
-}
-function SaveIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>;
-}
-function ChartIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>;
-}
+import { BarChart3, Bell, Save, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface PreferencesData {
   notifications: boolean;
@@ -22,65 +15,115 @@ interface PreferencesSectionProps {
   onPreferencesChange: (preferences: PreferencesData) => void;
 }
 
-const OPTIONS: { key: keyof PreferencesData; label: string; desc: string; Icon: () => JSX.Element }[] = [
-  { key: "notifications", label: "Email Notifications", desc: "Receive product updates and tips via email", Icon: BellIcon },
-  { key: "autoSave", label: "Auto-save Drafts", desc: "Automatically save your work as you go", Icon: SaveIcon },
-  { key: "analytics", label: "Usage Analytics", desc: "Help us improve by sharing anonymous usage data", Icon: ChartIcon },
+const OPTIONS: {
+  key: keyof PreferencesData;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+}[] = [
+  {
+    key: "notifications",
+    label: "Email notifications",
+    description: "Receive product updates and tips via email.",
+    icon: Bell,
+  },
+  {
+    key: "autoSave",
+    label: "Auto-save drafts",
+    description: "Automatically save your work as you go.",
+    icon: Save,
+  },
+  {
+    key: "analytics",
+    label: "Usage analytics",
+    description: "Help us improve by sharing anonymous usage data.",
+    icon: BarChart3,
+  },
 ];
 
-function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+}) {
   return (
     <button
+      type="button"
       role="switch"
       aria-checked={checked}
+      aria-label={label}
       onClick={onChange}
-      style={{
-        width: 40, height: 22, borderRadius: 11, border: "none", cursor: "pointer",
-        background: checked ? "hsl(var(--accent))" : "var(--border2)",
-        position: "relative", transition: "background .2s", flexShrink: 0,
-      }}
+      className={cn(
+        "relative inline-flex h-[22px] w-10 shrink-0 items-center rounded-full border transition-colors",
+        checked
+          ? "border-[var(--brand)] bg-[var(--brand)]"
+          : "border-[var(--line-strong)] bg-[var(--surface-3)]"
+      )}
     >
-      <span style={{
-        position: "absolute", top: 3, left: checked ? 21 : 3,
-        width: 16, height: 16, borderRadius: "50%", background: "#fff",
-        transition: "left .2s", boxShadow: "0 1px 3px rgba(0,0,0,.3)",
-      }} />
+      <span
+        className={cn(
+          "absolute h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+          checked ? "translate-x-[20px]" : "translate-x-[3px]"
+        )}
+        aria-hidden
+      />
     </button>
   );
 }
 
-export function PreferencesSection({ preferences, onPreferencesChange }: PreferencesSectionProps) {
+export function PreferencesSection({
+  preferences,
+  onPreferencesChange,
+}: PreferencesSectionProps) {
   const toggle = (key: keyof PreferencesData) => {
     onPreferencesChange({ ...preferences, [key]: !preferences[key] });
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Preferences</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Customize your Clario experience</div>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {OPTIONS.map((opt, i) => (
-            <div key={opt.key}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", gap: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg3)", borderRadius: 7, color: "var(--text3)", flexShrink: 0 }}>
-                    <opt.Icon />
-                  </span>
-                  <div>
-                    <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500 }}>{opt.label}</div>
-                    <div style={{ fontSize: ".78rem", color: "var(--text3)", marginTop: 2 }}>{opt.desc}</div>
-                  </div>
-                </div>
-                <Toggle checked={preferences[opt.key]} onChange={() => toggle(opt.key)} />
-              </div>
-              {i < OPTIONS.length - 1 && <div style={{ height: 1, background: "hsl(var(--border))" }} />}
-            </div>
-          ))}
-        </div>
+    <section className="surface">
+      <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+        <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+          Preferences
+        </h3>
+        <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+          Customize how Clario works for you.
+        </p>
       </div>
-    </div>
+
+      <div className="divide-y divide-[var(--line)] px-5 sm:px-6">
+        {OPTIONS.map((option) => {
+          const Icon = option.icon;
+          return (
+            <div
+              key={option.key}
+              className="flex items-center justify-between gap-4 py-4"
+            >
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)]">
+                  <Icon className="h-4 w-4" strokeWidth={1.8} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[13px] font-medium text-[var(--ink)]">
+                    {option.label}
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] leading-relaxed text-[var(--ink-3)]">
+                    {option.description}
+                  </p>
+                </div>
+              </div>
+              <Toggle
+                checked={preferences[option.key]}
+                onChange={() => toggle(option.key)}
+                label={option.label}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

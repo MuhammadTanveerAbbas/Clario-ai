@@ -94,6 +94,52 @@ export const metadata: Metadata = {
   },
 };
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://clario-hub.vercel.app/#organization",
+      name: "Clario",
+      url: "https://clario-hub.vercel.app/",
+      logo: "https://clario-hub.vercel.app/favicon.svg",
+      email: "muhammadtanveerabbas.contact@gmail.com",
+      sameAs: ["https://x.com/m_tanveerabbas"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://clario-hub.vercel.app/#website",
+      url: "https://clario-hub.vercel.app/",
+      name: "Clario",
+      publisher: { "@id": "https://clario-hub.vercel.app/#organization" },
+      inLanguage: "en-US",
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "Clario",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      url: "https://clario-hub.vercel.app/",
+      description:
+        "AI content workspace for summarizing, remixing, chatting, and managing brand voice.",
+      offers: [
+        {
+          "@type": "Offer",
+          name: "Free",
+          price: "0",
+          priceCurrency: "USD",
+        },
+        {
+          "@type": "Offer",
+          name: "Pro",
+          price: "19",
+          priceCurrency: "USD",
+        },
+      ],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -107,6 +153,10 @@ export default function RootLayout({
       className={`${cantarell.variable} ${fraunces.variable}`}
     >
       <body className="font-sans antialiased" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ClientProviders>
           <AuthProvider>
             <SidebarProvider>

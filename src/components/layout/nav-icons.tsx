@@ -9,7 +9,7 @@ export function Icon3D_Dashboard({ p = "sb" }: { p?: string }) {
       <rect x="19" y="3" width="10" height="3" rx="1.5" fill="rgba(255,255,255,0.35)"/>
       <defs>
         <linearGradient id={`${p}-db-g1`} x1="2" y1="2" x2="14" y2="14" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#fb923c"/><stop offset="1" stopColor="#c2410c"/>
+          <stop stopColor="#fb923c"/><stop offset="1" stopColor="#f97316"/>
         </linearGradient>
         <linearGradient id={`${p}-db-g2`} x1="18" y1="2" x2="30" y2="14" gradientUnits="userSpaceOnUse">
           <stop stopColor="#38bdf8"/><stop offset="1" stopColor="#0369a1"/>
@@ -30,7 +30,7 @@ export function Icon3D_Summarizer({ p = "sb" }: { p?: string }) {
     <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
       <defs>
         <linearGradient id={`${p}-sum-g`} x1="2" y1="2" x2="30" y2="30" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#fb923c"/><stop offset="1" stopColor="#c2410c"/>
+          <stop stopColor="#fb923c"/><stop offset="1" stopColor="#f97316"/>
         </linearGradient>
       </defs>
       <rect x="4" y="2" width="20" height="26" rx="3" fill={`url(#${p}-sum-g)`}/>

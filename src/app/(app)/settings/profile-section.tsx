@@ -4,37 +4,56 @@ import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 
-interface ProfileData { name: string; email: string; }
+interface ProfileData {
+  name: string;
+  email: string;
+}
 interface ProfileSectionProps {
   profile: ProfileData;
   userId?: string;
   onProfileUpdate: (name: string) => Promise<void>;
 }
 
-export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSectionProps) {
+export function ProfileSection({
+  profile,
+  userId,
+  onProfileUpdate,
+}: ProfileSectionProps) {
   const [loading, setLoading] = useState(false);
   const [name, setName] = useState(profile.name);
   const { toast } = useToast();
   const supabase = createClient();
 
-  // Update name when profile changes
   useEffect(() => {
     setName(profile.name);
   }, [profile.name]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleUpdateProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
     setLoading(true);
     try {
       if (!userId) throw new Error("User ID not found");
-      const { error } = await supabase.from("profiles").update({ full_name: name }).eq("id", userId);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ full_name: name })
+        .eq("id", userId);
       if (error) throw error;
       await supabase.auth.updateUser({ data: { name } });
       await onProfileUpdate(name);
-      toast({ title: "Profile updated", description: "Your profile has been successfully updated." });
-    } catch (error: any) {
-      toast({ variant: "destructive", title: "Error", description: error.message || "Failed to update profile." });
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to update profile.";
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: message,
+      });
     } finally {
       setLoading(false);
     }
@@ -43,58 +62,70 @@ export function ProfileSection({ profile, userId, onProfileUpdate }: ProfileSect
   const initials = (profile.name || profile.email || "U")[0].toUpperCase();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "20px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
-        <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, hsl(var(--accent)), #fb923c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", color: "#fff", fontWeight: 600, flexShrink: 0 }}>
+    <div className="space-y-4">
+      <div className="surface flex items-center gap-4 p-5">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] font-serif text-[22px] font-medium text-white">
           {initials}
         </div>
-        <div>
-          <div style={{ fontSize: ".95rem", color: "var(--text)", fontWeight: 500 }}>{profile.name || "No name set"}</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)", marginTop: 2 }}>{profile.email}</div>
+        <div className="min-w-0">
+          <p className="truncate text-[14px] font-semibold text-[var(--ink)]">
+            {profile.name || "No name set"}
+          </p>
+          <p className="mt-0.5 truncate text-[12.5px] text-[var(--ink-3)]">
+            {profile.email}
+          </p>
         </div>
       </div>
 
-      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Profile Information</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Update your display name and account details</div>
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Profile information
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Update your display name and account details.
+          </p>
         </div>
-        <form onSubmit={handleUpdateProfile} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label htmlFor="name" style={{ fontSize: ".8rem", color: "var(--text2)", fontWeight: 500 }}>Full Name</label>
+
+        <form
+          onSubmit={handleUpdateProfile}
+          className="space-y-4 px-5 py-5 sm:px-6"
+        >
+          <div>
+            <label htmlFor="name" className="field-label">
+              Full name
+            </label>
             <input
               id="name"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(event) => setName(event.target.value)}
               disabled={loading}
-              style={{ background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text)", fontSize: ".85rem", fontFamily: "inherit", outline: "none", transition: "border-color .15s" }}
-              onFocus={e => e.target.style.borderColor = "hsl(var(--accent))"}
-              onBlur={e => e.target.style.borderColor = "var(--input-b)"}
+              className="field-input"
             />
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <label htmlFor="email" style={{ fontSize: ".8rem", color: "var(--text2)", fontWeight: 500 }}>Email Address</label>
+
+          <div>
+            <label htmlFor="email" className="field-label">
+              Email address
+            </label>
             <input
               id="email"
               type="email"
               value={profile.email}
               disabled
-              style={{ background: "hsl(var(--input))", border: "1px solid var(--input-b)", borderRadius: 10, padding: "10px 14px", color: "var(--text3)", fontSize: ".85rem", fontFamily: "inherit", opacity: 0.6, cursor: "not-allowed" }}
+              className="field-input cursor-not-allowed opacity-60"
             />
-            <span style={{ fontSize: ".75rem", color: "var(--text3)" }}>Email cannot be changed. Contact support if needed.</span>
+            <p className="mt-1.5 text-[11.5px] text-[var(--ink-3)]">
+              Email cannot be changed. Contact support if needed.
+            </p>
           </div>
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 20px", background: "hsl(var(--accent))", color: "#fff", border: "none", borderRadius: 9, fontSize: ".84rem", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, fontFamily: "inherit", transition: "opacity .15s" }}
-            >
-              {loading && <Loader2 size={14} className="animate-spin" />}
-              {loading ? "Saving..." : "Save Changes"}
-            </button>
-          </div>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+            {loading ? "Saving..." : "Save changes"}
+          </Button>
         </form>
-      </div>
+      </section>
     </div>
   );
 }

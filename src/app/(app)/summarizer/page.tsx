@@ -3,14 +3,13 @@ import React from "react";
 import { useState, useEffect, useCallback, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useSidebar } from "@/contexts/SidebarContext";
 import Link from "next/link";
-import { Scale } from "lucide-react";
+import { History, Scale } from "lucide-react";
 import { LoadingPage } from "@/components/ui/loading-page";
-import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { Button } from "@/components/ui/button";
+import { Page, PageHeader } from "@/components/layout/page";
 
 interface Toast {
   id: string;
@@ -26,89 +25,6 @@ interface HistoryItem {
   created_at: string;
 }
 
-const NAV_ITEMS: {
-  label: string;
-  href: string;
-  icon: string;
-  badge?: string;
-}[] = [
-  { label: "Dashboard", href: "/dashboard", icon: "grid" },
-  { label: "AI Chat", href: "/chat", icon: "chat" },
-  { label: "Summarizer", href: "/summarizer", icon: "doc" },
-  { label: "Remix Studio", href: "/remix", icon: "remix" },
-  { label: "Brand Voice", href: "/brand-voice", icon: "voice" },
-  { label: "Settings", href: "/settings", icon: "settings" },
-];
-
-function NavIcon({ type }: { type: string }) {
-  const p = {
-    width: 16,
-    height: 16,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "1.8",
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-  switch (type) {
-    case "grid":
-      return (
-        <svg {...p}>
-          <rect x="3" y="3" width="7" height="7" />
-          <rect x="14" y="3" width="7" height="7" />
-          <rect x="3" y="14" width="7" height="7" />
-          <rect x="14" y="14" width="7" height="7" />
-        </svg>
-      );
-    case "chat":
-      return (
-        <svg {...p}>
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      );
-    case "doc":
-      return (
-        <svg {...p}>
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14,2 14,8 20,8" />
-          <line x1="16" y1="13" x2="8" y2="13" />
-          <line x1="16" y1="17" x2="8" y2="17" />
-        </svg>
-      );
-    case "remix":
-      return (
-        <svg {...p}>
-          <polyline points="23 4 23 10 17 10" />
-          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-        </svg>
-      );
-    case "voice":
-      return (
-        <svg {...p}>
-          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-        </svg>
-      );
-    case "cal":
-      return (
-        <svg {...p}>
-          <rect x="3" y="4" width="18" height="18" rx="2" />
-          <line x1="16" y1="2" x2="16" y2="6" />
-          <line x1="8" y1="2" x2="8" y2="6" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-        </svg>
-      );
-    case "settings":
-      return (
-        <svg {...p}>
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
-      );
-    default:
-      return null;
-  }
-}
 
 function Skeleton({
   w = "100%",
@@ -121,14 +37,12 @@ function Skeleton({
 }) {
   return (
     <div
+      className="animate-pulse"
       style={{
         width: w,
         height: h,
         borderRadius: r,
-        background:
-          "linear-gradient(90deg, hsl(var(--card)) 25%, hsl(var(--border)) 50%, hsl(var(--card)) 75%)",
-        backgroundSize: "200% 100%",
-        animation: "shimmer 1.5s infinite",
+        background: "var(--surface-3)",
       }}
     />
   );
@@ -161,11 +75,11 @@ function ToastContainer({
             display: "flex",
             alignItems: "center",
             gap: 10,
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
+            background: "var(--surface)",
+            border: "1px solid var(--line)",
             borderRadius: 10,
             padding: "11px 14px",
-            boxShadow: "0 4px 16px rgba(0,0,0,.12)",
+            boxShadow: "var(--shadow-medium)",
             animation: "fu .3s ease both",
             maxWidth: 320,
             fontFamily: "var(--sans)",
@@ -176,9 +90,9 @@ function ToastContainer({
             height: 6,
             borderRadius: "50%",
             flexShrink: 0,
-            background: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))",
+            background: t.type === "success" ? "var(--success)" : t.type === "error" ? "var(--error)" : "var(--brand)",
           }} />
-          <span style={{ fontSize: ".82rem", color: "var(--text2)", flex: 1 }}>
+          <span style={{ fontSize: ".82rem", color: "var(--ink-2)", flex: 1 }}>
             {t.message}
           </span>
           <button
@@ -435,16 +349,8 @@ const MODE_API_MAP: Record<SummarizeMode, string> = {
 };
 
 export default function SummarizerPage() {
-  const pathname = usePathname();
-  const router = useRouter();
   const supabase = createClient();
-  const { user: authUser, signOut, loading: authLoading } = useAuth();
-  const {
-    collapsed: sidebarCollapsed,
-    setCollapsed: setSidebarCollapsed,
-    mobileOpen: mobileSidebarOpen,
-    setMobileOpen: setMobileSidebarOpen,
-  } = useSidebar();
+  const { user: authUser, loading: authLoading } = useAuth();
 
   const pasteTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -500,7 +406,7 @@ export default function SummarizerPage() {
       .then(({ data }) => {
         if (data) setUserProfile(data);
       });
-  }, [authUser]);
+  }, [authUser, supabase]);
 
   const loadHistory = async () => {
     setHistoryLoading(true);
@@ -658,69 +564,18 @@ export default function SummarizerPage() {
   return (
     <>
       <style>{`
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--accent:#f97316;--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
-        body{font-family:var(--sans);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
-        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
         @keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-        .dash-layout{display:flex;height:100vh;overflow:hidden;background:var(--bg)}
-        .sidebar{width:220px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--sidebar-b);display:flex;flex-direction:column;transition:width .22s cubic-bezier(.4,0,.2,1);flex-shrink:0;position:sticky;top:0;height:100vh;overflow:hidden}
-        .sidebar[data-collapsed="true"]{width:60px}
-        .sb-logo{height:56px;display:flex;align-items:center;padding:0 16px;border-bottom:1px solid var(--sidebar-b);gap:10px;overflow:hidden;flex-shrink:0;transition:padding .22s}
-        .sidebar[data-collapsed="true"] .sb-logo{padding:0 14px}
-        .sb-logo-mark{width:28px;height:28px;background:hsl(var(--accent));border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-        .sb-logo-text{font-family:var(--serif);font-size:1.2rem;font-weight:300;color:var(--text);white-space:nowrap;opacity:1;transition:opacity .15s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-logo-text{opacity:0}
-        .sb-nav{flex:1;padding:10px 8px;display:flex;flex-direction:column;gap:2px;overflow:hidden auto}
-        .sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:9px;border:1px solid transparent;background:transparent;cursor:pointer;text-decoration:none;color:var(--text3);font-family:var(--sans);font-size:.82rem;font-weight:400;transition:all .15s;white-space:nowrap;justify-content:flex-start;position:relative}
-        .sidebar[data-collapsed="true"] .sb-item{justify-content:center;padding:9px 0;gap:0}
-        .sidebar[data-collapsed="true"] .sb-item svg{flex-shrink:0}
-        .sb-item:hover{background:var(--bg3);color:var(--text2);border-color:hsl(var(--border))}
-        .sb-item.active{background:var(--accent-l);color:hsl(var(--accent));font-weight:500;border-color:hsl(var(--accent))}
-        .sb-lbl{opacity:1;transition:opacity .12s;pointer-events:none;flex:1}
-        .sidebar[data-collapsed="true"] .sb-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-badge{font-size:.56rem;font-weight:700;background:hsl(var(--accent));color:#fff;padding:2px 6px;border-radius:100px;opacity:1;transition:opacity .12s,max-width .12s,padding .12s;max-width:60px}
-        .sidebar[data-collapsed="true"] .sb-badge{opacity:0;max-width:0;overflow:hidden;padding:0}
-        .sb-bottom{padding:10px 8px 14px;border-top:1px solid var(--sidebar-b);display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-        .sb-btn{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;border:none;background:transparent;cursor:pointer;color:var(--text3);font-family:var(--sans);font-size:.78rem;font-weight:400;transition:all .15s;width:100%;justify-content:flex-start}
-        .sidebar[data-collapsed="true"] .sb-btn{justify-content:center;padding:8px 0;gap:0}
-        .sb-btn:hover{background:var(--bg3);color:var(--text2)}
-        .sb-btn-lbl{opacity:1;transition:opacity .12s;pointer-events:none}
-        .sidebar[data-collapsed="true"] .sb-btn-lbl{opacity:0;max-width:0;overflow:hidden}
-        .sb-upgrade{margin:0 2px 4px;background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:10px;font-family:var(--sans);font-size:.76rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .18s,opacity .15s}
-        .sidebar[data-collapsed="true"] .sb-upgrade{opacity:0;pointer-events:none;height:0;padding:0;margin:0;overflow:hidden}
-        .sb-upgrade:hover{background:#ea6c0a}
-        .topbar{height:56px;border-bottom:1px solid hsl(var(--border));display:flex;align-items:center;padding:0 20px;gap:12px;background:var(--bg);position:sticky;top:0;z-index:40;flex-shrink:0}
-        .topbar-btn{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid hsl(var(--border));background:var(--bg2);color:var(--text3);cursor:pointer;transition:all .15s}
-        .topbar-btn:hover{background:var(--bg3);color:var(--text2);border-color:var(--border2)}
-        .topbar-hamburger{display:none}
-        @media(max-width:768px){.topbar-hamburger{display:flex}.topbar{padding:0 12px;gap:8px}}
-        .main-area{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
-        .page-content{flex:1;padding:24px;overflow:auto}
-        @media(max-width:768px){.page-content{padding:16px}}
-        @media(max-width:480px){.page-content{padding:12px}}
-        .card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:14px;overflow:hidden}
+        .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
         .mode-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
         @media(max-width:900px){.mode-grid{grid-template-columns:repeat(3,1fr)}}
         @media(max-width:600px){.mode-grid{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:380px){.mode-grid{grid-template-columns:1fr}}
-        .mode-card{background:hsl(var(--card));border:1px solid var(--card-b);border-radius:12px;padding:14px;cursor:pointer;transition:all .18s;position:relative}
-        .mode-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.12)}
-        .mode-card.selected{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .history-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:hsl(var(--card));border-left:1px solid hsl(var(--border));z-index:300;display:flex;flex-direction:column;transition:transform .25s;box-shadow:-8px 0 32px rgba(0,0,0,.08)}
+        .mode-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .15s,background .15s;position:relative}
+        .mode-card:hover{border-color:var(--line-strong);background:var(--surface-2)}
+        .mode-card.selected{border-color:var(--brand);background:var(--brand-soft)}
+        .history-panel{position:fixed;right:0;top:0;bottom:0;width:340px;background:var(--surface);border-left:1px solid var(--line);z-index:300;display:flex;flex-direction:column;transition:transform .25s;box-shadow:var(--shadow-medium)}
         .history-panel.closed{transform:translateX(100%)}
         @media(max-width:480px){.history-panel{width:100%}}
-        @media(max-width:768px){
-          .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:200;width:220px!important;transition:transform .25s}
-          .sidebar[data-mobile-open="false"]{transform:translateX(-100%)}
-          .sidebar[data-mobile-open="true"]{transform:translateX(0)}
-          .sb-lbl,.sb-badge,.sb-btn-lbl{opacity:1!important;max-width:none!important;overflow:visible!important;padding:2px 6px!important}
-          .sb-item{justify-content:flex-start!important;padding:9px 10px!important;gap:10px!important}
-          .sb-btn{justify-content:flex-start!important;padding:8px 10px!important;gap:9px!important}
-          .sb-upgrade{opacity:1!important;pointer-events:auto!important;height:auto!important;padding:10px!important;margin:0 2px 4px!important}
-        }
-        .mobile-overlay{display:none}
-        @media(max-width:768px){.mobile-overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:190}}
         @media(max-width:640px){
           .toast-container{left:12px;right:12px;bottom:12px;max-width:none}
           .toast-container > div{max-width:100%}
@@ -728,73 +583,24 @@ export default function SummarizerPage() {
       `}</style>
 
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
-      <div className="dash-layout">
-        <div className="main-area">
-          <div className="topbar">
-            <span
-              style={{
-                fontFamily: "var(--serif)",
-                fontSize: "1.1rem",
-                fontWeight: 300,
-                color: "var(--text)",
-                flex: 1,
-              }}
-            >
-              Text Summarizer
-            </span>
-            <button
-              className="topbar-btn"
+      <Page wide>
+        <PageHeader
+          title="Text summarizer"
+          description="Summarize articles, YouTube videos, or pasted text in ten focused modes."
+          actions={
+            <Button
+              variant="outline"
               onClick={() => {
                 setShowHistory(true);
                 loadHistory();
               }}
-              title="History"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12 6 12 12 16 14" />
-              </svg>
-            </button>
-            <TopbarUserMenu />
-          </div>
-
-          <div className="page-content">
-            <div
-              style={{
-                maxWidth: 900,
-                margin: "0 auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: 20,
-              }}
-            >
-              <div
-                style={{ animation: "fu .4s ease both", textAlign: "center" }}
-              >
-                <h1
-                  style={{
-                    fontFamily: "var(--serif)",
-                    fontSize: "1.8rem",
-                    fontWeight: 300,
-                    color: "var(--text)",
-                    marginBottom: 6,
-                  }}
-                >
-                  Text Summarizer
-                </h1>
-                <p style={{ fontSize: ".88rem", color: "var(--text3)" }}>
-                  Summarize articles, YouTube videos, or pasted text in 10 specialized modes.
-                </p>
-              </div>
-
+              <History className="h-4 w-4" />
+              History
+            </Button>
+          }
+        />
+        <div className="mx-auto flex max-w-[900px] flex-col gap-5">
               <div
                 className="card"
                 style={{ animation: "fu .4s .05s ease both" }}
@@ -1399,9 +1205,7 @@ export default function SummarizerPage() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </div>
+      </Page>
 
       <div className={`history-panel${showHistory ? "" : " closed"}`}>
         <div

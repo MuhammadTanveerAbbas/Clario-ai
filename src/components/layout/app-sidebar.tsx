@@ -2,257 +2,315 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
 import { useSidebar } from "@/contexts/SidebarContext";
-import { PanelLeftClose, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
-
 import {
-  Icon3D_Dashboard,
-  Icon3D_Summarizer,
-  Icon3D_Remix,
-  Icon3D_Chat,
-  Icon3D_BrandVoice,
-  Icon3D_Calendar,
-} from "./nav-icons";
+  Brain,
+  CalendarDays,
+  FileText,
+  Flame,
+  History,
+  LayoutDashboard,
+  LayoutTemplate,
+  ListChecks,
+  MessageCircle,
+  MessageSquareText,
+  Mic2,
+  PanelLeftClose,
+  PanelLeft,
+  PenLine,
+  Plus,
+  Repeat2,
+  Settings,
+  Sparkles,
+  Wand2,
+  X,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 
-const navigationGroups = [
+type NavItem = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+};
+
+const NAV_GROUPS: { label: string; items: NavItem[] }[] = [
   {
-    label: "Main",
+    label: "Workspace",
     items: [
-      { name: "Dashboard", href: "/dashboard", Icon3D: Icon3D_Dashboard },
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { name: "Calendar", href: "/calendar", icon: CalendarDays },
     ],
   },
   {
-    label: "Tools",
+    label: "Create",
     items: [
-      { name: "Summarizer",   href: "/summarizer",  Icon3D: Icon3D_Summarizer },
-      { name: "Remix Studio", href: "/remix",        Icon3D: Icon3D_Remix },
-      { name: "Chat",         href: "/chat",         Icon3D: Icon3D_Chat },
-      { name: "Brand Voice",  href: "/brand-voice",  Icon3D: Icon3D_BrandVoice },
+      { name: "Summarizer", href: "/summarizer", icon: FileText },
+      { name: "Remix Studio", href: "/remix", icon: Zap },
+      { name: "Comment Generator", href: "/comments", icon: MessageSquareText },
+      { name: "Repurpose", href: "/repurpose", icon: Wand2 },
     ],
   },
   {
-    label: "Scheduling",
+    label: "Assistant",
     items: [
-      { name: "Calendar", href: "/calendar", Icon3D: Icon3D_Calendar },
+      { name: "Chat", href: "/chat", icon: MessageCircle },
+      { name: "Brand Voice", href: "/brand-voice", icon: Mic2 },
+      { name: "AI Memory", href: "/ai-memory", icon: Brain },
+    ],
+  },
+  {
+    label: "Library",
+    items: [
+      { name: "History", href: "/history", icon: History },
+      { name: "Templates", href: "/templates", icon: LayoutTemplate },
+      { name: "Queue", href: "/queue", icon: ListChecks },
+    ],
+  },
+  {
+    label: "Toolkit",
+    items: [
+      { name: "Angle Finder", href: "/toolkit/angle-finder", icon: Sparkles },
+      { name: "Bio Builder", href: "/toolkit/bio-builder", icon: PenLine },
+      { name: "Hook Generator", href: "/toolkit/hook-generator", icon: Flame },
+      { name: "Repurposer", href: "/toolkit/repurposer", icon: Repeat2 },
     ],
   },
 ];
 
-function SidebarNavItem({
-  href,
-  Icon3D,
-  label,
-  isActive,
+
+
+function isItemActive(pathname: string | null, href: string) {
+  if (!pathname) return false;
+  if (href === "/dashboard") return pathname === "/dashboard";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavLink({
+  item,
+  active,
   collapsed,
-  onClick,
+  onNavigate,
 }: {
-  href: string;
-  Icon3D: (props: { p?: string }) => JSX.Element;
-  label: string;
-  isActive: boolean;
+  item: NavItem;
+  active: boolean;
   collapsed: boolean;
-  onClick?: () => void;
+  onNavigate?: () => void;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      title={collapsed ? item.name : undefined}
+      className={cn(
+        "group flex items-center rounded-lg border text-[13px] font-medium no-underline transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--sidebar)]",
+        collapsed ? "mx-auto h-10 w-10 justify-center" : "h-10 gap-3 px-3",
+        active
+          ? "border-[var(--line-strong)] bg-[var(--surface)] text-[var(--ink)] shadow-[0_1px_2px_rgba(23,20,18,0.04)]"
+          : "border-transparent text-[var(--ink-2)] hover:border-[var(--sidebar-b)] hover:bg-[var(--surface-2)]/70 hover:text-[var(--ink)]"
+      )}
+    >
+      <Icon
+        className={cn(
+          "h-[18px] w-[18px] shrink-0 transition-colors",
+          active
+            ? "text-[var(--brand)]"
+            : "text-[var(--ink-3)] group-hover:text-[var(--ink-2)]"
+        )}
+        strokeWidth={active ? 2.1 : 1.8}
+        aria-hidden
+      />
+      {!collapsed ? (
+        <span className={cn("truncate leading-5", active && "font-semibold")}>
+          {item.name}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+function SidebarContent({
+  collapsed,
+  pathname,
+  onNavigate,
+  onToggleCollapse,
+  showCollapse,
+  showClose,
+  onClose,
+}: {
+  collapsed: boolean;
+  pathname: string | null;
+  onNavigate?: () => void;
+  onToggleCollapse?: () => void;
+  showCollapse?: boolean;
+  showClose?: boolean;
+  onClose?: () => void;
 }) {
   return (
-    <Link href={href} className="block group" onClick={onClick}>
+    <>
       <div
         className={cn(
-          "relative flex items-center rounded-xl py-2 text-[13px] font-medium transition-all duration-150 cursor-pointer select-none",
-          collapsed ? "justify-center w-full px-0" : "gap-3 px-3",
-          isActive
-            ? "text-white"
-            : "text-[var(--text3)] hover:text-[var(--text2)] hover:bg-white/[0.05]"
+          "flex h-[60px] shrink-0 items-center border-b border-[var(--sidebar-b)]",
+          collapsed ? "justify-center px-3" : "justify-between px-4"
         )}
       >
-        {isActive && (
-          <motion.div
-            layoutId="sidebar-active"
-            className="absolute inset-0 rounded-xl"
-            style={{
-              background: "linear-gradient(135deg, hsl(var(--accent) / 0.18), hsl(var(--accent) / 0.08))",
-              border: "1px solid hsl(var(--accent) / 0.2)",
-              zIndex: 0,
-            }}
-            transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
-          />
-        )}
-        {/* 3D icon */}
-        <span
-          className={cn(
-            "relative z-10 flex items-center justify-center h-8 w-8 shrink-0 rounded-xl transition-all duration-200",
-            isActive ? "scale-[1.08]" : "group-hover:scale-105"
-          )}
-          style={
-            isActive
-              ? { filter: "drop-shadow(0 2px 8px rgba(249,115,22,0.5))" }
-              : undefined
-          }
+        <Link
+          href="/dashboard"
+          onClick={onNavigate}
+          className="flex min-w-0 items-center gap-2.5 no-underline"
+          aria-label="Clario dashboard"
         >
-          <Icon3D />
-        </span>
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.span
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: "auto" }}
-              exit={{ opacity: 0, width: 0 }}
-              transition={{ duration: 0.2 }}
-              className={cn(
-                "truncate relative z-10 leading-none",
-                isActive
-                  ? "text-[var(--text)] font-semibold"
-                  : "text-[var(--text3)]"
-              )}
-            >
-              {label}
-            </motion.span>
-          )}
-        </AnimatePresence>
+          <img
+            src="/favicon.svg"
+            alt=""
+            width={26}
+            height={26}
+            className="h-[26px] w-[26px] shrink-0 rounded-md"
+          />
+          {!collapsed ? (
+            <span className="block font-serif text-[18px] font-medium leading-none tracking-[-0.02em] text-[var(--ink)]">
+              Clario
+            </span>
+          ) : null}
+        </Link>
 
-
+        {showClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-[var(--ink-3)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink)] md:hidden"
+            aria-label="Close navigation"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
       </div>
-    </Link>
+
+      <nav className="app-sidebar-nav min-h-0 flex-1 overflow-y-auto px-3 pb-4 pt-4">
+        <div className="mb-4">
+          <Link
+            href="/summarizer"
+            onClick={onNavigate}
+            title={collapsed ? "New summary" : undefined}
+            className={cn(
+              "flex items-center justify-center gap-2 rounded-lg bg-[var(--brand)] text-[13px] font-semibold text-white no-underline transition-colors hover:bg-[var(--brand-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--sidebar)]",
+              collapsed ? "mx-auto h-10 w-10" : "h-10 w-full px-3"
+            )}
+          >
+            <Plus className="h-4 w-4 shrink-0" strokeWidth={2.2} />
+            {!collapsed ? <span>New summary</span> : null}
+          </Link>
+        </div>
+        {NAV_GROUPS.map((group, groupIndex) => (
+          <div key={group.label} className={groupIndex > 0 ? "mt-5" : undefined}>
+            {!collapsed ? (
+              <p className="mb-2 px-3 text-[11px] font-semibold tracking-[0.04em] text-[var(--ink-2)]">
+                {group.label}
+              </p>
+            ) : groupIndex > 0 ? (
+              <div
+                className="mx-auto mb-3 h-px w-6 rounded-full bg-[var(--sidebar-b)]"
+                aria-hidden
+              />
+            ) : null}
+
+            <div className="space-y-1">
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.href}
+                  item={item}
+                  active={isItemActive(pathname, item.href)}
+                  collapsed={collapsed}
+                  onNavigate={onNavigate}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="shrink-0 border-t border-[var(--sidebar-b)] p-3">
+        <NavLink
+          item={{ name: "Settings", href: "/settings", icon: Settings }}
+          active={isItemActive(pathname, "/settings")}
+          collapsed={collapsed}
+          onNavigate={onNavigate}
+        />
+
+        {showCollapse ? (
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={cn(
+              "mt-1 flex items-center rounded-lg border border-transparent text-[13px] font-medium text-[var(--ink-3)] transition-colors hover:bg-[var(--surface-2)] hover:text-[var(--ink-2)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--sidebar)]",
+              collapsed
+                ? "mx-auto h-10 w-10 justify-center"
+                : "h-10 w-full gap-3 px-3"
+            )}
+          >
+            {collapsed ? (
+              <PanelLeft className="h-[17px] w-[17px] shrink-0" strokeWidth={1.8} />
+            ) : (
+              <PanelLeftClose className="h-[17px] w-[17px] shrink-0" strokeWidth={1.8} />
+            )}
+            {!collapsed ? <span>Collapse</span> : null}
+          </button>
+        ) : null}
+      </div>
+    </>
   );
 }
 
 export function AppSidebar() {
   const { collapsed, setCollapsed, mobileOpen, setMobileOpen } = useSidebar();
   const pathname = usePathname();
-  const closeMobile = () => setMobileOpen(false);
 
   return (
     <>
-      {mobileOpen && (
+      {/* Mobile drawer */}
+      {mobileOpen ? (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
-          onClick={closeMobile}
+          className="fixed inset-0 z-[60] bg-[rgba(23,20,18,0.45)] md:hidden"
+          onClick={() => setMobileOpen(false)}
+          aria-hidden
         />
-      )}
-
-      <motion.aside
-        initial={false}
-        animate={{ width: collapsed ? "72px" : "240px" }}
-        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+      ) : null}
+      <aside
+        aria-label="Main navigation"
         className={cn(
-          "fixed left-0 top-0 z-50 h-screen flex flex-col overflow-hidden transition-transform duration-200",
-          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          "fixed inset-y-0 left-0 z-[70] flex w-[280px] flex-col border-r border-[var(--sidebar-b)] bg-[var(--sidebar)] transition-transform duration-200 ease-out md:hidden",
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
-        style={{
-          background: "var(--sidebar)",
-          borderRight: "1px solid var(--sidebar-b)",
-        }}
       >
-        {/* Logo */}
-        <div className="flex h-[60px] shrink-0 items-center px-4 border-b border-[var(--sidebar-b)]">
-          <AnimatePresence mode="wait">
-            {collapsed ? (
-              <motion.div
-                key="icon"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
-                className="mx-auto flex h-8 w-8 items-center justify-center rounded-xl"
-                style={{ background: "hsl(var(--accent))" }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="full"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{ duration: 0.15 }}
-                className="flex items-center gap-2.5"
-              >
-                <div
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                  style={{ background: "hsl(var(--accent))" }}
-                >
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                    <path d="M2 17l10 5 10-5" />
-                    <path d="M2 12l10 5 10-5" />
-                  </svg>
-                </div>
-                <span className="text-[15px] font-semibold tracking-tight" style={{ color: "var(--text)" }}>
-                  Clario
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <SidebarContent
+          collapsed={false}
+          pathname={pathname}
+          onNavigate={() => setMobileOpen(false)}
+          showClose
+          onClose={() => setMobileOpen(false)}
+        />
+      </aside>
 
-        {/* Nav — grouped */}
-        <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-3 app-sidebar-nav">
-          {navigationGroups.map((group, gi) => (
-            <div key={group.label} className={gi > 0 ? "mt-4" : ""}>
-              {/* Group label — hidden when collapsed */}
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.15 }}
-                    className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.1em] select-none"
-                    style={{ color: "var(--text3)", opacity: 0.45 }}
-                  >
-                    {group.label}
-                  </motion.p>
-                )}
-              </AnimatePresence>
-
-              {/* Collapsed: thin separator between groups */}
-              {collapsed && gi > 0 && (
-                <div className="mx-auto mb-3 h-px w-8 rounded-full" style={{ background: "var(--sidebar-b)" }} />
-              )}
-
-              <div className="space-y-0.5">
-                {group.items.map((item) => {
-                  const isActive =
-                    pathname === item.href ||
-                    (item.href !== "/dashboard" && pathname?.startsWith(item.href + "/"));
-                  return (
-                    <SidebarNavItem
-                      key={item.name}
-                      href={item.href}
-                      Icon3D={item.Icon3D}
-                      label={item.name}
-                      isActive={isActive}
-                      collapsed={collapsed}
-                      onClick={closeMobile}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        {/* Footer — collapse toggle */}
-        <div className="shrink-0 border-t border-[var(--sidebar-b)] px-3 pb-4 pt-3">
-          <button
-            type="button"
-            onClick={() => setCollapsed(!collapsed)}
-            className={cn(
-              "flex items-center rounded-xl py-2 text-[13px] font-medium transition-all duration-150 text-[var(--text3)] hover:text-[var(--text2)] hover:bg-white/[0.05]",
-              collapsed ? "justify-center w-full px-0" : "gap-3 px-3 w-full"
-            )}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          >
-            {collapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-            {!collapsed && <span>Collapse</span>}
-          </button>
-        </div>
-      </motion.aside>
+      {/* Desktop sidebar */}
+      <aside
+        aria-label="Main navigation"
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 hidden flex-col border-r border-[var(--sidebar-b)] bg-[var(--sidebar)] transition-[width] duration-200 ease-out md:flex",
+          collapsed ? "md:w-[76px]" : "md:w-[264px]"
+        )}
+      >
+        <SidebarContent
+          collapsed={collapsed}
+          pathname={pathname}
+          onToggleCollapse={() => setCollapsed(!collapsed)}
+          showCollapse
+        />
+      </aside>
     </>
   );
 }

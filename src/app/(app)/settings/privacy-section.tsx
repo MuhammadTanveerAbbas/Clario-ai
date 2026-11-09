@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Download, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 export function PrivacySection() {
   const supabase = createClient();
@@ -15,10 +17,22 @@ export function PrivacySection() {
     setExporting(true);
     try {
       const [summaries, chatMessages, chatSessions, voices] = await Promise.all([
-        supabase.from("ai_summaries").select("id, title, content, created_at").eq("user_id", user.id),
-        supabase.from("chat_messages").select("id, role, content, created_at").eq("user_id", user.id),
-        supabase.from("chat_sessions").select("id, title, created_at").eq("user_id", user.id),
-        supabase.from("brand_voices").select("id, name, tone, vocabulary, personality, description, created_at").eq("user_id", user.id),
+        supabase
+          .from("ai_summaries")
+          .select("id, title, content, created_at")
+          .eq("user_id", user.id),
+        supabase
+          .from("chat_messages")
+          .select("id, role, content, created_at")
+          .eq("user_id", user.id),
+        supabase
+          .from("chat_sessions")
+          .select("id, title, created_at")
+          .eq("user_id", user.id),
+        supabase
+          .from("brand_voices")
+          .select("id, name, tone, vocabulary, personality, description, created_at")
+          .eq("user_id", user.id),
       ]);
       const exportData = {
         exported_at: new Date().toISOString(),
@@ -28,17 +42,19 @@ export function PrivacySection() {
         chat_sessions: chatSessions.data || [],
         brand_voices: voices.data || [],
       };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `clario-data-export-${new Date().toISOString().split("T")[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `clario-data-export-${new Date().toISOString().split("T")[0]}.json`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
-    } catch (e) {
-      console.error('[Privacy] Failed to export data:', e);
+    } catch (error) {
+      console.error("[Privacy] Failed to export data:", error);
       alert("Failed to export data. Please try again.");
     } finally {
       setExporting(false);
@@ -46,9 +62,17 @@ export function PrivacySection() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm("Are you absolutely sure? This action cannot be undone. All your data will be permanently deleted.")) return;
+    if (
+      !confirm(
+        "Are you absolutely sure? This action cannot be undone. All your data will be permanently deleted."
+      )
+    )
+      return;
     const confirmText = prompt('Type "DELETE" to confirm account deletion:');
-    if (confirmText !== "DELETE") { alert("Account deletion cancelled."); return; }
+    if (confirmText !== "DELETE") {
+      alert("Account deletion cancelled.");
+      return;
+    }
     if (!user) return;
     setDeleting(true);
     try {
@@ -63,8 +87,8 @@ export function PrivacySection() {
       await supabase.from("profiles").delete().eq("id", user.id);
       await supabase.auth.signOut();
       window.location.href = "/";
-    } catch (e) {
-      console.error('[Privacy] Failed to delete account:', e);
+    } catch (error) {
+      console.error("[Privacy] Failed to delete account:", error);
       alert("Failed to delete account. Please contact support at support@clario.ai.");
     } finally {
       setDeleting(false);
@@ -72,46 +96,72 @@ export function PrivacySection() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid var(--card-b)", borderRadius: 14 }}>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: ".9rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Data & Privacy</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Control your data and privacy settings</div>
+    <div className="space-y-4">
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Data and privacy
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Control your data and privacy settings.
+          </p>
         </div>
-        <div style={{ padding: "16px", background: "var(--bg2)", border: "1px solid hsl(var(--border))", borderRadius: 10, display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-          <div>
-            <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500, marginBottom: 3 }}>Export Your Data</div>
-            <div style={{ fontSize: ".78rem", color: "var(--text3)" }}>Download all your summaries, chats, and documents as JSON</div>
-          </div>
-          <button
-            onClick={handleRequestExport}
-            disabled={exporting}
-            style={{ padding: "8px 16px", background: "none", border: "1px solid var(--border2)", borderRadius: 8, color: "var(--text2)", fontSize: ".8rem", cursor: exporting ? "not-allowed" : "pointer", fontFamily: "inherit", whiteSpace: "nowrap", opacity: exporting ? 0.6 : 1 }}
-          >
-            {exporting ? "Exporting..." : "Export Data"}
-          </button>
-        </div>
-      </div>
 
-      <div style={{ padding: "24px", background: "hsl(var(--card))", border: "1px solid rgba(248,113,113,.2)", borderRadius: 14 }}>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: ".9rem", color: "var(--error)", fontWeight: 500, marginBottom: 4 }}>Danger Zone</div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>Irreversible actions  proceed with caution</div>
-        </div>
-        <div style={{ padding: "16px", background: "rgba(248,113,113,.06)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 10 }}>
-          <div style={{ fontSize: ".85rem", color: "var(--text)", fontWeight: 500, marginBottom: 4 }}>Delete Account</div>
-          <div style={{ fontSize: ".78rem", color: "var(--text3)", marginBottom: 14 }}>
-            Permanently delete your account and all associated data. This action cannot be undone.
+        <div className="px-5 py-5 sm:px-6">
+          <div className="flex flex-wrap items-start justify-between gap-4 rounded-lg border border-[var(--line)] bg-[var(--surface-2)] p-4">
+            <div className="min-w-0">
+              <p className="text-[13px] font-medium text-[var(--ink)]">
+                Export your data
+              </p>
+              <p className="mt-0.5 text-[11.5px] leading-relaxed text-[var(--ink-3)]">
+                Download all your summaries, chats, and documents as JSON.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleRequestExport}
+              disabled={exporting}
+            >
+              <Download className="h-4 w-4" />
+              {exporting ? "Exporting..." : "Export data"}
+            </Button>
           </div>
-          <button
-            onClick={handleDeleteAccount}
-            disabled={deleting}
-            style={{ padding: "9px 18px", background: "rgba(248,113,113,.15)", border: "1px solid rgba(248,113,113,.3)", borderRadius: 8, color: "var(--error)", fontSize: ".83rem", fontWeight: 600, cursor: deleting ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: deleting ? 0.6 : 1 }}
-          >
-            {deleting ? "Deleting..." : "Delete My Account"}
-          </button>
         </div>
-      </div>
+      </section>
+
+      <section className="rounded-xl border border-[rgba(180,35,24,0.25)] bg-[var(--surface)]">
+        <div className="border-b border-[rgba(180,35,24,0.18)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--error)]">
+            Danger zone
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Irreversible actions. Proceed with caution.
+          </p>
+        </div>
+
+        <div className="px-5 py-5 sm:px-6">
+          <div className="rounded-lg border border-[rgba(180,35,24,0.18)] bg-[rgba(180,35,24,0.04)] p-4">
+            <p className="text-[13px] font-medium text-[var(--ink)]">
+              Delete account
+            </p>
+            <p className="mt-0.5 max-w-prose text-[11.5px] leading-relaxed text-[var(--ink-3)]">
+              Permanently delete your account and all associated data. This
+              action cannot be undone.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDeleteAccount}
+              disabled={deleting}
+              className="mt-4 border-[rgba(180,35,24,0.35)] text-[var(--error)] hover:border-[rgba(180,35,24,0.55)] hover:bg-[rgba(180,35,24,0.08)] hover:text-[var(--error)]"
+            >
+              <Trash2 className="h-4 w-4" />
+              {deleting ? "Deleting..." : "Delete my account"}
+            </Button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

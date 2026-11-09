@@ -1,79 +1,44 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
-  LineChart,
-  Line,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-import Link from "next/link";
+import { BarChart3, ArrowRight, RefreshCw } from "lucide-react";
 
-interface TrendData {
+interface TrendPoint {
   date: string;
   usage: number;
 }
 
-interface FeatureData {
+interface FeaturePoint {
   name: string;
   value: number;
 }
 
 interface AnalyticsData {
-  trendData: TrendData[];
-  featureData: FeatureData[];
+  trendData: TrendPoint[];
+  featureData: FeaturePoint[];
   totalUsage: number;
 }
 
-function EmptyChart({ title }: { title: string }) {
-  return (
-    <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 text-center">
-      <svg
-        width="32"
-        height="32"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="var(--text3)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="opacity-40"
-      >
-        <line x1="18" y1="20" x2="18" y2="10" />
-        <line x1="12" y1="20" x2="12" y2="4" />
-        <line x1="6" y1="20" x2="6" y2="14" />
-      </svg>
-      <div>
-        <p className="text-[11px] font-medium text-[var(--text3)]">
-          No data yet for {title.toLowerCase()}
-        </p>
-        <p className="mt-0.5 text-[10px] text-[var(--text3)] opacity-70">
-          Start using Clario to see your analytics.
-        </p>
-      </div>
-      <Link
-        href="/summarizer"
-        className="text-[11px] font-semibold text-[hsl(var(--accent))] transition-opacity hover:opacity-80"
-      >
-        Open Summarizer ➜
-      </Link>
-    </div>
-  );
-}
-
 const tooltipStyle = {
-  backgroundColor: "var(--bg2)",
-  border: "1px solid var(--sidebar-b)",
+  backgroundColor: "var(--surface)",
+  border: "1px solid var(--line)",
   borderRadius: "8px",
   fontSize: "11px",
   padding: "6px 10px",
-  color: "var(--text)",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  color: "var(--ink)",
+  boxShadow: "var(--shadow-medium)",
 };
 
 export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
@@ -87,21 +52,22 @@ export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
       setError(false);
     }
     fetch("/api/dashboard-analytics", { cache: "no-store" })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load"))))
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(new Error("Failed"))
+      )
       .then(setData)
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     loadAnalytics();
   }, [loadAnalytics, refreshKey]);
 
   useEffect(() => {
     const refetchIfVisible = () => {
-      if (document.visibilityState === "visible") {
-        loadAnalytics(true);
-      }
+      if (document.visibilityState === "visible") loadAnalytics(true);
     };
     document.addEventListener("visibilitychange", refetchIfVisible);
     window.addEventListener("focus", refetchIfVisible);
@@ -113,49 +79,69 @@ export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="h-[260px] rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 animate-pulse" />
-        <div className="h-[260px] rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 animate-pulse" />
+      <div className="surface">
+        <div className="space-y-4 px-5 py-5 sm:px-6">
+          <div className="h-4 w-28 animate-pulse rounded-md bg-[var(--surface-3)]" />
+          <div className="h-[200px] w-full animate-pulse rounded-md bg-[var(--surface-3)]" />
+        </div>
+        <div className="border-t border-[var(--line)] space-y-4 px-5 py-5 sm:px-6">
+          <div className="h-4 w-24 animate-pulse rounded-md bg-[var(--surface-3)]" />
+          <div className="h-[160px] w-full animate-pulse rounded-md bg-[var(--surface-3)]" />
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
-          <p className="text-[12px] font-medium text-red-700">
-            Couldn&apos;t load analytics
-          </p>
-          <button
-            type="button"
-            onClick={() => loadAnalytics()}
-            className="text-[11px] font-semibold text-[hsl(var(--accent))] transition-opacity hover:opacity-80"
-          >
-            Retry
-          </button>
+      <div className="surface flex min-h-[320px] flex-col items-center justify-center gap-4 px-6 py-10 text-center">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)]">
+          <BarChart3 className="h-5 w-5" strokeWidth={1.7} />
         </div>
-        <div className="flex min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-red-200 bg-red-50 p-5 text-center">
-          <p className="text-[12px] font-medium text-red-700">
-            Couldn&apos;t load analytics
+        <div className="space-y-1.5">
+          <p className="text-[14px] font-semibold text-[var(--ink)]">
+            Analytics did not load
           </p>
-          <button
-            type="button"
-            onClick={() => loadAnalytics()}
-            className="text-[11px] font-semibold text-[hsl(var(--accent))] transition-opacity hover:opacity-80"
-          >
-            Retry
-          </button>
+          <p className="max-w-[280px] text-[12.5px] leading-relaxed text-[var(--ink-3)]">
+            There was a problem reaching the analytics service.
+          </p>
         </div>
+        <button
+          type="button"
+          onClick={() => loadAnalytics()}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--line-strong)] bg-[var(--surface)] px-3.5 py-2 text-[12.5px] font-semibold text-[var(--ink-2)] transition-colors hover:border-[var(--brand-line)] hover:text-[var(--brand)]"
+        >
+          <RefreshCw className="h-3.5 w-3.5" />
+          Try again
+        </button>
       </div>
     );
   }
 
-  if (!data || data.trendData.every((d) => d.usage === 0)) {
+  const hasUsage =
+    data && data.trendData.some((point) => point.usage > 0);
+
+  if (!data || !hasUsage) {
     return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <EmptyChart title="Activity" />
-        <EmptyChart title="Features" />
+      <div className="surface flex min-h-[300px] flex-col items-center justify-center gap-5 px-6 py-10 text-center">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)]">
+          <BarChart3 className="h-5 w-5" strokeWidth={1.7} />
+        </div>
+        <div className="space-y-1.5">
+          <p className="text-[14px] font-semibold text-[var(--ink)]">
+            No usage data yet
+          </p>
+          <p className="mx-auto max-w-[280px] text-[12.5px] leading-relaxed text-[var(--ink-3)]">
+            Run a summary, chat, or remix and your activity will appear here.
+          </p>
+        </div>
+        <Link
+          href="/summarizer"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-soft)] px-3.5 py-2 text-[12.5px] font-semibold text-[var(--brand)] no-underline transition-colors hover:bg-[var(--accent-m)]"
+        >
+          Create your first summary
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
       </div>
     );
   }
@@ -164,95 +150,117 @@ export function AnalyticsCharts({ refreshKey = 0 }: { refreshKey?: number }) {
   const topFeatures = data.featureData.slice(0, 4);
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      {/* Activity line chart */}
-      <div className="rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <h4 className="text-[12px] font-semibold text-[var(--text2)]">Activity (Last 7 days)</h4>
-          <span className="rounded-full bg-[var(--bg3)] px-2 py-0.5 text-[9px] font-medium text-[var(--text3)]">
-            {data.totalUsage} total
-          </span>
+    <div className="surface overflow-hidden">
+      <div className="flex items-start justify-between gap-4 px-5 py-5 sm:px-6">
+        <div className="min-w-0">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Requests
+          </h3>
+          <p className="mt-1 text-[12px] text-[var(--ink-3)]">
+            Daily activity, last 7 days
+          </p>
         </div>
+        <span className="app-chip shrink-0">
+          {data.totalUsage.toLocaleString()} total
+        </span>
+      </div>
+
+      <div className="px-2 pb-4 sm:px-3">
         <ResponsiveContainer width="100%" height={200}>
           <LineChart
             data={last7Days}
-            margin={{ top: 5, right: 8, left: -18, bottom: 0 }}
+            margin={{ top: 8, right: 12, left: -12, bottom: 0 }}
           >
             <CartesianGrid
+              stroke="var(--line)"
               strokeDasharray="3 3"
-              stroke="var(--sidebar-b)"
               vertical={false}
             />
             <XAxis
               dataKey="date"
-              tick={{ fill: "var(--text3)", fontSize: 10 }}
+              tick={{ fill: "var(--ink-3)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
-              dy={4}
+              dy={6}
             />
             <YAxis
-              tick={{ fill: "var(--text3)", fontSize: 10 }}
+              tick={{ fill: "var(--ink-3)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
-              width={24}
+              width={28}
+              allowDecimals={false}
             />
             <Tooltip
               contentStyle={tooltipStyle}
-              labelStyle={{ color: "var(--text)", fontWeight: 600, fontSize: 11 }}
-              itemStyle={{ color: "var(--text2)", fontSize: 11 }}
-              cursor={{ stroke: "var(--sidebar-b)", strokeWidth: 1 }}
+              labelStyle={{
+                color: "var(--ink)",
+                fontWeight: 600,
+                fontSize: 11,
+              }}
+              itemStyle={{ color: "var(--ink-2)", fontSize: 11 }}
+              cursor={{ stroke: "var(--line-strong)", strokeWidth: 1 }}
             />
             <Line
               type="monotone"
               dataKey="usage"
-              stroke="hsl(var(--accent))"
+              stroke="var(--brand)"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 4, fill: "hsl(var(--accent))", strokeWidth: 0 }}
+              activeDot={{ r: 4, fill: "var(--brand)", strokeWidth: 0 }}
               isAnimationActive={false}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Features bar chart */}
-      <div className="rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5">
-        <div className="mb-4">
-          <h4 className="text-[12px] font-semibold text-[var(--text2)]">Features breakdown</h4>
-        </div>
-        <ResponsiveContainer width="100%" height={200}>
+      <div className="border-t border-[var(--line)] px-5 py-5 sm:px-6">
+        <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+          Feature mix
+        </h3>
+        <p className="mt-1 text-[12px] text-[var(--ink-3)]">
+          Where your requests went
+        </p>
+      </div>
+
+      <div className="px-2 pb-5 sm:px-3">
+        <ResponsiveContainer width="100%" height={160}>
           <BarChart
             data={topFeatures}
-            margin={{ top: 5, right: 8, left: -18, bottom: 0 }}
+            margin={{ top: 4, right: 12, left: -12, bottom: 0 }}
           >
             <CartesianGrid
+              stroke="var(--line)"
               strokeDasharray="3 3"
-              stroke="var(--sidebar-b)"
               vertical={false}
             />
             <XAxis
               dataKey="name"
-              tick={{ fill: "var(--text3)", fontSize: 10 }}
+              tick={{ fill: "var(--ink-3)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
-              dy={4}
+              dy={6}
             />
             <YAxis
-              tick={{ fill: "var(--text3)", fontSize: 10 }}
+              tick={{ fill: "var(--ink-3)", fontSize: 10 }}
               axisLine={false}
               tickLine={false}
-              width={24}
+              width={28}
+              allowDecimals={false}
             />
             <Tooltip
               contentStyle={tooltipStyle}
-              labelStyle={{ color: "var(--text)", fontWeight: 600, fontSize: 11 }}
-              itemStyle={{ color: "var(--text2)", fontSize: 11 }}
-              cursor={{ fill: "var(--bg3)" }}
+              labelStyle={{
+                color: "var(--ink)",
+                fontWeight: 600,
+                fontSize: 11,
+              }}
+              itemStyle={{ color: "var(--ink-2)", fontSize: 11 }}
+              cursor={{ fill: "var(--surface-2)" }}
             />
             <Bar
               dataKey="value"
-              fill="hsl(var(--accent))"
-              radius={[4, 4, 0, 0]}
+              fill="var(--brand)"
+              radius={[3, 3, 0, 0]}
               isAnimationActive={false}
             />
           </BarChart>

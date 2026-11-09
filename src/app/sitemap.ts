@@ -1,14 +1,27 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://clario-hub.vercel.app'
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ||
+  "https://clario-hub.vercel.app";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const routes = ['', '/pricing', '/privacy', '/terms', '/refund', '/sign-in', '/sign-up']
+  const routes: Array<{
+    path: string;
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+    priority: number;
+  }> = [
+    { path: "", changeFrequency: "weekly", priority: 1 },
+    { path: "/pricing", changeFrequency: "weekly", priority: 0.9 },
+    { path: "/privacy", changeFrequency: "monthly", priority: 0.4 },
+    { path: "/terms", changeFrequency: "monthly", priority: 0.4 },
+    { path: "/refund", changeFrequency: "monthly", priority: 0.4 },
+  ];
 
-  return routes.map((path) => ({
-    url: `${baseUrl}${path}`,
+  return routes.map(({ path, changeFrequency, priority }) => ({
+    url: `${baseUrl}${path || "/"}`,
     lastModified: new Date(),
-    changeFrequency: path === '' ? 'weekly' : 'monthly',
-    priority: path === '' ? 1 : 0.7,
-  }))
+    changeFrequency,
+    priority,
+  }));
 }
+

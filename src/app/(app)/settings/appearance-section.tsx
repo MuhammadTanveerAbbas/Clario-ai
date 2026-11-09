@@ -1,6 +1,9 @@
 "use client";
+
 import { useState, useEffect } from "react";
-import { applyTokens } from "@/lib/design-tokens";
+import { Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type FontOption = "geist" | "inter" | "fraunces" | "mono";
 type RadiusOption = "none" | "sm" | "md" | "lg" | "full";
@@ -52,10 +55,10 @@ const RADII: { id: RadiusOption; label: string; px: number }[] = [
   { id: "full", label: "Full", px: 999 },
 ];
 
-const DENSITIES: { id: DensityOption; label: string; desc: string }[] = [
-  { id: "compact", label: "Compact", desc: "Tighter spacing" },
-  { id: "default", label: "Default", desc: "Balanced spacing" },
-  { id: "comfortable", label: "Comfortable", desc: "More breathing room" },
+const DENSITIES: { id: DensityOption; label: string; description: string }[] = [
+  { id: "compact", label: "Compact", description: "Tighter spacing" },
+  { id: "default", label: "Default", description: "Balanced spacing" },
+  { id: "comfortable", label: "Comfortable", description: "More breathing room" },
 ];
 
 export function AppearanceSection() {
@@ -64,7 +67,9 @@ export function AppearanceSection() {
       try {
         const saved = localStorage.getItem("clario-appearance");
         if (saved) return JSON.parse(saved);
-      } catch {}
+      } catch {
+        // Ignore malformed local settings.
+      }
     }
     return { font: "geist", radius: "md", density: "default" };
   });
@@ -72,13 +77,13 @@ export function AppearanceSection() {
 
   useEffect(() => {
     applyAppearance(appearance);
-  }, []);
+  }, [appearance]);
 
   function applyAppearance(data: AppearanceData) {
     const root = document.documentElement;
-    const font = FONTS.find((f) => f.id === data.font);
+    const font = FONTS.find((option) => option.id === data.font);
     if (font) root.style.setProperty("--sans", font.stack);
-    const radius = RADII.find((r) => r.id === data.radius);
+    const radius = RADII.find((option) => option.id === data.radius);
     if (radius) root.style.setProperty("--radius-ui", `${radius.px}px`);
     const densityMap: Record<DensityOption, string> = {
       compact: "0.8",
@@ -90,7 +95,7 @@ export function AppearanceSection() {
 
   function handleChange<K extends keyof AppearanceData>(
     key: K,
-    value: AppearanceData[K],
+    value: AppearanceData[K]
   ) {
     const next = { ...appearance, [key]: value };
     setAppearance(next);
@@ -103,128 +108,146 @@ export function AppearanceSection() {
     setTimeout(() => setSaved(false), 2000);
   }
 
-  const card: React.CSSProperties = {
-    background: "hsl(var(--card))",
-    border: "1px solid var(--card-b)",
-    borderRadius: 14,
-    padding: "22px 24px",
-    marginBottom: 16,
-  };
-
-  const label: React.CSSProperties = {
-    fontSize: ".7rem",
-    fontWeight: 600,
-    letterSpacing: ".08em",
-    textTransform: "uppercase",
-    color: "var(--text3)",
-    marginBottom: 14,
-    display: "block",
-  };
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      <style>{`
-        .ap-font-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-        .ap-font-btn{padding:14px 16px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;text-align:left}
-        .ap-font-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-font-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .ap-font-name{font-size:.75rem;font-weight:600;color:var(--text3);margin-bottom:4px}
-        .ap-font-btn.active .ap-font-name{color:hsl(var(--accent))}
-        .ap-font-sample{font-size:.95rem;color:var(--text2);line-height:1.3}
-        .ap-radius-row{display:flex;gap:8px;align-items:center}
-        .ap-radius-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s}
-        .ap-radius-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-radius-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .ap-radius-box{width:28px;height:28px;background:var(--border2)}
-        .ap-radius-lbl{font-size:.68rem;font-weight:500;color:var(--text3)}
-        .ap-radius-btn.active .ap-radius-lbl{color:hsl(var(--accent))}
-        .ap-density-row{display:flex;gap:8px}
-        .ap-density-btn{flex:1;padding:12px 10px;border-radius:10px;border:1.5px solid hsl(var(--border));background:var(--bg2);cursor:pointer;transition:all .18s;text-align:center}
-        .ap-density-btn:hover{border-color:var(--border2);background:var(--bg3)}
-        .ap-density-btn.active{border-color:hsl(var(--accent));background:var(--accent-l)}
-        .ap-density-title{font-size:.78rem;font-weight:600;color:var(--text2);margin-bottom:2px}
-        .ap-density-btn.active .ap-density-title{color:hsl(var(--accent))}
-        .ap-density-desc{font-size:.68rem;color:var(--text3)}
-        .ap-save-btn{width:100%;padding:12px;border-radius:10px;border:none;background:hsl(var(--accent));color:#fff;font-family:var(--sans);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .18s;margin-top:4px}
-        .ap-save-btn:hover{background:#ea6c0a}
-        .ap-save-btn.saved{background:var(--success);color:#fff}
-        @media(max-width:640px){
-          .ap-theme-grid{grid-template-columns:repeat(3,1fr);gap:8px}
-          .ap-theme-btn{padding:12px 8px;font-size:.7rem;gap:6px}
-          .ap-theme-preview{height:36px}
-          .ap-font-grid{grid-template-columns:repeat(2,1fr);gap:6px}
-          .ap-font-btn{padding:12px}
-          .ap-font-sample{font-size:.85rem}
-          .ap-radius-row{gap:6px}
-          .ap-radius-btn{padding:10px 6px}
-          .ap-radius-box{width:22px;height:22px}
-          .ap-density-row{gap:6px}
-          .ap-density-btn{padding:10px 8px}
-        }
-      `}</style>
-
-      {/* Font */}
-      <div style={card}>
-        <span style={label}>Font</span>
-        <div className="ap-font-grid">
-          {FONTS.map((f) => (
-            <button
-              key={f.id}
-              className={`ap-font-btn${appearance.font === f.id ? " active" : ""}`}
-              onClick={() => handleChange("font", f.id)}
-            >
-              <div className="ap-font-name">{f.label}</div>
-              <div className="ap-font-sample" style={{ fontFamily: f.stack }}>
-                {f.sample}
-              </div>
-            </button>
-          ))}
+    <div className="space-y-4">
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">Font</h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Choose the typeface used across the app.
+          </p>
         </div>
-      </div>
-
-      {/* Border Radius */}
-      <div style={card}>
-        <span style={label}>Border Radius</span>
-        <div className="ap-radius-row">
-          {RADII.map((r) => (
-            <button
-              key={r.id}
-              className={`ap-radius-btn${appearance.radius === r.id ? " active" : ""}`}
-              onClick={() => handleChange("radius", r.id)}
-            >
-              <div
-                className="ap-radius-box"
-                style={{ borderRadius: r.px > 14 ? 14 : r.px }}
-              />
-              <span className="ap-radius-lbl">{r.label}</span>
-            </button>
-          ))}
+        <div className="grid gap-2 px-5 py-5 sm:grid-cols-2 sm:px-6">
+          {FONTS.map((font) => {
+            const active = appearance.font === font.id;
+            return (
+              <button
+                key={font.id}
+                type="button"
+                onClick={() => handleChange("font", font.id)}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-lg border px-4 py-3 text-left transition-colors",
+                  active
+                    ? "border-[var(--brand)] bg-[var(--brand-soft)]"
+                    : "border-[var(--line)] bg-[var(--surface-2)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-3)]"
+                )}
+              >
+                <span
+                  className={cn(
+                    "block text-[11px] font-semibold uppercase tracking-[0.08em]",
+                    active ? "text-[var(--brand)]" : "text-[var(--ink-3)]"
+                  )}
+                >
+                  {font.label}
+                </span>
+                <span
+                  className="mt-1 block text-[15px] text-[var(--ink-2)]"
+                  style={{ fontFamily: font.stack }}
+                >
+                  {font.sample}
+                </span>
+              </button>
+            );
+          })}
         </div>
-      </div>
+      </section>
 
-      {/* Density */}
-      <div style={card}>
-        <span style={label}>Density</span>
-        <div className="ap-density-row">
-          {DENSITIES.map((d) => (
-            <button
-              key={d.id}
-              className={`ap-density-btn${appearance.density === d.id ? " active" : ""}`}
-              onClick={() => handleChange("density", d.id)}
-            >
-              <div className="ap-density-title">{d.label}</div>
-              <div className="ap-density-desc">{d.desc}</div>
-            </button>
-          ))}
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Corner radius
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Set how rounded cards and controls are.
+          </p>
         </div>
-      </div>
+        <div className="grid grid-cols-5 gap-2 px-5 py-5 sm:px-6">
+          {RADII.map((radius) => {
+            const active = appearance.radius === radius.id;
+            return (
+              <button
+                key={radius.id}
+                type="button"
+                onClick={() => handleChange("radius", radius.id)}
+                aria-pressed={active}
+                className={cn(
+                  "flex flex-col items-center gap-2 rounded-lg border px-2 py-3 transition-colors",
+                  active
+                    ? "border-[var(--brand)] bg-[var(--brand-soft)]"
+                    : "border-[var(--line)] bg-[var(--surface-2)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-3)]"
+                )}
+              >
+                <span
+                  className={cn(
+                    "h-6 w-6 border",
+                    active
+                      ? "border-[var(--brand)] bg-[var(--accent-m)]"
+                      : "border-[var(--line-strong)] bg-[var(--surface-3)]"
+                  )}
+                  style={{ borderRadius: radius.px > 14 ? 14 : radius.px }}
+                  aria-hidden
+                />
+                <span
+                  className={cn(
+                    "text-[10.5px] font-medium",
+                    active ? "text-[var(--brand)]" : "text-[var(--ink-3)]"
+                  )}
+                >
+                  {radius.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
-      <button
-        className={`ap-save-btn${saved ? " saved" : ""}`}
-        onClick={handleSave}
-      >
-        {saved ? "✓ Saved" : "Save Appearance"}
-      </button>
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Density
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Adjust the spacing between elements.
+          </p>
+        </div>
+        <div className="grid gap-2 px-5 py-5 sm:grid-cols-3 sm:px-6">
+          {DENSITIES.map((density) => {
+            const active = appearance.density === density.id;
+            return (
+              <button
+                key={density.id}
+                type="button"
+                onClick={() => handleChange("density", density.id)}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-lg border px-3 py-3 text-center transition-colors",
+                  active
+                    ? "border-[var(--brand)] bg-[var(--brand-soft)]"
+                    : "border-[var(--line)] bg-[var(--surface-2)] hover:border-[var(--line-strong)] hover:bg-[var(--surface-3)]"
+                )}
+              >
+                <span
+                  className={cn(
+                    "block text-[12.5px] font-semibold",
+                    active ? "text-[var(--brand)]" : "text-[var(--ink-2)]"
+                  )}
+                >
+                  {density.label}
+                </span>
+                <span className="mt-0.5 block text-[10.5px] text-[var(--ink-3)]">
+                  {density.description}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      <Button type="button" onClick={handleSave} className="w-full">
+        {saved ? <Check className="h-4 w-4" /> : null}
+        {saved ? "Saved" : "Save appearance"}
+      </Button>
     </div>
   );
 }

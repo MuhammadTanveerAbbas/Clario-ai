@@ -1,26 +1,30 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo, useRef, type ReactNode } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { AnalyticsCharts } from "@/components/analytics-charts";
 import { LoadingPage } from "@/components/ui/loading-page";
-import { AppNavbar } from "@/components/layout/app-navbar";
+import { Button } from "@/components/ui/button";
+import { Page, PageHeader, SectionHeading } from "@/components/layout/page";
 import {
-  BarChart3,
-  Activity,
+  AlertCircle,
   ArrowRight,
-  X,
-  Clock,
-  Sparkles,
-  MessageCircle,
+  ArrowUpRight,
   FileText,
+  MessageCircle,
   MessageSquare,
-  Zap,
+  MessageSquareText,
   Mic,
+  Sparkles,
+  Wand2,
+  X,
+  Zap,
+  type LucideIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface UserProfile {
   id: string;
@@ -38,6 +42,11 @@ interface UsageStat {
   requests_limit: number;
 }
 
+interface ToolkitStat {
+  comments: number;
+  repurposes: number;
+}
+
 interface RecentActivity {
   id: string;
   type: string;
@@ -51,45 +60,17 @@ interface RecentSummary {
   created_at: string;
 }
 
-function Skeleton({ className = "", circle = false }: { className?: string; circle?: boolean }) {
+interface Toast {
+  id: string;
+  type: "success" | "error" | "info";
+  message: string;
+}
+
+function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse bg-[var(--bg3)] ${circle ? "rounded-full" : "rounded-lg"} ${className}`}
+      className={cn("animate-pulse rounded-md bg-[var(--surface-3)]", className)}
     />
-  );
-}
-
-function SectionHeader({
-  icon: Icon,
-  children,
-  action,
-}: {
-  icon: typeof Activity;
-  children: ReactNode;
-  action?: ReactNode;
-}) {
-  return (
-    <div className="mb-4 flex h-5 items-center justify-between">
-      <span className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--text3)]">
-        <Icon size={12} />
-        {children}
-      </span>
-      {action}
-    </div>
-  );
-}
-
-function PanelCard({
-  children,
-  className = "",
-}: {
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={`rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 ${className}`}>
-      {children}
-    </div>
   );
 }
 
@@ -101,63 +82,6 @@ function getGreeting(): string {
   return "night";
 }
 
-// ── Module-level data cache so navigating away & back skips skeleton ─────────
-let _cachedStats: UsageStat | null = null;
-let _cachedActivity: RecentActivity[] = [];
-let _cachedSummaries: RecentSummary[] = [];
-let _cachedUser: UserProfile | null = null;
-let _cacheUserId: string | null = null;
-
-// ─────────────────────────────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  sub,
-  href,
-  delay,
-  icon,
-  iconColor,
-  iconBg,
-}: {
-  label: string;
-  value: number;
-  sub: string;
-  href: string;
-  delay: number;
-  icon: ReactNode;
-  iconColor: string;
-  iconBg: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group relative flex min-h-[104px] items-center gap-4 rounded-2xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--border2)] hover:shadow-[var(--shadow-medium)] no-underline"
-      style={{ animation: `fadeInUp 0.5s ${delay}s both` }}
-    >
-      {/* Subtle glow blob */}
-      <div className="pointer-events-none absolute -right-4 -top-4 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
-           style={{ background: "hsl(var(--accent) / 0.12)" }} />
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl transition-all duration-300 group-hover:scale-105 group-hover:rotate-[-4deg]"
-           style={{ background: iconBg, color: iconColor }}>
-        {icon}
-      </div>
-      <div className="min-w-0 flex-1">
-        <span className="font-serif text-2xl font-light tracking-tight text-[var(--text)]">
-          {value}
-        </span>
-        <div className="mt-0.5 text-[12px] font-semibold text-[var(--text2)]">{label}</div>
-        <div className="mt-0.5 text-[11px] text-[var(--text3)]">{sub}</div>
-      </div>
-      <div className="shrink-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style={{ color: "var(--text3)" }}>
-          <path d="M3 8h10M8 3l5 5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      </div>
-    </Link>
-  );
-}
-
 function formatRelativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
@@ -167,7 +91,10 @@ function formatRelativeTime(dateStr: string): string {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(dateStr).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function activityLabel(type: string): string {
@@ -176,18 +103,119 @@ function activityLabel(type: string): string {
     case "summarize":
       return "Generated a summary";
     case "chat":
-      return "AI chat message";
+      return "Sent a chat message";
     case "remix":
       return "Remixed content";
+    case "comment":
+    case "comments":
+      return "Generated comments";
+    case "repurpose":
+      return "Repurposed content";
     default:
       return "Used Clario";
   }
 }
 
-interface Toast {
-  id: string;
-  type: "success" | "error" | "info";
-  message: string;
+function activityIcon(type: string): LucideIcon {
+  switch (type) {
+    case "summary":
+    case "summarize":
+      return FileText;
+    case "chat":
+      return MessageSquare;
+    case "remix":
+      return Zap;
+    case "comment":
+    case "comments":
+      return MessageSquareText;
+    case "repurpose":
+      return Wand2;
+    default:
+      return Sparkles;
+  }
+}
+
+// Module-level data cache so navigating away and back skips the skeleton.
+let _cachedStats: UsageStat | null = null;
+let _cachedToolkit: ToolkitStat | null = null;
+let _cachedActivity: RecentActivity[] = [];
+let _cachedSummaries: RecentSummary[] = [];
+let _cachedUser: UserProfile | null = null;
+let _cacheUserId: string | null = null;
+
+function StatCell({
+  label,
+  value,
+  sub,
+  href,
+  icon: Icon,
+  loading,
+}: {
+  label: string;
+  value: number;
+  sub: string;
+  href: string;
+  icon: LucideIcon;
+  loading: boolean;
+  accent?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex min-h-[132px] flex-col justify-between bg-[var(--surface)] p-5 no-underline transition-colors hover:bg-[var(--surface-2)] sm:p-6"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="text-[12px] font-medium leading-5 text-[var(--ink-3)]">
+          {label}
+        </span>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)] transition-colors group-hover:border-[var(--brand-line)] group-hover:text-[var(--brand)]">
+          <Icon className="h-4 w-4" strokeWidth={1.8} />
+        </span>
+      </div>
+      <div className="pt-4">
+        {loading ? (
+          <Skeleton className="h-9 w-20" />
+        ) : (
+          <div className="flex items-end justify-between gap-3">
+            <span className="font-serif text-[30px] font-medium leading-none tracking-[-0.03em] text-[var(--ink)] tabular-nums sm:text-[34px]">
+              {value.toLocaleString()}
+            </span>
+            <ArrowUpRight
+              className="mb-0.5 h-4 w-4 shrink-0 text-[var(--ink-3)] opacity-0 transition-opacity group-hover:opacity-100"
+              strokeWidth={1.8}
+              aria-hidden
+            />
+          </div>
+        )}
+        <p className="mt-2 text-[12px] leading-5 text-[var(--ink-3)]">{sub}</p>
+      </div>
+    </Link>
+  );
+}
+
+function MiniStat({
+  label,
+  value,
+  loading,
+}: {
+  label: string;
+  value: string | number;
+  loading: boolean;
+}) {
+  return (
+    <div className="flex min-h-[88px] flex-col justify-between rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--ink-3)]">
+        {label}
+      </p>
+      {loading ? (
+        <Skeleton className="h-7 w-14" />
+      ) : (
+        <p className="font-serif text-[24px] font-medium leading-none tracking-[-0.02em] text-[var(--ink)] tabular-nums">
+          {typeof value === "number" ? value.toLocaleString() : value}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export default function Dashboard() {
@@ -195,95 +223,153 @@ export default function Dashboard() {
   const supabase = createClient();
   const { user: authUser, loading: authLoading } = useAuth();
 
-  // Seed state from module-level cache to avoid skeleton flash on back-navigation
   const [loading, setLoading] = useState(() => _cachedStats === null);
   const [loadError, setLoadError] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [user, setUser] = useState<UserProfile | null>(_cachedUser);
   const [stats, setStats] = useState<UsageStat | null>(_cachedStats);
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>(_cachedActivity);
-  const [recentSummaries, setRecentSummaries] = useState<RecentSummary[]>(_cachedSummaries);
+  const [toolkit, setToolkit] = useState<ToolkitStat | null>(_cachedToolkit);
+  const [recentActivity, setRecentActivity] =
+    useState<RecentActivity[]>(_cachedActivity);
+  const [recentSummaries, setRecentSummaries] =
+    useState<RecentSummary[]>(_cachedSummaries);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  // Track whether we've already loaded for this user to prevent double-fetch
   const loadedForRef = useRef<string | null>(_cacheUserId);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const loadData = useCallback(async (options?: { silent?: boolean }) => {
-    if (!authUser) return;
-    if (!options?.silent) setLoading(true);
-    setLoadError(false);
-    try {
-      const uid = authUser.id;
-      const [
-        profileRes,
-        recentUsageRes,
-        summaryCountRes,
-        chatCountRes,
-        remixCountRes,
-        brandVoiceRes,
-        summariesRes,
-      ] = await Promise.all([
-        supabase.from("profiles").select("id, full_name, avatar_url, plan, requests_used").eq("id", uid).single(),
-        supabase.from("usage_tracking").select("id, created_at, type").eq("user_id", uid).order("created_at", { ascending: false }).limit(8),
-        supabase.from("usage_tracking").select("*", { count: "exact", head: true }).eq("user_id", uid).in("type", ["summary", "summarize"]),
-        supabase.from("usage_tracking").select("*", { count: "exact", head: true }).eq("user_id", uid).eq("type", "chat"),
-        supabase.from("usage_tracking").select("*", { count: "exact", head: true }).eq("user_id", uid).eq("type", "remix"),
-        supabase.from("brand_voices").select("id").eq("user_id", uid),
-        supabase.from("summarizer_history").select("id, source_title, summary_mode, created_at").eq("user_id", uid).order("created_at", { ascending: false }).limit(5),
-      ]);
+  const loadData = useCallback(
+    async (options?: { silent?: boolean }) => {
+      if (!authUser) return;
+      if (!options?.silent) setLoading(true);
+      setLoadError(false);
+      try {
+        const uid = authUser.id;
+        const [
+          profileRes,
+          recentUsageRes,
+          summaryCountRes,
+          chatCountRes,
+          remixCountRes,
+          brandVoiceRes,
+          summariesRes,
+          historyRes,
+        ] = await Promise.all([
+          supabase
+            .from("profiles")
+            .select("id, full_name, avatar_url, plan, requests_used")
+            .eq("id", uid)
+            .single(),
+          supabase
+            .from("usage_tracking")
+            .select("id, created_at, type")
+            .eq("user_id", uid)
+            .order("created_at", { ascending: false })
+            .limit(8),
+          supabase
+            .from("usage_tracking")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", uid)
+            .in("type", ["summary", "summarize"]),
+          supabase
+            .from("usage_tracking")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", uid)
+            .eq("type", "chat"),
+          supabase
+            .from("usage_tracking")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", uid)
+            .eq("type", "remix"),
+          supabase.from("brand_voices").select("id").eq("user_id", uid),
+          supabase
+            .from("summarizer_history")
+            .select("id, source_title, summary_mode, created_at")
+            .eq("user_id", uid)
+            .order("created_at", { ascending: false })
+            .limit(5),
+          fetch("/api/history", { cache: "no-store" })
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null),
+        ]);
 
-      const profileData = profileRes.data;
-      const tier = profileData?.plan || "free";
+        const profileData = profileRes.data;
+        const tier = profileData?.plan || "free";
 
-      const newUser: UserProfile = {
-        id: uid,
-        email: authUser.email!,
-        full_name: profileData?.full_name,
-        plan: tier === "pro" ? "pro" : "free",
-      };
+        const newUser: UserProfile = {
+          id: uid,
+          email: authUser.email!,
+          full_name: profileData?.full_name,
+          plan: tier === "pro" ? "pro" : "free",
+        };
 
-      const newActivity = (recentUsageRes.data || []).map((r: { id: string; type: string; created_at: string }) => ({
-        id: r.id,
-        type: r.type,
-        created_at: r.created_at,
-      }));
+        const newActivity = (recentUsageRes.data || []).map(
+          (row: { id: string; type: string; created_at: string }) => ({
+            id: row.id,
+            type: row.type,
+            created_at: row.created_at,
+          })
+        );
 
-      const newSummaries = summariesRes.data || [];
+        const newSummaries = summariesRes.data || [];
 
-      const newStats: UsageStat = {
-        summaries: summaryCountRes.count ?? 0,
-        chats: chatCountRes.count ?? 0,
-        remixes: remixCountRes.count ?? 0,
-        brand_voices: brandVoiceRes.data?.length ?? 0,
-        requests_used: profileData?.requests_used ?? 0,
-        requests_limit: tier === "pro" ? 1000 : 100,
-      };
+        const newStats: UsageStat = {
+          summaries: summaryCountRes.count ?? 0,
+          chats: chatCountRes.count ?? 0,
+          remixes: remixCountRes.count ?? 0,
+          brand_voices: brandVoiceRes.data?.length ?? 0,
+          requests_used: profileData?.requests_used ?? 0,
+          requests_limit: tier === "pro" ? 1000 : 100,
+        };
 
-      // Write to module-level cache
-      _cachedUser = newUser;
-      _cachedStats = newStats;
-      _cachedActivity = newActivity;
-      _cachedSummaries = newSummaries;
-      _cacheUserId = uid;
-      loadedForRef.current = uid;
+        const newToolkit: ToolkitStat = {
+          comments: Array.isArray(historyRes?.comments)
+            ? historyRes.comments.length
+            : 0,
+          repurposes: Array.isArray(historyRes?.repurpose)
+            ? historyRes.repurpose.length
+            : 0,
+        };
 
-      setUser(newUser);
-      setRecentActivity(newActivity);
-      setRecentSummaries(newSummaries);
-      setStats(newStats);
-      setRefreshKey((k) => k + 1);
-    } catch (e) {
-      console.error("[Dashboard] Failed to load dashboard data:", e);
-      setLoadError(true);
-      setUser({ id: authUser.id, email: authUser.email || "", plan: "free" });
-      setStats({ summaries: 0, chats: 0, remixes: 0, brand_voices: 0, requests_used: 0, requests_limit: 100 });
-    } finally {
-      setLoading(false);
-    }
-  }, [authUser, supabase]);
+        _cachedUser = newUser;
+        _cachedStats = newStats;
+        _cachedToolkit = newToolkit;
+        _cachedActivity = newActivity;
+        _cachedSummaries = newSummaries;
+        _cacheUserId = uid;
+        loadedForRef.current = uid;
+
+        setUser(newUser);
+        setRecentActivity(newActivity);
+        setRecentSummaries(newSummaries);
+        setStats(newStats);
+        setToolkit(newToolkit);
+        setRefreshKey((key) => key + 1);
+      } catch (error) {
+        console.error("[Dashboard] Failed to load dashboard data:", error);
+        setLoadError(true);
+        setUser({
+          id: authUser.id,
+          email: authUser.email || "",
+          plan: "free",
+        });
+        setStats({
+          summaries: 0,
+          chats: 0,
+          remixes: 0,
+          brand_voices: 0,
+          requests_used: 0,
+          requests_limit: 100,
+        });
+        setToolkit({ comments: 0, repurposes: 0 });
+      } finally {
+        setLoading(false);
+      }
+    },
+    [authUser, supabase]
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -291,8 +377,12 @@ export default function Dashboard() {
       router.push("/sign-in");
       return;
     }
-    // If we already have cached data for this user, skip the full reload
-    if (loadedForRef.current === authUser.id && _cachedStats !== null) return;
+    if (
+      loadedForRef.current === authUser.id &&
+      _cachedStats !== null &&
+      _cachedToolkit !== null
+    )
+      return;
     loadData();
   }, [authUser, authLoading, loadData, router]);
 
@@ -309,9 +399,10 @@ export default function Dashboard() {
     };
   }, [authLoading, authUser, loadData]);
 
-  const retryLoad = useCallback(() => { loadData(); }, [loadData]);
+  const retryLoad = useCallback(() => {
+    loadData();
+  }, [loadData]);
 
-  const usagePercent = stats ? Math.round((stats.requests_used / stats.requests_limit) * 100) : 0;
   const greeting = useMemo(() => getGreeting(), []);
   const firstName = user?.full_name?.split(" ")[0] || "there";
 
@@ -319,393 +410,289 @@ export default function Dashboard() {
   if (!authUser) return <LoadingPage />;
 
   const isPro = user?.plan === "pro";
+  const requestsLeft = stats
+    ? Math.max(0, stats.requests_limit - stats.requests_used)
+    : 0;
 
-  const STAT_CARDS = [
+  const totalCreations =
+    (stats?.summaries ?? 0) +
+    (stats?.chats ?? 0) +
+    (stats?.remixes ?? 0) +
+    (toolkit?.comments ?? 0) +
+    (toolkit?.repurposes ?? 0);
+
+  const statCards = [
     {
       label: "Summaries",
       value: stats?.summaries ?? 0,
-      sub: "Total processed",
+      sub: "Content processed",
       href: "/summarizer",
-      icon: <FileText size={22} />,
-      iconColor: "#f97316",
-      iconBg: "rgba(249,115,22,0.12)",
+      icon: FileText,
     },
     {
-      label: "AI Chats",
+      label: "AI chats",
       value: stats?.chats ?? 0,
       sub: "Conversations",
       href: "/chat",
-      icon: <MessageSquare size={22} />,
-      iconColor: "#0ea5e9",
-      iconBg: "rgba(14,165,233,0.12)",
+      icon: MessageSquare,
     },
     {
       label: "Remixes",
       value: stats?.remixes ?? 0,
-      sub: "Content remixed",
+      sub: "Content adapted",
       href: "/remix",
-      icon: <Zap size={22} />,
-      iconColor: "#a855f7",
-      iconBg: "rgba(168,85,247,0.12)",
+      icon: Zap,
     },
     {
-      label: "Brand Voices",
+      label: "Brand voices",
       value: stats?.brand_voices ?? 0,
       sub: "Voices created",
       href: "/brand-voice",
-      icon: <Mic size={22} />,
-      iconColor: "#10b981",
-      iconBg: "rgba(16,185,129,0.12)",
+      icon: Mic,
+    },
+    {
+      label: "Comments",
+      value: toolkit?.comments ?? 0,
+      sub: "Comments generated",
+      href: "/comments",
+      icon: MessageSquareText,
+    },
+    {
+      label: "Repurposes",
+      value: toolkit?.repurposes ?? 0,
+      sub: "Repurpose runs",
+      href: "/repurpose",
+      icon: Wand2,
     },
   ];
 
   return (
-    <>
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
+    <Page>
+      <PageHeader
+        meta={
+          <>
+            <span className="app-chip app-chip-accent">
+              {isPro ? "Pro workspace" : "Free workspace"}
+            </span>
+            <span className="text-[12px] font-medium text-[var(--ink-3)]">
+              {new Date().toLocaleDateString(undefined, {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </span>
+          </>
         }
-        .dash-content { flex: 1; display: flex; flex-direction: column; }
-      `}</style>
+        title={`Good ${greeting}, ${firstName}.`}
+        description={
+          isPro
+            ? "Your studio is on Pro. All stats, usage, and activity are here in one place."
+            : "All your stats, usage, and activity in one place."
+        }
+        actions={
+          <>
+            <Button asChild>
+              <Link href="/summarizer">
+                <Sparkles className="h-4 w-4" />
+                New summary
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/chat">
+                <MessageCircle className="h-4 w-4" />
+                Open chat
+              </Link>
+            </Button>
+          </>
+        }
+      />
 
-      <div className="flex flex-col min-h-screen bg-[var(--bg)]">
-        <AppNavbar />
-        <div className="dash-content">
-          <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-4 py-6 sm:px-6 lg:px-8 xl:px-10">
+      {loadError && !loading ? (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[rgba(180,35,24,0.22)] bg-[rgba(180,35,24,0.04)] px-4 py-3">
+          <p className="flex items-center gap-2 text-[12.5px] text-[var(--error)]">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            Some workspace data could not be loaded. Numbers may be incomplete.
+          </p>
+          <button
+            type="button"
+            onClick={retryLoad}
+            className="text-[12px] font-semibold text-[var(--brand)] hover:underline"
+          >
+            Try again
+          </button>
+        </div>
+      ) : null}
 
-            {/* ── Hero Banner ────────────────────────────────────────────────── */}
-            <div
-              className="relative overflow-hidden rounded-2xl border border-[var(--card-b)] p-6 sm:p-8"
-              style={{
-                background: "linear-gradient(135deg, hsl(var(--card)) 0%, var(--bg2) 50%, hsl(var(--card)) 100%)",
-                animation: "fadeInUp 0.4s both",
-              }}
-            >
-              <div className="absolute -right-8 -top-8 h-40 w-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
-              <div className="absolute -left-4 bottom-0 h-32 w-32 rounded-full bg-sky-500/8 blur-2xl pointer-events-none" />
-              <div className="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[hsl(var(--accent))] mb-2">
-                    Your workspace
-                  </p>
-                  <h1 className="font-serif text-2xl sm:text-3xl font-light tracking-tight text-[var(--text)]">
-                    Good {greeting},{" "}
-                    <em className="italic text-[hsl(var(--accent))]">{firstName}</em>
-                  </h1>
-                  <p className="mt-2 text-[13px] leading-relaxed text-[var(--text3)] max-w-lg">
-                    {loading
-                      ? "Loading your workspace…"
-                      : isPro
-                      ? "Pro plan active — unlimited requests, priority processing."
-                      : `You've used ${stats?.requests_used ?? 0} of ${stats?.requests_limit ?? 100} requests this month.`}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-3 shrink-0">
-                  <Link
-                    href="/summarizer"
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[hsl(var(--accent))] px-4 text-[12px] font-semibold text-white transition-opacity hover:opacity-90 no-underline"
-                  >
-                    <Sparkles size={14} />
-                    New summary
-                  </Link>
-                  <Link
-                    href="/chat"
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] px-4 text-[12px] font-semibold text-[var(--text2)] transition-colors hover:border-[var(--border2)] no-underline"
-                  >
-                    <MessageCircle size={14} />
-                    Open chat
-                  </Link>
-                </div>
+      {/* All statistics */}
+      <section aria-label="Workspace statistics" className="space-y-4">
+        <SectionHeading
+          title="All statistics"
+          description="Everything you have created across Clario."
+        />
+        <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--line)] sm:grid-cols-3 xl:grid-cols-6">
+          {statCards.map((card) => (
+            <StatCell
+              key={card.label}
+              label={card.label}
+              value={card.value}
+              sub={card.sub}
+              href={card.href}
+              icon={card.icon}
+              loading={loading}
+            />
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-1 sm:grid-cols-4">
+          <MiniStat
+            label="Total creations"
+            value={totalCreations}
+            loading={loading}
+          />
+          <MiniStat
+            label="Requests used"
+            value={stats?.requests_used ?? 0}
+            loading={loading}
+          />
+          <MiniStat
+            label="Requests left"
+            value={requestsLeft}
+            loading={loading}
+          />
+          <MiniStat label="Plan" value={isPro ? "Pro" : "Free"} loading={loading} />
+        </div>
+      </section>
+
+      <div className="mt-10 space-y-10">
+        <section>
+          <SectionHeading
+            title="Usage over time"
+            description="Daily requests and feature mix across your workspace."
+          />
+          {loading ? (
+            <div className="surface">
+              <div className="space-y-4 px-5 py-5 sm:px-6">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-[200px] w-full" />
+              </div>
+              <div className="border-t border-[var(--line)] space-y-4 px-5 py-5 sm:px-6">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-[160px] w-full" />
               </div>
             </div>
+          ) : (
+            <AnalyticsCharts refreshKey={refreshKey} />
+          )}
+        </section>
 
-            {/* Error banner */}
-            {loadError && !loading && (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-                <p className="text-[12px] text-red-700">
-                  Some dashboard data couldn&apos;t be loaded. Stats may be incomplete.
+        <section>
+          <SectionHeading
+            title="Recent summaries"
+            description="Pick up where you left off."
+            action={
+              <Link
+                href="/summarizer"
+                className="link-accent inline-flex items-center gap-1 text-[12px]"
+              >
+                View all
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            }
+          />
+          <div className="surface overflow-hidden">
+            {loading ? (
+              <div className="divide-y divide-[var(--line)]">
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="flex items-center gap-4 px-5 py-4 sm:px-6">
+                    <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <Skeleton className="h-3.5 w-2/3" />
+                      <Skeleton className="h-3 w-1/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : recentSummaries.length === 0 ? (
+              <div className="px-6 py-12 sm:px-8">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)]">
+                  <FileText className="h-5 w-5" strokeWidth={1.7} />
+                </span>
+                <p className="mt-4 text-[15px] font-semibold text-[var(--ink)]">
+                  No summaries yet
                 </p>
-                <button
-                  type="button"
-                  onClick={retryLoad}
-                  className="text-[11px] font-semibold text-[hsl(var(--accent))]"
+                <p className="mt-1.5 max-w-sm text-[13px] leading-relaxed text-[var(--ink-3)]">
+                  Paste an article, a URL, or a YouTube link to create your
+                  first one.
+                </p>
+                <Link
+                  href="/summarizer"
+                  className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-[var(--line-strong)] bg-[var(--surface)] px-4 py-2.5 text-[13px] font-semibold text-[var(--ink-2)] no-underline transition-colors hover:border-[var(--brand-line)] hover:text-[var(--brand)]"
                 >
-                  Retry
-                </button>
+                  Open the summarizer
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
-            )}
-
-            {/* ── Category 1: Overview Stats ─────────────────────────────────── */}
-            <section>
-              <SectionHeader icon={Activity}>Overview</SectionHeader>
-              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-                {loading
-                  ? [...Array(4)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-4 rounded-2xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 min-h-[108px]">
-                        <Skeleton className="h-14 w-14 shrink-0 rounded-2xl" />
-                        <div className="flex flex-1 flex-col gap-2.5">
-                          <Skeleton className="h-7 w-14 rounded-md" />
-                          <Skeleton className="h-3 w-24 rounded-md" />
-                          <Skeleton className="h-2.5 w-16 rounded-md" />
-                        </div>
-                      </div>
-                    ))
-                  : STAT_CARDS.map((card, i) => (
-                      <StatCard key={card.label} {...card} delay={0.08 + i * 0.06} />
-                    ))}
-              </div>
-            </section>
-
-            {/* ── Category 2: Usage ─────────────────────────────────────────── */}
-            {(!isPro) && (
-              <section>
-                <SectionHeader icon={BarChart3}>Usage</SectionHeader>
-
-                {loading ? (
-                  <div className="rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-4 sm:p-5">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
-                          <div className="min-w-0 flex-1 space-y-1.5">
-                            <Skeleton className="h-3 w-24" />
-                            <Skeleton className="h-2.5 w-32" />
-                          </div>
-                        </div>
-                        <Skeleton className="h-7 w-20 shrink-0 rounded-lg" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Skeleton className="h-2.5 w-12" />
-                          <Skeleton className="h-2.5 w-8" />
-                        </div>
-                        <Skeleton className="h-2.5 w-full rounded-full" />
-                      </div>
-                    </div>
-                  </div>
-                ) : stats && (
-                  <div className="rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-4 sm:p-5">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
-                            <BarChart3 size={18} />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-[12px] font-semibold text-[var(--text2)]">Monthly usage</h3>
-                            <p className="text-[10px] text-[var(--text3)] mt-0.5">
-                              {stats.requests_used} of {stats.requests_limit} requests
-                            </p>
-                          </div>
-                        </div>
-                        <Link
-                          href="/pricing"
-                          className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-[hsl(var(--accent))] px-3 py-1.5 text-[10px] font-semibold text-white transition-opacity hover:opacity-90 whitespace-nowrap no-underline"
-                        >
-                          Upgrade <ArrowRight size={12} />
-                        </Link>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-medium text-[var(--text3)]">Progress</span>
-                          <span
-                            className="text-[10px] font-semibold"
-                            style={{
-                              color:
-                                usagePercent > 85
-                                  ? "#ef4444"
-                                  : usagePercent > 70
-                                  ? "#f59e0b"
-                                  : "hsl(var(--accent))",
-                            }}
-                          >
-                            {usagePercent}%
-                          </span>
-                        </div>
-                        <div className="relative h-2.5 overflow-hidden rounded-full bg-[var(--bg3)]">
-                          <div
-                            className="h-full rounded-full transition-all duration-1000 ease-out"
-                            style={{
-                              width: `${Math.max(usagePercent, 2)}%`,
-                              background:
-                                usagePercent > 85
-                                  ? "linear-gradient(90deg, #ef4444, #f87171)"
-                                  : usagePercent > 70
-                                  ? "linear-gradient(90deg, #f59e0b, #fbbf24)"
-                                  : "linear-gradient(90deg, hsl(var(--accent)), hsl(var(--accent)) 80%, #10b981)",
-                              boxShadow:
-                                usagePercent > 0
-                                  ? `0 0 12px ${usagePercent > 85 ? "rgba(239, 68, 68, 0.4)" : usagePercent > 70 ? "rgba(245, 158, 11, 0.4)" : "rgba(var(--accent-rgb), 0.3)"}`
-                                  : "none",
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between text-[10px]">
-                        <span className="text-[var(--text3)]">
-                          {usagePercent >= 100
-                            ? "Limit reached. Upgrade to continue."
-                            : usagePercent > 85
-                            ? "Approaching limit. Consider upgrading."
-                            : usagePercent > 70
-                            ? `${stats.requests_limit - stats.requests_used} requests remaining`
-                            : usagePercent === 0
-                            ? `${stats.requests_limit} requests available to use`
-                            : `${stats.requests_limit - stats.requests_used} requests available`}
-                        </span>
-                        {usagePercent > 0 && (
-                          <span className="text-[var(--text3)]">{usagePercent}% used</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
-            )}
-
-            {/* ── Category 3: Analytics ─────────────────────────────────────── */}
-            <section>
-              <SectionHeader icon={BarChart3}>Analytics</SectionHeader>
-              {loading ? (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="h-[260px] rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 animate-pulse" />
-                  <div className="h-[260px] rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] p-5 animate-pulse" />
-                </div>
-              ) : (
-                <AnalyticsCharts refreshKey={refreshKey} />
-              )}
-            </section>
-
-            {/* ── Category 4: Activity ──────────────────────────────────────── */}
-            <section>
-              <SectionHeader icon={Sparkles}>Activity</SectionHeader>
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                {/* Recent Activity */}
-                <PanelCard>
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                         style={{ background: "color-mix(in srgb, #78716c 12%, transparent)", color: "#78716c" }}>
-                      <Clock size={16} />
-                    </div>
-                    <span className="text-[12px] font-semibold text-[var(--text2)]">Recent activity</span>
-                  </div>
-                  {loading ? (
-                    <div className="space-y-2">
-                      {[...Array(4)].map((_, i) => (
-                        <div key={i} className="flex items-center justify-between py-2 border-b border-[var(--card-b)] last:border-0">
-                          <Skeleton className="h-3 w-36" />
-                          <Skeleton className="h-3 w-12" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : recentActivity.length === 0 ? (
-                    <p className="text-[11px] text-[var(--text3)] m-0">
-                      No activity yet. Start with a summary or chat.
-                    </p>
-                  ) : (
-                    <ul className="space-y-1 list-none m-0 p-0">
-                      {recentActivity.map((item) => (
-                        <li
-                          key={item.id}
-                          className="flex items-center justify-between gap-2 py-2 border-b border-[var(--card-b)] last:border-0"
-                        >
-                          <span className="text-[11px] text-[var(--text2)] truncate">
-                            {activityLabel(item.type)}
-                          </span>
-                          <span className="text-[10px] text-[var(--text3)] shrink-0">
-                            {formatRelativeTime(item.created_at)}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </PanelCard>
-
-                {/* Recent Summaries */}
-                <PanelCard>
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                           style={{ background: "rgba(249,115,22,0.12)", color: "#f97316" }}>
-                        <FileText size={18} />
-                      </div>
-                      <span className="text-[12px] font-semibold text-[var(--text2)]">Recent summaries</span>
-                    </div>
+            ) : (
+              <ul className="divide-y divide-[var(--line)]">
+                {recentSummaries.map((summary) => (
+                  <li key={summary.id}>
                     <Link
                       href="/summarizer"
-                      className="text-[10px] font-semibold text-[hsl(var(--accent))] no-underline hover:opacity-80"
+                      className="group flex items-center gap-4 px-5 py-4 no-underline transition-colors hover:bg-[var(--surface-2)] sm:px-6"
                     >
-                      View all
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface-2)] text-[var(--ink-3)] transition-colors group-hover:text-[var(--brand)]">
+                        <FileText className="h-4 w-4" strokeWidth={1.7} />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[13.5px] font-medium leading-5 text-[var(--ink)]">
+                          {summary.source_title || "Untitled summary"}
+                        </span>
+                        <span className="mt-1 block text-[12px] leading-4 text-[var(--ink-3)]">
+                          {summary.summary_mode.replace(/-/g, " ")} ·{" "}
+                          {formatRelativeTime(summary.created_at)}
+                        </span>
+                      </span>
+                      <ArrowUpRight
+                        className="h-4 w-4 shrink-0 text-[var(--ink-3)] opacity-0 transition-opacity group-hover:opacity-100"
+                        strokeWidth={1.8}
+                        aria-hidden
+                      />
                     </Link>
-                  </div>
-                  {loading ? (
-                    <div className="space-y-2">
-                      {[...Array(3)].map((_, i) => (
-                        <div key={i} className="flex flex-col gap-1.5 rounded-lg px-2 py-2">
-                          <Skeleton className="h-3 w-3/4" />
-                          <Skeleton className="h-2.5 w-1/2" />
-                        </div>
-                      ))}
-                    </div>
-                  ) : recentSummaries.length === 0 ? (
-                    <p className="text-[11px] text-[var(--text3)] m-0">
-                      No summaries yet. Paste text, a URL, or a YouTube link to get started.
-                    </p>
-                  ) : (
-                    <ul className="space-y-1 list-none m-0 p-0">
-                      {recentSummaries.map((s) => (
-                        <li key={s.id}>
-                          <Link
-                            href="/summarizer"
-                            className="flex flex-col gap-0.5 rounded-lg px-2 py-2 hover:bg-[var(--bg3)] transition-colors no-underline"
-                          >
-                            <span className="text-[11px] font-medium text-[var(--text2)] truncate">
-                              {s.source_title || "Untitled summary"}
-                            </span>
-                            <span className="text-[10px] text-[var(--text3)]">
-                              {s.summary_mode.replace(/-/g, " ")} ·{" "}
-                              {formatRelativeTime(s.created_at)}
-                            </span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </PanelCard>
-              </div>
-            </section>
-
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-        </div>
+        </section>
       </div>
 
-      {/* Toast notifications */}
-      {toasts.length > 0 && (
-        <div className="fixed bottom-20 right-4 z-50 flex flex-col gap-2 md:bottom-6 md:right-6">
-          {toasts.map((t) => (
+      {toasts.length > 0 ? (
+        <div className="fixed bottom-24 right-4 z-50 flex flex-col gap-2 md:bottom-6 md:right-6">
+          {toasts.map((toast) => (
             <div
-              key={t.id}
-              className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 text-[12px] font-medium shadow-lg backdrop-blur-md ${
-                t.type === "success"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
-                  : t.type === "error"
-                  ? "border-red-200 bg-red-50 text-red-800"
-                  : "border-[var(--card-b)] bg-[hsl(var(--card))] text-[var(--text2)]"
-              }`}
-              style={{ animation: "fadeInUp 0.3s both" }}
+              key={toast.id}
+              className={cn(
+                "flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-[12.5px] font-medium shadow-[var(--shadow-medium)]",
+                toast.type === "success"
+                  ? "border-[rgba(21,128,61,0.25)] bg-[rgba(21,128,61,0.06)] text-[var(--success)]"
+                  : toast.type === "error"
+                    ? "border-[rgba(180,35,24,0.25)] bg-[rgba(180,35,24,0.06)] text-[var(--error)]"
+                    : "border-[var(--line)] bg-[var(--surface)] text-[var(--ink-2)]"
+              )}
             >
-              <span className="flex-1">{t.message}</span>
+              <span className="flex-1">{toast.message}</span>
               <button
-                onClick={() => dismissToast(t.id)}
-                className="flex h-5 w-5 items-center justify-center rounded-md opacity-60 transition-opacity hover:opacity-100"
+                type="button"
+                onClick={() => dismissToast(toast.id)}
+                className="text-current opacity-60 transition-opacity hover:opacity-100"
+                aria-label="Dismiss notification"
               >
-                <X size={12} />
+                <X className="h-3.5 w-3.5" />
               </button>
             </div>
           ))}
         </div>
-      )}
-    </>
+      ) : null}
+    </Page>
   );
 }

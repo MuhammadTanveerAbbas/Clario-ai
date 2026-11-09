@@ -1,5 +1,8 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard
 
-Sitemap: https://clario-summarizer.vercel.app/sitemap.xml
+Sitemap: https://clario-hub.vercel.app/sitemap.xml
+

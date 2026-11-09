@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ArrowUpRight, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface BillingData {
   subscription_tier: "free" | "pro" | "enterprise";
@@ -15,24 +16,22 @@ interface BillingSectionProps {
   profile?: BillingData;
 }
 
-const PLAN_LIMITS = {
-  free: { requests: 100, label: "Free Plan", color: "var(--text3)" },
-  pro: { requests: 1000, label: "Pro Plan", color: "#f59e0b" },
-  enterprise: { requests: 1000, label: "Enterprise", color: "#8b5cf6" },
+const PLANS = {
+  free: { requests: 100, label: "Free plan" },
+  pro: { requests: 1000, label: "Pro plan" },
+  enterprise: { requests: 1000, label: "Enterprise" },
 };
 
 export function BillingSection({ profile }: BillingSectionProps) {
-  const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const router = useRouter();
   const { toast } = useToast();
 
   const tier = (profile?.subscription_tier || "free") as
     | "free"
     | "pro"
     | "enterprise";
-  const plan = PLAN_LIMITS[tier];
+  const plan = PLANS[tier];
   const isPaid = tier !== "free";
   const isActive = profile?.subscription_status === "active";
 
@@ -44,13 +43,13 @@ export function BillingSection({ profile }: BillingSectionProps) {
       })
     : isPaid
       ? "Contact support"
-      : "";
+      : "Not applicable";
 
   const handleManageBilling = async () => {
     setPortalLoading(true);
     try {
-      const res = await fetch("/api/stripe/portal", { method: "POST" });
-      const data = await res.json();
+      const response = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await response.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -60,8 +59,8 @@ export function BillingSection({ profile }: BillingSectionProps) {
           description: data.error || "Failed to open billing portal.",
         });
       }
-    } catch (e) {
-      console.error('[Billing] Failed to open portal:', e);
+    } catch (error) {
+      console.error("[Billing] Failed to open portal:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -75,12 +74,12 @@ export function BillingSection({ profile }: BillingSectionProps) {
   const handleUpgrade = async () => {
     setCheckoutLoading(true);
     try {
-      const res = await fetch("/api/stripe/create-checkout", {
+      const response = await fetch("/api/stripe/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: "pro", billing: "monthly" }),
       });
-      const data = await res.json();
+      const data = await response.json();
       if (data.url) {
         window.location.href = data.url;
       } else {
@@ -90,8 +89,8 @@ export function BillingSection({ profile }: BillingSectionProps) {
           description: data.error || "Could not start checkout.",
         });
       }
-    } catch (e) {
-      console.error('[Billing] Checkout failed:', e);
+    } catch (error) {
+      console.error("[Billing] Checkout failed:", error);
       toast({
         variant: "destructive",
         title: "Checkout failed",
@@ -103,216 +102,93 @@ export function BillingSection({ profile }: BillingSectionProps) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <style>{`.billing-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}@media(max-width:380px){.billing-stats{grid-template-columns:1fr}}.billing-actions{display:flex;gap:10px;flex-wrap:wrap}.billing-actions button{flex:1;min-width:120px}`}</style>
-      <div
-        style={{
-          padding: "24px",
-          background: "hsl(var(--card))",
-          border: "1px solid var(--card-b)",
-          borderRadius: 14,
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: 120,
-            height: 120,
-            background: isPaid
-              ? "radial-gradient(circle, rgba(245,158,11,.12) 0%, transparent 70%)"
-              : "radial-gradient(circle, rgba(249,115,22,.08) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            marginBottom: 20,
-            gap: 12,
-          }}
-        >
+    <div className="space-y-4">
+      <section className="surface">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--line)] px-5 py-4 sm:px-6">
           <div>
-            <div
-              style={{
-                fontSize: ".9rem",
-                color: "var(--text)",
-                fontWeight: 500,
-                marginBottom: 4,
-              }}
-            >
-              Current Plan
-            </div>
-            <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>
-              Your active subscription details
-            </div>
-          </div>
-          <span
-            style={{
-              padding: "4px 12px",
-              borderRadius: 20,
-              fontSize: ".75rem",
-              fontWeight: 700,
-              letterSpacing: ".04em",
-              textTransform: "uppercase",
-              background: isPaid ? "rgba(245,158,11,.15)" : "var(--bg3)",
-              color: plan.color,
-              border: `1px solid ${isPaid ? "rgba(245,158,11,.3)" : "hsl(var(--border))"}`,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {plan.label}
-          </span>
-        </div>
-
-        <div className="billing-stats">
-          <div
-            style={{
-              padding: "16px",
-              background: "var(--bg2)",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 10,
-            }}
-          >
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: 700,
-                color: "var(--text)",
-                marginBottom: 4,
-              }}
-            >
-              {plan.requests.toLocaleString()}
-            </div>
-            <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>
-              AI Requests / month
-            </div>
-          </div>
-          <div
-            style={{
-              padding: "16px",
-              background: "var(--bg2)",
-              border: "1px solid hsl(var(--border))",
-              borderRadius: 10,
-            }}
-          >
-            <div
-              style={{
-                fontSize: "1.5rem",
-                fontWeight: 700,
-                color: isActive ? "var(--success)" : "var(--text3)",
-                marginBottom: 4,
-              }}
-            >
-              {isPaid ? (isActive ? "Active" : "Canceled") : "Free"}
-            </div>
-            <div style={{ fontSize: ".75rem", color: "var(--text3)" }}>
-              Status
-            </div>
-          </div>
-        </div>
-
-        <div className="billing-actions">
-          {isPaid && (
-            <button
-              onClick={handleManageBilling}
-              disabled={portalLoading}
-              style={{
-                flex: 1,
-                padding: "10px 16px",
-                background: "hsl(var(--accent))",
-                color: "#fff",
-                border: "none",
-                borderRadius: 9,
-                fontSize: ".84rem",
-                fontWeight: 600,
-                cursor: portalLoading ? "not-allowed" : "pointer",
-                fontFamily: "inherit",
-                opacity: portalLoading ? 0.7 : 1,
-              }}
-            >
-              {portalLoading ? "Opening..." : "Manage Billing"}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {!isPaid && (
-        <div
-          style={{
-            padding: "24px",
-            background: "hsl(var(--card))",
-            border: "1px solid var(--card-b)",
-            borderRadius: 14,
-          }}
-        >
-          <div style={{ marginBottom: 12 }}>
-            <div
-              style={{
-                fontSize: ".95rem",
-                fontWeight: 600,
-                color: "var(--text)",
-                marginBottom: 6,
-              }}
-            >
-              Upgrade to Pro
-            </div>
-            <p style={{ fontSize: ".84rem", color: "var(--text3)", lineHeight: 1.6 }}>
-              Unlock unlimited summaries, Remix Studio, AI chat, and brand voice
-              tools. Free plan includes {plan.requests} AI requests per month.
+            <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+              Current plan
+            </h3>
+            <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+              Your active subscription details.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={handleUpgrade}
-            disabled={checkoutLoading}
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              background: "hsl(var(--accent))",
-              color: "#fff",
-              border: "none",
-              borderRadius: 9,
-              fontSize: ".88rem",
-              fontWeight: 600,
-              cursor: checkoutLoading ? "not-allowed" : "pointer",
-              opacity: checkoutLoading ? 0.75 : 1,
-            }}
-          >
-            {checkoutLoading ? "Starting checkout…" : "Upgrade to Pro"}
-          </button>
+          <span className="app-chip app-chip-accent">{plan.label}</span>
         </div>
-      )}
 
-      <div
-        style={{
-          padding: "24px",
-          background: "hsl(var(--card))",
-          border: "1px solid var(--card-b)",
-          borderRadius: 14,
-        }}
-      >
-        <div style={{ marginBottom: 16 }}>
-          <div
-            style={{
-              fontSize: ".9rem",
-              color: "var(--text)",
-              fontWeight: 500,
-              marginBottom: 4,
-            }}
-          >
-            Billing Details
+        <div className="px-5 py-5 sm:px-6">
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--line)]">
+            <div className="bg-[var(--surface)] p-4">
+              <p className="font-serif text-[26px] font-medium leading-none tracking-[-0.03em] text-[var(--ink)]">
+                {plan.requests.toLocaleString()}
+              </p>
+              <p className="mt-1.5 text-[11.5px] text-[var(--ink-3)]">
+                AI requests per month
+              </p>
+            </div>
+            <div className="bg-[var(--surface)] p-4">
+              <p
+                className={
+                  isActive
+                    ? "font-serif text-[26px] font-medium leading-none tracking-[-0.03em] text-[var(--success)]"
+                    : "font-serif text-[26px] font-medium leading-none tracking-[-0.03em] text-[var(--ink-3)]"
+                }
+              >
+                {isPaid ? (isActive ? "Active" : "Canceled") : "Free"}
+              </p>
+              <p className="mt-1.5 text-[11.5px] text-[var(--ink-3)]">Status</p>
+            </div>
           </div>
-          <div style={{ fontSize: ".8rem", color: "var(--text3)" }}>
-            Your subscription and billing information
-          </div>
+
+          {isPaid ? (
+            <Button
+              type="button"
+              className="mt-5"
+              onClick={handleManageBilling}
+              disabled={portalLoading}
+            >
+              <CreditCard className="h-4 w-4" />
+              {portalLoading ? "Opening..." : "Manage billing"}
+            </Button>
+          ) : null}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      </section>
+
+      {!isPaid ? (
+        <section className="surface">
+          <div className="px-5 py-5 sm:px-6">
+            <h3 className="text-[15px] font-semibold text-[var(--ink)]">
+              Upgrade to Pro
+            </h3>
+            <p className="mt-1 max-w-prose text-[12.5px] leading-relaxed text-[var(--ink-3)]">
+              Unlock more summaries, Remix Studio, AI chat, and brand voice
+              tools. The free plan includes {plan.requests} AI requests per
+              month.
+            </p>
+            <Button
+              type="button"
+              className="mt-4 w-full sm:w-auto"
+              onClick={handleUpgrade}
+              disabled={checkoutLoading}
+            >
+              {checkoutLoading ? "Starting checkout..." : "Upgrade to Pro"}
+              <ArrowUpRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="surface">
+        <div className="border-b border-[var(--line)] px-5 py-4 sm:px-6">
+          <h3 className="text-[14px] font-semibold text-[var(--ink)]">
+            Billing details
+          </h3>
+          <p className="mt-0.5 text-[12.5px] text-[var(--ink-3)]">
+            Your subscription and billing information.
+          </p>
+        </div>
+
+        <dl className="divide-y divide-[var(--line)] px-5 sm:px-6">
           {[
             { label: "Next billing date", value: nextBillingDate },
             {
@@ -324,40 +200,29 @@ export function BillingSection({ profile }: BillingSectionProps) {
           ].map((row) => (
             <div
               key={row.label}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 14px",
-                background: "var(--bg2)",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: 9,
-              }}
+              className="flex items-center justify-between gap-4 py-3.5"
             >
-              <span style={{ fontSize: ".83rem", color: "var(--text2)" }}>
-                {row.label}
-              </span>
-              <span
-                style={{
-                  fontSize: ".83rem",
-                  color: row.highlight ? "var(--success)" : "var(--text3)",
-                  fontWeight: row.highlight ? 600 : 400,
-                }}
+              <dt className="text-[12.5px] text-[var(--ink-3)]">{row.label}</dt>
+              <dd
+                className={
+                  row.highlight
+                    ? "text-right text-[12.5px] font-semibold text-[var(--success)]"
+                    : "text-right text-[12.5px] font-medium text-[var(--ink-2)]"
+                }
               >
                 {row.value}
-              </span>
+              </dd>
             </div>
           ))}
-        </div>
-        {isPaid && (
-          <p
-            style={{ fontSize: ".75rem", color: "var(--text3)", marginTop: 12 }}
-          >
-            To update your payment method or cancel, use the Manage Billing
+        </dl>
+
+        {isPaid ? (
+          <p className="border-t border-[var(--line)] px-5 py-4 text-[11.5px] text-[var(--ink-3)] sm:px-6">
+            To update your payment method or cancel, use the Manage billing
             button above.
           </p>
-        )}
-      </div>
+        ) : null}
+      </section>
     </div>
   );
 }

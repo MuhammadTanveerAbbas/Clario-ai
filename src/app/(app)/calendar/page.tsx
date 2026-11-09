@@ -4,7 +4,8 @@ import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoadingPage } from "@/components/ui/loading-page";
-import { TopbarUserMenu } from "@/components/layout/topbar-user-menu";
+import { Button } from "@/components/ui/button";
+import { Page, PageHeader, EmptyState } from "@/components/layout/page";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Plus, X, Trash2, CalendarDays } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,7 @@ interface CalEvent {
 }
 
 const PLATFORMS = ["Twitter", "LinkedIn", "Instagram", "YouTube", "Newsletter", "Podcast", "Blog", "TikTok", "Other"];
-const COLORS = ["hsl(var(--accent))", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
+const COLORS = ["var(--brand)", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
 const STATUSES = ["Draft", "Scheduled", "Published", "Cancelled"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -49,9 +50,9 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
             transition={{ duration: 0.2 }}
             className="flex items-center gap-3 rounded-xl border px-4 py-3 text-[12px] font-medium shadow-lg backdrop-blur-md max-w-[320px]"
             style={{
-              background: "hsl(var(--card))",
-              borderColor: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))",
-              color: "var(--text2)",
+              background: "var(--surface)",
+              borderColor: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--brand)",
+              color: "var(--ink-2)",
             }}
           >
             <span className="flex-1">{t.message}</span>
@@ -75,7 +76,7 @@ function EventPill({ event, onClick }: { event: CalEvent; onClick: (e: React.Mou
     <button
       onClick={onClick}
       className="w-full truncate rounded-md px-2 py-0.5 text-left text-[11px] font-medium text-white transition-opacity hover:opacity-80"
-      style={{ background: event.color || "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+      style={{ background: event.color || "var(--brand)", border: "none", cursor: "pointer" }}
     >
       {event.title}
     </button>
@@ -102,18 +103,18 @@ function DayCell({
     <div
       onClick={() => onAddClick(new Date(dateStr + "T12:00:00"))}
       className={cn(
-        "group relative min-h-[90px] cursor-pointer rounded-xl border p-2 transition-all duration-150 hover:border-[hsl(var(--accent)/0.5)] hover:bg-[hsl(var(--accent)/0.02)]",
+        "group relative min-h-[90px] cursor-pointer rounded-xl border p-2 transition-all duration-150 hover:border-[var(--brand-line)] hover:bg-[var(--surface)]",
         isToday
-          ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent)/0.04)]"
-          : "border-[var(--card-b)] bg-[hsl(var(--card))]"
+          ? "border-[var(--brand)] bg-[var(--brand-soft)]"
+          : "border-[var(--line)] bg-[var(--surface)]"
       )}
     >
       {/* Day number */}
       <div className={cn(
         "mb-1.5 flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-medium transition-colors",
         isToday
-          ? "bg-[hsl(var(--accent))] text-white"
-          : "text-[var(--text3)] group-hover:text-[var(--text2)]"
+          ? "bg-[var(--brand)] text-white"
+          : "text-[var(--ink-3)] group-hover:text-[var(--ink-2)]"
       )}>
         {day}
       </div>
@@ -128,7 +129,7 @@ function DayCell({
           />
         ))}
         {dayEvents.length > 2 && (
-          <span className="px-1 text-[10px] font-medium text-[var(--text3)]">
+          <span className="px-1 text-[10px] font-medium text-[var(--ink-3)]">
             +{dayEvents.length - 2} more
           </span>
         )}
@@ -141,13 +142,13 @@ function DayCell({
 function FormField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-[12px] font-medium text-[var(--text2)]">{label}</label>
+      <label className="text-[12px] font-medium text-[var(--ink-2)]">{label}</label>
       {children}
     </div>
   );
 }
 
-const inputClass = "w-full rounded-xl border border-[var(--card-b)] bg-[hsl(var(--input))] px-3 py-2.5 text-[13px] text-[var(--text)] placeholder-[var(--text3)] transition-colors focus:border-[hsl(var(--accent))] focus:outline-none";
+const inputClass = "w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-[13px] text-[var(--ink)] placeholder-[var(--ink-3)] transition-colors focus:border-[var(--brand)] focus:outline-none";
 
 // ── Event Modal ───────────────────────────────────────────────────────────────
 function EventModal({
@@ -189,18 +190,18 @@ function EventModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed left-1/2 top-1/2 z-50 w-full max-w-[460px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl shadow-2xl"
-            style={{ background: "var(--bg2)", border: "1px solid var(--card-b)" }}
+            className="fixed left-4 right-4 top-1/2 z-50 mx-auto max-h-[calc(100vh-2rem)] w-auto max-w-[460px] -translate-y-1/2 overflow-hidden rounded-2xl shadow-2xl sm:left-1/2 sm:right-auto sm:w-full sm:-translate-x-1/2"
+            style={{ background: "var(--bg2)", border: "1px solid var(--line)" }}
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-[var(--card-b)] px-5 py-4">
-              <h2 className="font-serif text-[18px] font-light text-[var(--text)]">
+            <div className="flex items-center justify-between border-b border-[var(--line)] px-5 py-4">
+              <h2 className="font-serif text-[18px] font-light text-[var(--ink)]">
                 {isEditing ? "Edit event" : "Add event"}
               </h2>
               <button
                 onClick={onClose}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text3)] transition-colors hover:bg-[var(--bg3)] hover:text-[var(--text)]"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--ink-3)] transition-colors hover:bg-[var(--bg3)] hover:text-[var(--ink)]"
                 style={{ border: "none", background: "transparent", cursor: "pointer" }}
               >
                 <X size={14} />
@@ -229,7 +230,7 @@ function EventModal({
                   />
                 </FormField>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <FormField label="Platform">
                     <select
                       value={formData.platform}
@@ -269,8 +270,8 @@ function EventModal({
                         className="h-8 w-8 rounded-lg transition-transform hover:scale-110"
                         style={{
                           background: color,
-                          border: formData.color === color ? "2.5px solid var(--text)" : "2px solid transparent",
-                          outline: formData.color === color ? "2px solid hsl(var(--accent)/0.3)" : "none",
+                          border: formData.color === color ? "2.5px solid var(--ink)" : "2px solid transparent",
+                          outline: formData.color === color ? "2px solid var(--brand-line)" : "none",
                           cursor: "pointer",
                         }}
                       />
@@ -281,7 +282,7 @@ function EventModal({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center gap-2 border-t border-[var(--card-b)] px-5 py-4">
+            <div className="flex items-center gap-2 border-t border-[var(--line)] px-5 py-4">
               {isEditing && onDelete && (
                 <button
                   onClick={onDelete}
@@ -295,7 +296,7 @@ function EventModal({
               <div className="flex flex-1 justify-end gap-2">
                 <button
                   onClick={onClose}
-                  className="rounded-xl border border-[var(--card-b)] px-4 py-2 text-[12px] font-medium text-[var(--text2)] transition-colors hover:bg-[var(--bg3)]"
+                  className="rounded-xl border border-[var(--line)] px-4 py-2 text-[12px] font-medium text-[var(--ink-2)] transition-colors hover:bg-[var(--bg3)]"
                   style={{ cursor: "pointer", background: "transparent" }}
                 >
                   Cancel
@@ -303,7 +304,7 @@ function EventModal({
                 <button
                   onClick={onSave}
                   className="rounded-xl px-5 py-2 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
+                  style={{ background: "var(--brand)", border: "none", cursor: "pointer" }}
                 >
                   {isEditing ? "Update" : "Add event"}
                 </button>
@@ -356,6 +357,7 @@ function CalendarPageInner() {
 
   useEffect(() => {
     if (authLoading || !user) return;
+    // eslint-disable-next-line
     fetchEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, authLoading, year, month]);
@@ -364,6 +366,7 @@ function CalendarPageInner() {
     const content = searchParams?.get("content");
     const platform = searchParams?.get("platform");
     if (content) {
+      // eslint-disable-next-line
       setFormData(p => ({ ...p, content: decodeURIComponent(content), platform: platform || "Other" }));
       setModalOpen(true);
     }
@@ -493,67 +496,45 @@ function CalendarPageInner() {
     <>
       <ToastContainer toasts={toasts} dismiss={dismissToast} />
 
-      <div className="flex min-h-screen flex-col bg-[var(--bg)]">
-        {/* Topbar */}
-        <div
-          className="sticky top-0 z-40 flex h-[52px] items-center gap-3 border-b px-4 sm:px-6"
-          style={{
-            background: "var(--glass)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            borderColor: "hsl(var(--border))",
-          }}
-        >
-          <CalendarDays size={15} style={{ color: "hsl(var(--accent))", flexShrink: 0 }} />
-          <span className="flex-1 text-[14px] font-semibold text-[var(--text)]">Calendar</span>
-          <TopbarUserMenu />
+      <Page wide>
+        <PageHeader
+          title="Calendar"
+          description="Plan and track every post across every platform in one place."
+          actions={
+            <Button onClick={() => openAddModal()}>
+              <Plus className="h-4 w-4" />
+              Add event
+            </Button>
+          }
+        />
+
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={prevMonth}
+            aria-label="Previous month"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={goToday}>
+            Today
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={nextMonth}
+            aria-label="Next month"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <h2 className="ml-1 font-serif text-[20px] font-medium leading-none tracking-[-0.01em] text-[var(--ink)]">
+            {MONTHS[month]}{" "}
+            <span className="text-[var(--ink-3)]">{year}</span>
+          </h2>
         </div>
 
-        {/* Content */}
-        <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-6 px-4 py-6 sm:px-6 lg:px-8">
-
-          {/* Header row */}
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <h1 className="font-serif text-2xl font-light text-[var(--text)]">
-                {MONTHS[month]}{" "}
-                <span className="text-[var(--text3)]">{year}</span>
-              </h1>
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={prevMonth}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] text-[var(--text3)] transition-all hover:border-[var(--border2)] hover:text-[var(--text2)]"
-                style={{ cursor: "pointer" }}
-              >
-                <ChevronLeft size={15} />
-              </button>
-              <button
-                onClick={goToday}
-                className="flex h-9 items-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] px-3.5 text-[12px] font-medium text-[var(--text2)] transition-all hover:border-[var(--border2)]"
-                style={{ cursor: "pointer" }}
-              >
-                Today
-              </button>
-              <button
-                onClick={nextMonth}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[var(--card-b)] bg-[hsl(var(--card))] text-[var(--text3)] transition-all hover:border-[var(--border2)] hover:text-[var(--text2)]"
-                style={{ cursor: "pointer" }}
-              >
-                <ChevronRight size={15} />
-              </button>
-              <button
-                onClick={() => openAddModal()}
-                className="flex h-9 items-center gap-1.5 rounded-xl px-4 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
-              >
-                <Plus size={14} />
-                Add event
-              </button>
-            </div>
-          </div>
-
-          {/* Calendar grid */}
+        {/* Calendar grid */}
           <div className="overflow-x-auto">
             <div className="min-w-[560px]">
               {/* Day headers */}
@@ -561,7 +542,7 @@ function CalendarPageInner() {
                 {DAYS.map(day => (
                   <div
                     key={day}
-                    className="py-1 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--text3)]"
+                    className="py-1 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--ink-3)]"
                   >
                     {day}
                   </div>
@@ -574,7 +555,7 @@ function CalendarPageInner() {
                   {Array.from({ length: 35 }).map((_, i) => (
                     <div
                       key={i}
-                      className="min-h-[90px] animate-pulse rounded-xl border border-[var(--card-b)] bg-[var(--bg3)]"
+                      className="min-h-[90px] animate-pulse rounded-xl border border-[var(--line)] bg-[var(--bg3)]"
                       style={{ animationDelay: `${(i % 7) * 0.04}s` }}
                     />
                   ))}
@@ -608,35 +589,22 @@ function CalendarPageInner() {
             </div>
           </div>
 
-          {/* Empty state */}
-          {!loading && events.length === 0 && (
-            <div className="flex flex-col items-center gap-4 py-16 text-center">
-              <div
-                className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
-                style={{ background: "var(--bg3)" }}
-              >
-                📅
-              </div>
-              <div>
-                <h2 className="font-serif text-xl font-light text-[var(--text)]">
-                  Your content schedule, at a glance
-                </h2>
-                <p className="mt-1 text-[13px] text-[var(--text3)]">
-                  Plan and track every post across every platform in one place
-                </p>
-              </div>
-              <button
-                onClick={() => openAddModal()}
-                className="flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-                style={{ background: "hsl(var(--accent))", border: "none", cursor: "pointer" }}
-              >
-                <Plus size={15} />
+        {/* Empty state */}
+        {!loading && events.length === 0 && (
+          <EmptyState
+            icon={CalendarDays}
+            title="Your content schedule, at a glance"
+            description="Plan and track every post across every platform in one place."
+            action={
+              <Button onClick={() => openAddModal()}>
+                <Plus className="h-4 w-4" />
                 Add your first event
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+              </Button>
+            }
+            className="mt-6"
+          />
+        )}
+      </Page>
 
       {/* Event modal */}
       <EventModal

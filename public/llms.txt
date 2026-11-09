@@ -1,0 +1,28 @@
+# Clario
+
+> Clario is an AI content workspace for creators and teams to summarize, remix, chat, and manage brand voice.
+
+## What Clario does
+- Summarizer: turn articles, text, URLs, and YouTube videos into structured summaries with multiple modes.
+- Remix Studio: repurpose one piece of content into platform-native formats (e.g. posts, threads, scripts, outlines).
+- AI Chat: creator-focused chat with conversation history.
+- Brand Voice: save and apply a consistent voice across outputs.
+- Dashboard: track usage, summaries, remixes, chats, comments, repurposes, and recent activity.
+- Calendar, history, templates, queue, and toolkit utilities for content workflows.
+
+## Plans
+- Free: limited monthly requests (see pricing).
+- Pro: higher limits and priority processing (see pricing).
+
+## Key pages
+- Home: https://clario-hub.vercel.app/
+- Pricing: https://clario-hub.vercel.app/pricing
+- Privacy: https://clario-hub.vercel.app/privacy
+- Terms: https://clario-hub.vercel.app/terms
+- Refund: https://clario-hub.vercel.app/refund
+
+## Technical notes
+- Built with Next.js (App Router), TypeScript, Supabase, and Stripe.
+- Authenticated app areas require sign-in; public marketing pages are indexable.
+- Support: muhammadtanveerabbas.contact@gmail.com
+- X: https://x.com/m_tanveerabbas

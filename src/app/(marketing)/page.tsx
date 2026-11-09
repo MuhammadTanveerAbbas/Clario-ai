@@ -22,7 +22,12 @@ function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   useEffect(() => {
-    const obs = new IntersectionObserver(([e]) => { setInView(e.isIntersecting); }, { threshold });
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setInView(true);
+        obs.disconnect();
+      }
+    }, { threshold });
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, [threshold]);
@@ -30,10 +35,12 @@ function useInView(threshold = 0.15) {
 }
 
 const HM_TABS = [
+  { id: "dashboard", label: "Dashboard", hint: "Stats and usage in one view", icon: "chart" },
   { id: "sum", label: "Summarizer", hint: "Long content into a short brief", icon: "doc" },
-  { id: "remix", label: "Remix", hint: "One idea into ten formats", icon: "remix" },
+  { id: "remix", label: "Remix", hint: "One idea into platform formats", icon: "remix" },
   { id: "chat", label: "Chat", hint: "Ask about your content", icon: "chat" },
   { id: "voice", label: "Brand voice", hint: "Tone that stays consistent", icon: "heart" },
+  { id: "tools", label: "Tools", hint: "Plan, write, and organize", icon: "grid" },
 ];
 
 const HM_FORMATS = [
@@ -108,6 +115,8 @@ function HmIcon({ name, size = 15 }: { name: string; size?: number }) {
     camera: <><rect x="3" y="7" width="18" height="13" rx="3" /><path d="M8.5 7l1.4-2.4h4.2L15.5 7" /><circle cx="12" cy="13.5" r="3.4" /></>,
     send: <><path d="M21.5 3.5L2.8 10.2l7.4 2.6 2.6 7.4z" /><path d="M21.5 3.5l-11.3 9.3" /></>,
     bolt: <path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z" />,
+    chart: <><path d="M4 20h16" /><rect x="6" y="10" width="3" height="7" rx="1" /><rect x="10.5" y="6" width="3" height="11" rx="1" /><rect x="15" y="13" width="3" height="4" rx="1" /></>,
+    grid: <><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></>,
   };
   return (
     <svg
@@ -125,6 +134,40 @@ function HmIcon({ name, size = 15 }: { name: string; size?: number }) {
       {p[name] ?? p.doc}
     </svg>
   );
+}
+
+function ToolMark({ name }: { name: string }) {
+  const c = { width: 30, height: 30, viewBox: "0 0 32 32", fill: "none", "aria-hidden": true, focusable: "false" as const };
+  const Tile = ({ top, front, side }: { top: string; front: string; side: string }) => (
+    <>
+      <path d="M6 11.5L16 6.5l10 5v9.5l-10 5-10-5z" fill={side} />
+      <path d="M6 11.5l10 5v9.5l-10-5z" fill={front} />
+      <path d="M16 6.5l10 5-10 5-10-5z" fill={top} />
+      <path d="M16 16.5v9.5M6 11.5l10 5 10-5" stroke="rgba(28,25,23,.1)" strokeWidth=".6" />
+    </>
+  );
+  const marks: Record<string, React.ReactNode> = {
+    summarizer: <svg {...c}><Tile top="#FDBA74" front="#F97316" side="#EA580C" /><path d="M12 13.5h8M12 16h8M12 18.5h5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" /></svg>,
+    remix: <svg {...c}><Tile top="#FDE68A" front="#F59E0B" side="#D97706" /><path d="M12.5 15.5h7M16 12v7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" /><circle cx="20" cy="19.5" r="2" fill="#fff" fillOpacity=".9" /></svg>,
+    chat: <svg {...c}><Tile top="#7DD3FC" front="#0EA5E9" side="#0284C7" /><path d="M11.5 14h9M11.5 17h6" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" /><path d="M19.5 19.5l2 1.5v-2.5" fill="#fff" fillOpacity=".85" /></svg>,
+    brand: <svg {...c}><Tile top="#FDA4AF" front="#F43F5E" side="#E11D48" /><circle cx="16" cy="15.5" r="4" stroke="#fff" strokeWidth="1.6" /><circle cx="16" cy="15.5" r="1.4" fill="#fff" /></svg>,
+    comment: <svg {...c}><Tile top="#C4B5FD" front="#8B5CF6" side="#7C3AED" /><path d="M11.5 14h9M11.5 17h5.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" /></svg>,
+    repurpose: <svg {...c}><Tile top="#99F6E4" front="#14B8A6" side="#0D9488" /><path d="M12 15.5h8M12 15.5l2-2M12 15.5l2 2M20 18h-8M20 18l-2-2M20 18l-2 2" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+    youtube: <svg {...c}><Tile top="#FCA5A5" front="#EF4444" side="#DC2626" /><path d="M14 13.5v5l4.5-2.5-4.5-2.5z" fill="#fff" /></svg>,
+    memory: <svg {...c}><Tile top="#86EFAC" front="#22C55E" side="#16A34A" /><path d="M13 14.5h2.5a2 2 0 010 4H13v-5.5h2.2a1.7 1.7 0 010 3.4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /><circle cx="19.5" cy="13.5" r="1.2" fill="#fff" /></svg>,
+    history: <svg {...c}><Tile top="#D6D3D1" front="#78716C" side="#57534E" /><path d="M16 13v3.2l2.2 1.3" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /><path d="M11.8 17.2a4.6 4.6 0 114.2-6.4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>,
+    stats: <svg {...c}><Tile top="#FED7AA" front="#FB923C" side="#EA580C" /><path d="M12 19v-3M16 19v-5.5M20 19v-8" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" /></svg>,
+    usage: <svg {...c}><Tile top="#BAE6FD" front="#38BDF8" side="#0284C7" /><path d="M11.5 18l3-3.5 2.5 2 3.5-4.5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+    recent: <svg {...c}><Tile top="#DDD6FE" front="#A78BFA" side="#7C3AED" /><path d="M12 13.5h8M12 16h8M12 18.5h4.5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" /></svg>,
+    plan: <svg {...c}><Tile top="#BBF7D0" front="#4ADE80" side="#16A34A" /><path d="M12 14.5h8M12 17.5h5" stroke="#fff" strokeWidth="1.7" strokeLinecap="round" /><path d="M18.5 17.5l1.2 1.2 2.3-2.4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>,
+    calendar: <svg {...c}><Tile top="#BFDBFE" front="#60A5FA" side="#2563EB" /><path d="M12 13.5h8M13.5 11.5v2M18.5 11.5v2" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /><rect x="12.5" y="15.2" width="2.6" height="2.6" rx=".6" fill="#fff" /><rect x="16.2" y="15.2" width="2.6" height="2.6" rx=".6" fill="#fff" fillOpacity=".75" /></svg>,
+    templates: <svg {...c}><Tile top="#FECDD3" front="#FB7185" side="#E11D48" /><rect x="12" y="13" width="3.5" height="3" rx=".7" fill="#fff" /><rect x="16.5" y="13" width="3.5" height="3" rx=".7" fill="#fff" fillOpacity=".75" /><path d="M12 17.8h8M12 19.6h5.5" stroke="#fff" strokeWidth="1.3" strokeLinecap="round" /></svg>,
+    queue: <svg {...c}><Tile top="#FDE68A" front="#FBBF24" side="#D97706" /><path d="M13 13.8h7M13 16.2h7M13 18.6h4.5" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" /><circle cx="11.3" cy="13.8" r="1" fill="#fff" /><circle cx="11.3" cy="16.2" r="1" fill="#fff" /><circle cx="11.3" cy="18.6" r="1" fill="#fff" /></svg>,
+    angle: <svg {...c}><Tile top="#99F6E4" front="#2DD4BF" side="#0D9488" /><path d="M16 12.2l1.4 2.8 3.1.4-2.2 2.1.6 3-2.9-1.5-2.9 1.5.6-3-2.2-2.1 3.1-.4z" fill="#fff" /></svg>,
+    bio: <svg {...c}><Tile top="#C7D2FE" front="#818CF8" side="#4F46E5" /><circle cx="16" cy="14.2" r="2.2" fill="#fff" /><path d="M12 19.8c0-2.2 1.8-3.6 4-3.6s4 1.4 4 3.6" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" /></svg>,
+    hook: <svg {...c}><Tile top="#FED7AA" front="#FB923C" side="#EA580C" /><path d="M15.2 12.2l-3 4.4h3.4l-.8 4.2 4.2-5.3h-3.2l1.2-3.3h-1.8z" fill="#fff" /></svg>,
+  };
+  return marks[name] ?? marks.summarizer;
 }
 
 function HeroMockup() {
@@ -149,16 +192,10 @@ function HeroMockup() {
   const reduceMotion =
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Keep the hero infographic visible; users can switch tabs manually.
   useEffect(() => {
-    if (!inView || paused || reduceMotion) return;
-    const t = setInterval(() => setTab((i) => (i + 1) % HM_TABS.length), 5200);
-    return () => clearInterval(t);
-  }, [inView, paused, reduceMotion]);
-
-  // Resume auto-play whenever the mockup scrolls back into view
-  useEffect(() => {
-    if (inView) { const t = setTimeout(() => setPaused(false), 0); return () => clearTimeout(t); }
-  }, [inView]);
+    setPaused(true);
+  }, []);
 
   useEffect(() => {
     if (!inView || reduceMotion) return;
@@ -185,7 +222,7 @@ function HeroMockup() {
   }, []);
 
   useEffect(() => {
-    if (!inView || tab !== 2) return;
+    if (!inView || tab !== 3) return;
     const q = HM_PROMPTS[0];
     const t = setTimeout(() => {
       setPrompt([{ q, a: null }]);
@@ -214,16 +251,12 @@ function HeroMockup() {
     <div
       ref={ref}
       className={`hm${inView ? " hm-on" : ""}`}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocus={() => setPaused(true)}
-      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setPaused(false); }}
     >
       <div className="hm-bar">
         <span className="hm-dots" aria-hidden="true">
           <i style={{ background: "#ff5f57" }} /><i style={{ background: "#ffbd2e" }} /><i style={{ background: "#28c840" }} />
         </span>
-        <span className="hm-url">app.clario.ai/{HM_TABS[tab].id === "voice" ? "settings" : HM_TABS[tab].id}</span>
+        <span className="hm-url">app.clario.ai/{HM_TABS[tab].id === "voice" ? "settings" : HM_TABS[tab].id === "sum" ? "summarizer" : HM_TABS[tab].id}</span>
       </div>
 
       <div className="hm-main">
@@ -255,6 +288,37 @@ function HeroMockup() {
 
           {tab === 0 && (
             <div className="hm-panel" role="tabpanel" id="hm-panel-0" aria-labelledby="hm-tab-0">
+              <div className="hm-dash-grid">
+                <div className="hm-dash-card"><b>24</b><span>Summaries</span></div>
+                <div className="hm-dash-card"><b>18</b><span>AI chats</span></div>
+                <div className="hm-dash-card"><b>31</b><span>Remixes</span></div>
+                <div className="hm-dash-card"><b>3</b><span>Brand voices</span></div>
+                <div className="hm-dash-card"><b>12</b><span>Comments</span></div>
+                <div className="hm-dash-card"><b>9</b><span>Repurposes</span></div>
+              </div>
+              <div className="hm-dash-wide">
+                <div className="hm-card" style={{ margin: 0 }}>
+                  <p className="hm-eyebrow">Usage this month</p>
+                  <p className="hm-input" style={{ marginTop: 4 }}><b style={{ color: "#1c1917", fontFamily: "var(--serif)", fontSize: 18, fontWeight: 500 }}>47</b> <span style={{ color: "#78716c" }}>requests used · 53 left</span></p>
+                  <div className="hm-mini-bars" aria-hidden="true">
+                    <i style={{ height: "28%" }} /><i style={{ height: "44%" }} /><i style={{ height: "36%" }} /><i style={{ height: "62%" }} className="is-hi" /><i style={{ height: "52%" }} /><i style={{ height: "70%" }} className="is-hi" /><i style={{ height: "48%" }} />
+                  </div>
+                </div>
+                <div className="hm-card" style={{ margin: 0 }}>
+                  <p className="hm-eyebrow">Plan and activity</p>
+                  <p className="hm-input" style={{ marginTop: 4 }}>Free plan · all stats in one view</p>
+                  <div className="hm-keys" style={{ marginTop: 10 }}>
+                    <span className="hm-key">Usage over time</span>
+                    <span className="hm-key">Feature mix</span>
+                    <span className="hm-key">Recent summaries</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 1 && (
+            <div className="hm-panel" role="tabpanel" id="hm-panel-1" aria-labelledby="hm-tab-1">
               <div className="hm-card">
                 <p className="hm-eyebrow">YouTube URL or paste text</p>
                 <p className="hm-input">Just finished recording my deep dive on content strategy for creators. Covered ideation, distribution, monetization...</p>
@@ -302,8 +366,8 @@ function HeroMockup() {
             </div>
           )}
 
-          {tab === 1 && (
-            <div className="hm-panel" role="tabpanel" id="hm-panel-1" aria-labelledby="hm-tab-1">
+          {tab === 2 && (
+            <div className="hm-panel" role="tabpanel" id="hm-panel-2" aria-labelledby="hm-tab-2">
               <div className="hm-rows-wrap">
                 <div
                   className="hm-rows"
@@ -348,8 +412,8 @@ function HeroMockup() {
             </div>
           )}
 
-          {tab === 2 && (
-            <div className="hm-panel" role="tabpanel" id="hm-panel-2" aria-labelledby="hm-tab-2">
+          {tab === 3 && (
+            <div className="hm-panel" role="tabpanel" id="hm-panel-3" aria-labelledby="hm-tab-3">
               <div className="hm-chat">
                 <div className="hm-msg is-user"><p className="hm-bubble">What should my Q1 content strategy be?</p></div>
                 <div className="hm-msg"><p className="hm-bubble is-ai">Anchor on long form YouTube, then repurpose each video into a thread and a newsletter. Two anchor pieces a month are enough to fill every channel.</p></div>
@@ -372,8 +436,8 @@ function HeroMockup() {
             </div>
           )}
 
-          {tab === 3 && (
-            <div className="hm-panel" role="tabpanel" id="hm-panel-3" aria-labelledby="hm-tab-3">
+          {tab === 4 && (
+            <div className="hm-panel" role="tabpanel" id="hm-panel-4" aria-labelledby="hm-tab-4">
               <div className="hm-card">
                 <p className="hm-eyebrow">Your brand voice</p>
                 {HM_VOICE.map((v) => (
@@ -403,6 +467,31 @@ function HeroMockup() {
                     <span key={u} className="hm-key" style={{ color: "var(--g5)", background: "var(--w)", borderColor: "var(--g2)" }}>{u}</span>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {tab === 5 && (
+            <div className="hm-panel" role="tabpanel" id="hm-panel-5" aria-labelledby="hm-tab-5">
+              <div className="hm-tool-grid">
+                {[
+                  ["Calendar", "Plan posts across platforms."],
+                  ["Templates", "Reusable prompts and outlines."],
+                  ["Queue", "Manage your publishing flow."],
+                  ["Comment Generator", "Platform-ready comments."],
+                  ["Repurpose", "Turn content into new formats."],
+                  ["YouTube summarizer", "Summaries from video links."],
+                  ["Angle Finder", "Fresh angles for ideas."],
+                  ["Bio Builder", "Clear, on-brand bios."],
+                  ["Hook Generator", "Strong openings for posts."],
+                  ["AI Memory", "Context that stays useful."],
+                  ["History", "Revisit past work quickly."],
+                ].map(([t, d]) => (
+                  <div key={t} className="hm-tool">
+                    <b>{t}</b>
+                    <span>{d}</span>
+                  </div>
+                ))}
               </div>
             </div>
           )}
@@ -458,7 +547,7 @@ const remixFormats = [
         @media(max-width:860px){.hero{padding-top:44px;gap:34px}}
         @media(max-width:480px){.hero{padding:24px 2% 48px;gap:28px}}
         @media(max-width:360px){.hero{padding:20px 0 40px}}
-        .h-badge{display:inline-flex;align-items:center;gap:8px;position:relative;background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 60%,#fed7aa 100%);border:1px solid #fdba74;color:#c2410c;font-size:.7rem;font-weight:700;padding:6px 16px 6px 10px;border-radius:100px;margin-bottom:22px;letter-spacing:.06em;text-transform:uppercase;animation:fu .6s ease both;box-shadow:0 2px 12px -4px rgba(249,115,22,.35),0 1px 0 0 rgba(255,255,255,.8) inset,0 -1px 0 0 rgba(249,115,22,.15) inset;overflow:hidden}
+        .h-badge{display:inline-flex;align-items:center;gap:8px;position:relative;background:linear-gradient(135deg,#fff7ed 0%,#ffedd5 60%,#fed7aa 100%);border:1px solid #fdba74;color:#ea580c;font-size:.7rem;font-weight:700;padding:6px 16px 6px 10px;border-radius:100px;margin-bottom:22px;letter-spacing:.06em;text-transform:uppercase;animation:fu .6s ease both;box-shadow:0 2px 12px -4px rgba(249,115,22,.35),0 1px 0 0 rgba(255,255,255,.8) inset,0 -1px 0 0 rgba(249,115,22,.15) inset;overflow:hidden}
         .h-badge-icon{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#ffedd5 100%);border:1px solid #fdba74;box-shadow:0 2px 6px -2px rgba(249,115,22,.4),0 1px 2px rgba(0,0,0,.06);flex-shrink:0;position:relative;z-index:1}
         .h-badge-text{position:relative;z-index:1}
         .h-badge-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.5) 0%,transparent 70%);pointer-events:none}
@@ -479,14 +568,21 @@ const remixFormats = [
         @media(max-width:420px){.h-ctas{justify-content:center}.btn-p{width:100%;justify-content:center}}
 
         .b-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
-        @media(max-width:860px){.b-grid>*{grid-column:span 12!important}}
+        @media(max-width:1024px){.b-grid>*{grid-column:span 6!important}}
+        @media(max-width:640px){.b-grid>*{grid-column:span 12!important}}
         .b-card{background:var(--w);border-radius:18px;border:1px solid var(--g2);overflow:hidden;transition:transform .25s,box-shadow .25s;display:flex;flex-direction:column}
         .b-card:hover{transform:translateY(-4px);box-shadow:0 14px 44px rgba(0,0,0,.08)}
         .b-in{padding:28px}
-        .b-tag{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#c2410c;margin-bottom:10px}
+        @media(max-width:640px){.b-in{padding:20px}}
+        .b-tag{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#ea580c;margin-bottom:10px}
         .b-title{font-family:var(--serif);font-size:1.42rem;font-weight:300;letter-spacing:-.03em;line-height:1.2;color:var(--bk);margin-bottom:8px}
         .b-title em{font-style:italic;color:var(--o)}
         .b-desc{font-size:.88rem;color:var(--g5);line-height:1.7}
+        .b-tool-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;min-width:0}
+        .b-tool-icon{width:48px;height:48px;flex:0 0 48px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(28,25,23,.06)}
+        .b-tool-icon svg{width:30px;height:30px;display:block;flex-shrink:0}
+        .b-tool-title{font-family:var(--serif);font-size:1.06rem;font-weight:500;letter-spacing:-.02em;line-height:1.2;color:var(--bk);margin:0;min-width:0}
+        @media(max-width:640px){.b-tool-head{gap:10px;align-items:flex-start}.b-tool-icon{width:44px;height:44px;flex-basis:44px;border-radius:11px}.b-tool-icon svg{width:28px;height:28px}.b-tool-title{font-size:1rem;padding-top:2px}}
         .b-formats{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 28px 28px;flex:1;grid-auto-rows:1fr}
         @media(max-width:520px){.b-formats{grid-auto-rows:auto}}
         .b-modes{display:flex;flex-direction:column;gap:6px;margin-top:auto}
@@ -625,7 +721,7 @@ const remixFormats = [
         @media(max-width:360px){.sec{padding:32px 0}}
         .sec-w{max-width:1060px;margin:0 auto}
         .sec-h{text-align:center;margin-bottom:44px}
-        .s-tag{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#c2410c;margin-bottom:10px}
+        .s-tag{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#ea580c;margin-bottom:10px}
         .s-title{font-family:var(--serif);font-size:clamp(1.55rem,3.2vw,2.8rem);font-weight:300;letter-spacing:-.03em;line-height:1.1;color:var(--bk);margin-bottom:8px}
         .s-title em{font-style:italic;color:var(--o)}
         .s-sub{font-size:.93rem;color:var(--g5);line-height:1.7;max-width:440px;margin:0 auto}
@@ -641,72 +737,72 @@ const remixFormats = [
         @media(max-width:560px){.hm-scale{--s:.54}.hero-visual{padding-bottom:12px}}
         @media(max-width:420px){.hm-scale{--s:.46}.hero-visual{padding-bottom:8px}}
         @media(max-width:340px){.hm-scale{--s:.4}.hero-visual{padding-bottom:4px}}
-        .hm{width:680px;height:506px;background:var(--w);border:1px solid var(--g2);border-radius:18px;box-shadow:0 1px 1px rgba(28,25,23,.03),0 8px 20px -12px rgba(28,25,23,.18),0 34px 60px -30px rgba(28,25,23,.34);overflow:hidden;opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.3,1)}
+        .hm{width:760px;height:568px;background:var(--w);border:1px solid #e2ded8;border-radius:16px;box-shadow:0 1px 0 rgba(28,25,23,.04),0 16px 40px -18px rgba(28,25,23,.2);overflow:hidden;opacity:0;transform:translateY(12px);transition:opacity .45s ease,transform .45s ease}
         .hm.hm-on{opacity:1;transform:none}
-        .hm-bar{display:flex;align-items:center;gap:10px;height:40px;padding:0 13px;background:linear-gradient(180deg,#fcfcfb,#f7f6f4);border-bottom:1px solid var(--g2)}
-        .hm-dots{display:flex;gap:5px;flex-shrink:0}
-        .hm-dots i{width:9px;height:9px;border-radius:50%;display:block}
-        .hm-url{flex:1;min-width:0;background:rgba(231,229,228,.55);border:1px solid rgba(231,229,228,.9);border-radius:6px;padding:3px 10px;font-size:10.5px;color:var(--g4);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .hm-main{display:flex;height:424px}
-        .hm-tabs{width:50px;flex-shrink:0;background:var(--g0);border-right:1px solid var(--g2);padding:11px 0;display:flex;flex-direction:column;align-items:center;gap:5px}
-        .hm-tab{position:relative;width:34px;height:34px;border-radius:9px;border:1px solid transparent;background:transparent;color:var(--g4);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease,color .18s ease,border-color .18s ease,box-shadow .18s ease}
-        .hm-tab:hover{background:var(--g1);color:var(--g7)}
-        .hm-tab:focus-visible{outline:2px solid var(--o);outline-offset:1px}
-        .hm-tab.is-active{background:var(--w);border-color:var(--om);color:var(--o);box-shadow:0 2px 6px rgba(249,115,22,.14)}
-        .hm-body{flex:1;min-width:0;padding:13px 15px;display:flex;flex-direction:column}
-        .hm-head{display:flex;align-items:center;gap:9px;margin-bottom:12px;padding-bottom:11px;border-bottom:1px solid var(--g2)}
-        .hm-head-ic{display:flex;width:24px;height:24px;border-radius:7px;background:var(--ol);border:1px solid var(--om);color:var(--o);align-items:center;justify-content:center;flex-shrink:0}
-        .hm-head-t{font-size:12px;font-weight:700;letter-spacing:-.01em;color:var(--bk)}
-        .hm-head-h{font-size:10.5px;color:var(--g4);margin-left:auto;text-align:right}
-        .hm-panel{flex:1;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:11px;animation:hmfade .32s ease both}
-        .hm-card{border:1px solid var(--g2);border-radius:12px;padding:12px;background:var(--g0)}
-        .hm-eyebrow{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--g4)}
-        .hm-eyebrow-o{color:var(--o)}
-        .hm-input{font-size:11.5px;line-height:1.65;color:var(--g5);margin-top:7px}
+        .hm-bar{display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;background:#faf9f7;border-bottom:1px solid #e7e5e4}
+        .hm-dots{display:flex;gap:6px;flex-shrink:0}
+        .hm-dots i{width:10px;height:10px;border-radius:50%;display:block;border:1px solid rgba(28,25,23,.08)}
+        .hm-url{flex:1;min-width:0;background:#fff;border:1px solid #e7e5e4;border-radius:8px;padding:5px 12px;font-size:11.5px;font-weight:500;color:#57534e;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .hm-main{display:flex;height:480px}
+        .hm-tabs{width:56px;flex-shrink:0;background:#fafaf9;border-right:1px solid #e7e5e4;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:6px}
+        .hm-tab{position:relative;width:38px;height:38px;border-radius:10px;border:1px solid transparent;background:transparent;color:#78716c;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s ease,color .15s ease,border-color .15s ease}
+        .hm-tab:hover{background:#f5f5f4;color:#44403c}
+        .hm-tab:focus-visible{outline:2px solid var(--o);outline-offset:2px}
+        .hm-tab.is-active{background:#fff7ed;border-color:#fdba74;color:#ea580c}
+        .hm-body{flex:1;min-width:0;padding:14px 16px;display:flex;flex-direction:column;background:#fff}
+        .hm-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #e7e5e4}
+        .hm-head-ic{display:flex;width:30px;height:30px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;color:#ea580c;align-items:center;justify-content:center;flex-shrink:0}
+        .hm-head-t{font-size:14px;font-weight:700;letter-spacing:-.02em;color:#1c1917}
+        .hm-head-h{font-size:11.5px;color:#78716c;margin-left:auto;text-align:right;line-height:1.3;max-width:240px}
+        .hm-panel{flex:1;min-width:0;min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:8px;animation:hmfade .28s ease both}
+        .hm-card{border:1px solid #e7e5e4;border-radius:12px;padding:10px 12px;background:#fafaf9}
+        .hm-eyebrow{font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:none;color:#78716c}
+        .hm-eyebrow-o{color:#c2410c}
+        .hm-input{font-size:12px;line-height:1.55;color:#57534e;margin-top:6px}
         .hm-chips{display:flex;flex-wrap:wrap;gap:6px}
-        .hm-chip{font-family:inherit;font-size:10.5px;font-weight:600;color:var(--g5);background:var(--w);border:1px solid var(--g2);border-radius:100px;padding:5px 11px;cursor:pointer;transition:color .18s ease,border-color .18s ease,background .18s ease,transform .18s ease}
-        .hm-chip:hover{transform:translateY(-1px);border-color:var(--om);color:var(--bk)}
+        .hm-chip{font-family:inherit;font-size:11px;font-weight:600;color:#57534e;background:#fff;border:1px solid #d6d3d1;border-radius:999px;padding:5px 11px;cursor:pointer;transition:color .15s ease,border-color .15s ease,background .15s ease}
+        .hm-chip:hover{border-color:#fdba74;color:#1c1917}
         .hm-chip:focus-visible{outline:2px solid var(--o);outline-offset:2px}
-        .hm-chip.is-active{background:var(--ol);border-color:var(--o);color:var(--o)}
-        .hm-out{background:linear-gradient(180deg,#fffaf5,#fff7ed);border-color:var(--om);margin-top:auto;box-shadow:0 6px 18px rgba(249,115,22,.1)}
-        .hm-out-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
-        .hm-count{font-size:10px;font-weight:700;color:var(--o)}
-        .hm-out-text{font-size:11.5px;line-height:1.7;color:var(--g7);margin:8px 0 11px}
-        .hm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
-        .hm-stat{background:var(--w);border:1px solid var(--om);border-radius:9px;padding:7px 9px;display:flex;flex-direction:column;gap:2px}
-        .hm-stat-k{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--g4)}
-        .hm-stat-v{font-family:var(--serif);font-size:14px;color:var(--bk)}
-        .hm-keys{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
-        .hm-key{font-size:9.5px;font-weight:600;color:var(--o);background:var(--ol);border:1px solid var(--om);border-radius:100px;padding:3px 9px}
-        .hm-bar-track{height:4px;border-radius:100px;background:#fed7aa;overflow:hidden}
-        .hm-bar-track i{display:block;height:100%;border-radius:100px;background:var(--o);transition:width .12s linear}
+        .hm-chip.is-active{background:#fff7ed;border-color:#f97316;color:#c2410c}
+        .hm-out{background:#fff;border:1px solid #fdba74;margin-top:auto;box-shadow:none}
+        .hm-out-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:2px}
+        .hm-count{font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;border:1px solid #fed7aa;border-radius:999px;padding:2px 8px}
+        .hm-out-text{font-size:12px;line-height:1.6;color:#44403c;margin:8px 0 10px}
+        .hm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+        .hm-stat{background:#fafaf9;border:1px solid #e7e5e4;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:1px}
+        .hm-stat-k{font-size:10px;font-weight:600;color:#78716c}
+        .hm-stat-v{font-family:var(--serif);font-size:16px;font-weight:500;line-height:1.2;color:#1c1917}
+        .hm-keys{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+        .hm-key{font-size:10px;font-weight:600;color:#57534e;background:#f5f5f4;border:1px solid #e7e5e4;border-radius:999px;padding:3px 9px}
+        .hm-bar-track{height:5px;border-radius:999px;background:#f5f5f4;border:1px solid #e7e5e4;overflow:hidden}
+        .hm-bar-track i{display:block;height:100%;border-radius:999px;background:#f97316;transition:width .12s linear}
         .hm-rows-wrap{position:relative;flex:1;min-height:0}
-        .hm-rows-fade{position:absolute;left:0;right:0;bottom:0;height:26px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff);pointer-events:none}
-        .hm-rows{display:flex;flex-direction:column;gap:6px;height:100%;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain;padding-bottom:14px}
+        .hm-rows-fade{position:absolute;left:0;right:0;bottom:0;height:20px;background:#fff;pointer-events:none;opacity:.92}
+        .hm-rows{display:flex;flex-direction:column;gap:6px;height:100%;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain;padding-bottom:10px}
         .hm-rows::-webkit-scrollbar{display:none}
-        .hm-row{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font-family:inherit;padding:7px 11px;border-radius:10px;border:1px solid var(--g2);background:var(--w);cursor:pointer;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease,background .18s ease}
-        .hm-row:hover{transform:translateY(-1px);border-color:var(--om);box-shadow:0 4px 12px rgba(28,25,23,.05)}
+        .hm-row{position:relative;display:flex;align-items:center;gap:10px;width:100%;text-align:left;font-family:inherit;padding:8px 11px;border-radius:10px;border:1px solid #e7e5e4;background:#fff;cursor:pointer;transition:border-color .15s ease,background .15s ease}
+        .hm-row:hover{border-color:#d6d3d1;background:#fafaf9}
         .hm-row:focus-visible{outline:2px solid var(--o);outline-offset:2px}
-        .hm-row.is-active{border-color:var(--om);background:var(--ol);box-shadow:0 4px 14px rgba(249,115,22,.1)}
-        .hm-row.is-active::before{content:"";position:absolute;left:-1px;top:50%;transform:translateY(-50%);width:3px;height:18px;border-radius:100px;background:var(--o)}
-        .hm-row-ic{display:flex;width:23px;height:23px;border-radius:7px;background:var(--w);border:1px solid var(--g2);color:var(--c);align-items:center;justify-content:center;flex-shrink:0}
-        .hm-row.is-active .hm-row-ic{background:var(--w);border-color:var(--om)}
-        .hm-row-n{font-size:11.5px;font-weight:600;color:var(--g7);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .hm-row.is-active .hm-row-n{color:var(--bk);font-weight:700}
-        .hm-row-m{font-size:10px;color:var(--g4);white-space:nowrap}
-        .hm-row.is-active .hm-row-m{color:var(--o)}
-        .hm-note{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--g4)}
-        .hm-note svg{color:var(--o)}
-        .hm-preview{border:1px solid var(--g2);border-radius:12px;padding:11px 12px;background:linear-gradient(180deg,#fff,#fbfaf9);box-shadow:0 4px 14px rgba(28,25,23,.05);animation:hmfade .3s ease both;margin-top:auto}
-        .hm-preview .hm-eyebrow{color:var(--o)}
-        .hm-preview-text{font-size:11px;line-height:1.65;color:var(--g5);margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+        .hm-row.is-active{border-color:#fdba74;background:#fff7ed}
+
+        .hm-row-ic{display:flex;width:24px;height:24px;border-radius:8px;background:#fafaf9;border:1px solid #e7e5e4;color:var(--c);align-items:center;justify-content:center;flex-shrink:0}
+        .hm-row.is-active .hm-row-ic{background:#fff;border-color:#fed7aa}
+        .hm-row-n{font-size:12px;font-weight:600;color:#44403c;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .hm-row.is-active .hm-row-n{color:#1c1917;font-weight:700}
+        .hm-row-m{font-size:10px;color:#78716c;white-space:nowrap}
+        .hm-row.is-active .hm-row-m{color:#c2410c;font-weight:600}
+        .hm-note{display:flex;align-items:center;gap:6px;font-size:11px;color:#78716c}
+        .hm-note svg{color:#f97316}
+        .hm-preview{border:1px solid #e7e5e4;border-radius:12px;padding:12px;background:#fafaf9;box-shadow:none;animation:hmfade .24s ease both;margin-top:auto}
+        .hm-preview .hm-eyebrow{color:#c2410c}
+        .hm-preview-text{font-size:11.5px;line-height:1.6;color:#57534e;margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
         .hm-chat{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;overscroll-behavior:contain}
         .hm-chat::-webkit-scrollbar{display:none}
         .hm-msg{display:flex}
         .hm-msg.is-user{justify-content:flex-end}
         .hm-bubble{max-width:86%;padding:8px 11px;border-radius:12px 12px 12px 3px;background:var(--g1);color:var(--g7);font-size:11px;line-height:1.6;white-space:pre-line}
         .hm-msg.is-user .hm-bubble{background:var(--bk);color:#fff;border-radius:12px 12px 3px 12px}
-        .hm-bubble.is-ai{background:var(--ol);color:var(--g7)}
+        .hm-bubble.is-ai{background:#fff7ed;border:1px solid #fed7aa;color:var(--g7)}
         .hm-typing{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--g4);padding:6px 2px}
         .hm-typing i{width:5px;height:5px;border-radius:50%;background:var(--o);animation:pulse 1.4s infinite}
         .hm-typing i:nth-child(2){animation-delay:.2s}
@@ -730,9 +826,22 @@ const remixFormats = [
         .hm-toggle.is-on .hm-toggle-dot::after{transform:translateX(14px)}
         .hm-toggle-tx{font-size:10.5px;font-weight:600;color:var(--g7)}
         .hm-toggle.is-on .hm-toggle-tx{color:#15803d}
-        .hm-foot{display:flex;align-items:center;gap:10px;height:42px;padding:0 15px;background:linear-gradient(180deg,#17150f,#0c0a09);font-size:11px;color:rgba(255,255,255,.66)}
+        .hm-dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+        .hm-dash-card{border:1px solid #e7e5e4;border-radius:10px;padding:8px 10px;background:#fafaf9;display:flex;flex-direction:column;gap:1px;min-width:0}
+        .hm-dash-card b{font-family:var(--serif);font-size:18px;font-weight:500;line-height:1.1;color:#1c1917}
+        .hm-dash-card span{font-size:10px;font-weight:600;color:#78716c;line-height:1.2}
+        .hm-dash-wide{grid-column:span 3;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+        .hm-mini-bars{display:flex;align-items:flex-end;gap:3px;height:36px;margin-top:6px}
+        .hm-mini-bars i{flex:1;border-radius:4px 4px 0 0;background:#fed7aa;border:1px solid #fdba74;border-bottom:0;display:block}
+        .hm-mini-bars i.is-hi{background:#f97316;border-color:#ea580c}
+        .hm-tool-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;flex:1;min-height:0;align-content:start;overflow-y:auto;scrollbar-width:none;padding-bottom:2px}
+        .hm-tool-grid::-webkit-scrollbar{display:none}
+        .hm-tool{border:1px solid #e7e5e4;border-radius:10px;padding:9px 10px;background:#fff;display:flex;flex-direction:column;gap:1px}
+        .hm-tool b{font-size:12px;font-weight:700;color:#1c1917;line-height:1.2}
+        .hm-tool span{font-size:10.5px;color:#78716c;line-height:1.3}
+        .hm-foot{display:flex;align-items:center;gap:10px;height:44px;padding:0 15px;background:#1c1917;border-top:1px solid #292524;font-size:11.5px;color:rgba(255,255,255,.72)}
         .hm-foot b{color:#fff;font-weight:600}
-        .hm-foot-line{flex:1;height:1px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.28) 0 5px,transparent 5px 10px)}
+        .hm-foot-line{flex:1;height:1px;background:rgba(255,255,255,.18)}
         @keyframes hmfade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
         :focus-visible{outline:2px solid var(--o);outline-offset:2px}
         @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.hm{opacity:1;transform:none;transition:none}.hm-panel,.hm-preview{animation:none}.hm-typing i{animation:none}}
@@ -770,7 +879,7 @@ const remixFormats = [
         <div className="sec-w">
           <div style={{ marginBottom: 44 }}>
             <div className="s-tag">What Clario does</div>
-            <h2 className="s-title" style={{ textAlign: "left", maxWidth: 460 }}>Four tools.<br /><em>One creative OS.</em></h2>
+            <h2 className="s-title" style={{ textAlign: "left", maxWidth: 520 }}>Core tools.<br /><em>One creative workspace.</em></h2>
           </div>
           <div className="b-grid">
             {/* Summarizer */}
@@ -946,6 +1055,103 @@ const remixFormats = [
         </div>
       </section>
 
+      <section className="sec sec-alt" id="creator-os">
+        <div className="sec-w">
+          <div className="sec-h">
+            <div className="s-tag">Creator workspace</div>
+            <h2 className="s-title">Every tool you need.<br /><em>In one place.</em></h2>
+            <p className="s-sub">Create, repurpose, organize, and track your content without switching tabs.</p>
+          </div>
+          <div className="b-grid">
+            {[
+              { t: "Summarizer", d: "Turn text, URLs, and YouTube videos into structured summaries with multiple modes.", icon: "summarizer", bg: "#fff7ed" },
+              { t: "Remix Studio", d: "Repurpose one idea into platform-native formats for social, email, video, and more.", icon: "remix", bg: "#fffbeb" },
+              { t: "AI Chat", d: "A creator-focused chat assistant with conversation history.", icon: "chat", bg: "#f0f9ff" },
+              { t: "Brand Voice", d: "Save voices and apply your tone across supported outputs.", icon: "brand", bg: "#fff1f2" },
+              { t: "Comment Generator", d: "Generate platform-ready comments in the right tone.", icon: "comment", bg: "#f5f3ff" },
+              { t: "Repurpose", d: "Transform existing content into new formats and angles.", icon: "repurpose", bg: "#f0fdfa" },
+              { t: "YouTube summarizer", d: "Paste a YouTube link and get a clear summary from the transcript.", icon: "youtube", bg: "#fef2f2" },
+              { t: "AI Memory", d: "Keep useful context so your outputs stay consistent.", icon: "memory", bg: "#f0fdf4" },
+              { t: "History", d: "Revisit past summaries and work from one place.", icon: "history", bg: "#fafaf9" },
+            ].map(({ t, d, icon, bg }) => (
+              <div key={t} className="b-card" style={{ gridColumn: "span 4" }}>
+                <div className="b-in">
+                  <div className="b-tool-head">
+                    <span className="b-tool-icon" style={{ background: bg }} aria-hidden="true">
+                      <ToolMark name={icon} />
+                    </span>
+                    <h3 className="b-tool-title">{t}</h3>
+                  </div>
+                  <p className="b-desc">{d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sec" id="dashboard-insights">
+        <div className="sec-w">
+          <div className="sec-h">
+            <div className="s-tag">Dashboard and insights</div>
+            <h2 className="s-title">All your stats.<br /><em>One clear view.</em></h2>
+            <p className="s-sub">See what you created, how you use Clario, and where to pick up next.</p>
+          </div>
+          <div className="b-grid">
+            {[
+              { t: "Unified statistics", d: "Track summaries, AI chats, remixes, brand voices, comments, and repurposes in one dashboard.", icon: "stats", bg: "#fff7ed" },
+              { t: "Usage over time", d: "View daily requests and feature mix so you understand your workflow.", icon: "usage", bg: "#f0f9ff" },
+              { t: "Recent summaries", d: "Jump back into recent work and keep momentum without searching.", icon: "recent", bg: "#f5f3ff" },
+              { t: "Plan visibility", d: "See requests used, requests left, and your current plan at a glance.", icon: "plan", bg: "#f0fdf4" },
+            ].map(({ t, d, icon, bg }) => (
+              <div key={t} className="b-card" style={{ gridColumn: "span 6" }}>
+                <div className="b-in">
+                  <div className="b-tool-head">
+                    <span className="b-tool-icon" style={{ background: bg }} aria-hidden="true">
+                      <ToolMark name={icon} />
+                    </span>
+                    <h3 className="b-tool-title">{t}</h3>
+                  </div>
+                  <p className="b-desc">{d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sec sec-alt" id="workflow-tools">
+        <div className="sec-w">
+          <div className="sec-h">
+            <div className="s-tag">Workflow and toolkit</div>
+            <h2 className="s-title">Plan, organize, and refine.<br /><em>Without extra apps.</em></h2>
+            <p className="s-sub">Built-in tools help you move from idea to publish-ready content.</p>
+          </div>
+          <div className="b-grid">
+            {[
+              { t: "Calendar", d: "Plan and track content across platforms with a clear schedule view.", icon: "calendar", bg: "#eff6ff" },
+              { t: "Templates", d: "Save reusable prompts and outlines for repeatable work.", icon: "templates", bg: "#fff1f2" },
+              { t: "Queue", d: "Manage content tasks and keep your publishing flow moving.", icon: "queue", bg: "#fffbeb" },
+              { t: "Angle Finder", d: "Discover fresh angles for the same topic or idea.", icon: "angle", bg: "#f0fdfa" },
+              { t: "Bio Builder", d: "Create clear, on-brand bios for profiles and platforms.", icon: "bio", bg: "#eef2ff" },
+              { t: "Hook Generator", d: "Generate strong hooks to open posts, scripts, and campaigns.", icon: "hook", bg: "#fff7ed" },
+            ].map(({ t, d, icon, bg }) => (
+              <div key={t} className="b-card" style={{ gridColumn: "span 4" }}>
+                <div className="b-in">
+                  <div className="b-tool-head">
+                    <span className="b-tool-icon" style={{ background: bg }} aria-hidden="true">
+                      <ToolMark name={icon} />
+                    </span>
+                    <h3 className="b-tool-title">{t}</h3>
+                  </div>
+                  <p className="b-desc">{d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="sec" id="pricing">
         <div className="sec-w">
           <div className="sec-h">
@@ -985,9 +1191,9 @@ const remixFormats = [
       <section className="finale">
         <div className="f-glow" /><div className="f-grid" />
         <div className="fin-in">
-          <p className="fin-tag"><i />One toolkit, four tools</p>
+          <p className="fin-tag"><i />All creator tools, one workspace</p>
           <h2 className="fin-h">Your content,<br /><em>multiplied.</em></h2>
-          <p className="fin-sub">The AI toolkit built for YouTubers, podcasters, and bloggers. Summarize in seconds, remix for every platform, and keep your voice.</p>
+          <p className="fin-sub">Summarize, remix, chat, plan, and repurpose with brand voice and clear stats in one place.</p>
           <div className="fin-cta">
             <button className="fin-btn fin-btn-p" onClick={() => window.location.href="/sign-up"}>
               Start for free

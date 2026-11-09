@@ -62,6 +62,7 @@ export function useSettings({
     }, [userId, userEmail, userName, supabase])
 
     useEffect(() => {
+        // eslint-disable-next-line
         loadProfile()
     }, [loadProfile])
 

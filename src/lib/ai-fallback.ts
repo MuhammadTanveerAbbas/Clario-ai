@@ -20,16 +20,76 @@ export const RATE_LIMIT_BASE_DELAY_MS = 1000
 export const RATE_LIMIT_MAX_DELAY_MS = 15000
 export const TRANSIENT_MAX_RETRIES = 2
 
-const groqApiKey = process.env.GROQ_API_KEY
+const groqApiKeys = Array.from(
+  new Set(
+    [
+      process.env.GROQ_API_KEY,
+      process.env.GROQ_API_KEY_1,
+      process.env.GROQ_API_KEY_2,
+      process.env.GROQ_API_KEY_3,
+    ].filter((k): k is string => Boolean(k && k.trim()))
+  )
+)
 
-let groq: Groq | null = null
-if (groqApiKey) {
-  try {
-    // maxRetries: 0 the reliability layer below owns retry behavior.
-    groq = new Groq({ apiKey: groqApiKey, maxRetries: 0, timeout: 60000 })
-  } catch (e) {
-    console.error('[AI] Failed to initialize Groq:', e)
+interface PooledClient {
+  key: string
+  groq: Groq
+  reliable: ReliableClient
+}
+
+const pooledClients: PooledClient[] = groqApiKeys.map((key) => {
+  const groq = new Groq({ apiKey: key, maxRetries: 0, timeout: 60000 })
+  return {
+    key,
+    groq,
+    reliable: createReliableClient(groq, { apiKey: key }),
   }
+})
+
+const keyCooldowns = new Map<string, number>()
+
+function isRateLimitedError(err: unknown): boolean {
+  if (isRateLimitError(err)) return true
+  const msg = err instanceof Error ? err.message : String(err)
+  return /rate limit/i.test(msg)
+}
+
+async function pooledCompletion(
+  prompt: string,
+  systemPrompt: string,
+  options: CompletionOptions = {}
+): Promise<string> {
+  if (pooledClients.length === 0) {
+    throw new Error('No GROQ_API_KEY configured. Add GROQ_API_KEY or GROQ_API_KEY_1/2/3.')
+  }
+
+  let lastError: unknown
+  for (let i = 0; i < pooledClients.length; i++) {
+    const client = pooledClients[i]
+    const cooldownUntil = keyCooldowns.get(client.key) ?? 0
+    if (cooldownUntil > Date.now()) {
+      continue
+    }
+    try {
+      return await client.reliable.completion(prompt, systemPrompt, options)
+    } catch (err) {
+      if (isRateLimitedError(err)) {
+        keyCooldowns.set(client.key, Date.now() + 60_000)
+        lastError = err
+        continue
+      }
+      throw err
+    }
+  }
+
+  // All keys cooling down: wait for the earliest and retry once.
+  const earliest = Math.min(...pooledClients.map((c) => keyCooldowns.get(c.key) ?? 0).filter((t) => t > Date.now()))
+  if (Number.isFinite(earliest) && earliest > Date.now()) {
+    await sleep(earliest - Date.now())
+    return pooledClients[0].reliable.completion(prompt, systemPrompt, options)
+  }
+
+  throw (lastError instanceof Error ? lastError : new Error('All Groq keys are rate limited. Please try again later.'))
 }
 
 export interface CompletionOptions {
@@ -291,8 +351,6 @@ export function createReliableClient(
   return { completion }
 }
 
-const reliableClient = groq ? createReliableClient(groq, { apiKey: groqApiKey }) : null
-
 // ─── Token estimation / chunking (preserved behavior) ──────────────────────
 
 function estimateTokens(text: string): number {
@@ -350,11 +408,8 @@ export async function generateWithFallback(
     temperature = 0.7,
   } = options
 
-  if (!groqApiKey) {
-    throw new Error('GROQ_API_KEY is not configured. Please add it to your environment variables.')
-  }
-  if (!reliableClient) {
-    throw new Error('Groq client failed to initialize. Check your GROQ_API_KEY.')
+  if (pooledClients.length === 0) {
+    throw new Error('No GROQ_API_KEY configured. Add GROQ_API_KEY or GROQ_API_KEY_1/2/3.')
   }
 
   const totalTokens = estimateTokens(systemPrompt + prompt)
@@ -370,7 +425,7 @@ export async function generateWithFallback(
       const summaries: string[] = []
       for (let i = 0; i < chunks.length; i++) {
         const chunkPrompt = `Part ${i + 1} of ${chunks.length}:\n\n${chunks[i]}`
-        const chunkSummary = await reliableClient.completion(
+        const chunkSummary = await pooledCompletion(
           chunkPrompt,
           systemPrompt + '\n\nNote: This is part of a larger text. Summarize this section.',
           { model, maxTokens, temperature }
@@ -379,7 +434,7 @@ export async function generateWithFallback(
       }
 
       const finalPrompt = `Combine these ${summaries.length} summaries into one cohesive summary:\n\n${summaries.map((s, i) => `Part ${i + 1}:\n${s}`).join('\n\n---\n\n')}`
-      return await reliableClient.completion(finalPrompt, systemPrompt, {
+      return await pooledCompletion(finalPrompt, systemPrompt, {
         model,
         maxTokens,
         temperature,
@@ -387,7 +442,7 @@ export async function generateWithFallback(
     }
   }
 
-  return await reliableClient.completion(prompt, systemPrompt, { model, maxTokens, temperature })
+  return await pooledCompletion(prompt, systemPrompt, { model, maxTokens, temperature })
 }
 
 /**
@@ -404,11 +459,8 @@ export async function generateCompletion(
     temperature?: number
   } = {}
 ): Promise<string> {
-  if (!groqApiKey) {
-    throw new Error('GROQ_API_KEY is not configured. Please add it to your environment variables.')
+  if (pooledClients.length === 0) {
+    throw new Error('No GROQ_API_KEY configured. Add GROQ_API_KEY or GROQ_API_KEY_1/2/3.')
   }
-  if (!reliableClient) {
-    throw new Error('Groq client failed to initialize. Check your GROQ_API_KEY.')
-  }
-  return await reliableClient.completion(prompt, systemPrompt, options)
+  return await pooledCompletion(prompt, systemPrompt, options)
 }
