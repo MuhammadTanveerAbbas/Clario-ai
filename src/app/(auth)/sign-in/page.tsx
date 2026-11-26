@@ -28,23 +28,23 @@ const AUTH_STYLES = `
     padding:11px 14px;font-size:.88rem;color:var(--text);font-family:var(--sans);
     outline:none;transition:border-color .18s,box-shadow .18s;width:100%;
   }
-  .field-input:focus{outline:none;box-shadow:none}
+  .field-input:focus,.field-input:focus-visible{outline:none;outline-offset:0;box-shadow:none;border-color:rgba(23,20,18,.28)}
   .field-input::placeholder{color:var(--text3)}
   .field-input.error{border-color:var(--error)}
   .btn-primary{
-    background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;
+    background:hsl(var(--accent));color:var(--color-paper);border:none;border-radius:9px;
     padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;
     font-family:var(--sans);letter-spacing:-.01em;width:100%;
     display:flex;align-items:center;justify-content:center;gap:8px;
     transition:background .18s,transform .15s;
   }
-  .btn-primary:hover:not(:disabled){background:#ea6c0a;transform:translateY(-1px)}
+  .btn-primary:hover:not(:disabled){background:var(--color-accent-hover);transform:translateY(-1px)}
   .btn-primary:disabled{opacity:.6;cursor:not-allowed}
   .btn-google{
     background:var(--bg2);color:var(--text2);border:1px solid hsl(var(--border));
     border-radius:9px;padding:11px;font-size:.86rem;font-weight:500;cursor:pointer;
     font-family:var(--sans);width:100%;display:flex;align-items:center;
-    justify-content:center;gap:9px;transition:all .18s;
+    justify-content:center;gap:9px;transition:background .18s ease,border-color .18s ease,color .18s ease;
   }
   .btn-google:hover{background:var(--bg3);border-color:var(--border2);color:var(--text)}
   .divider{display:flex;align-items:center;gap:12px;margin:4px 0}
@@ -54,14 +54,14 @@ const AUTH_STYLES = `
   .auth-footer a{color:hsl(var(--accent));text-decoration:none;font-weight:500}
   .auth-footer a:hover{text-decoration:underline}
   .global-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:10px 13px;font-size:.8rem;color:var(--error);margin-bottom:4px}
-  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--color-paper);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
   .forgot-link{font-size:.75rem;color:var(--text3);text-decoration:none;text-align:right;transition:color .15s}
   .forgot-link:hover{color:hsl(var(--accent))}
 `;
 
 function GoogleIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24">
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -143,27 +143,19 @@ function SignInForm() {
         <div className="auth-left">
           <div className="auth-card">
             <Link href="/" className="auth-logo">
-              <div className="auth-logo-mark">
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                >
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
+              <img
+                src="/Clario.png"
+                alt=""
+                width={26}
+                height={26}
+                className="h-[26px] w-[26px] rounded-md object-cover"
+              />
               Clario
             </Link>
             <h1 className="auth-h1">
               Welcome
               <br />
-              <em>back.</em>
+              <span>back.</span>
             </h1>
             <p className="auth-sub">
               Sign in to your account to continue creating.
@@ -177,7 +169,7 @@ function SignInForm() {
               {googleLoading ? (
                 <div
                   className="spinner"
-                  style={{ borderTopColor: "#78716c" }}
+                  style={{ borderTopColor: "var(--color-muted)" }}
                 />
               ) : (
                 <GoogleIcon />
@@ -251,7 +243,7 @@ function SignInForm() {
                         stroke="currentColor"
                         strokeWidth="1.8"
                         strokeLinecap="round"
-                      >
+                       aria-hidden="true">
                         <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
                         <line x1="1" y1="1" x2="23" y2="23" />
                       </svg>
@@ -264,7 +256,7 @@ function SignInForm() {
                         stroke="currentColor"
                         strokeWidth="1.8"
                         strokeLinecap="round"
-                      >
+                       aria-hidden="true">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                         <circle cx="12" cy="12" r="3" />
                       </svg>
@@ -290,7 +282,7 @@ function SignInForm() {
 export default function SignInPage() {
   return (
     <Suspense
-      fallback={<div style={{ minHeight: "100vh", background: "#0c0a09" }} />}
+      fallback={<div style={{ minHeight: "100vh", background: "var(--color-ink)" }} />}
     >
       <SignInForm />
     </Suspense>

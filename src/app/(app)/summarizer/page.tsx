@@ -146,7 +146,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <rect x="2" y="3" width="20" height="14" rx="2" />
         <path d="M8 21h8M12 17v4" />
       </svg>
@@ -166,7 +166,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <polyline points="9 11 12 14 22 4" />
         <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
       </svg>
@@ -186,7 +186,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <rect x="3" y="3" width="8" height="8" rx="1" />
         <rect x="13" y="3" width="8" height="8" rx="1" />
         <rect x="3" y="13" width="8" height="8" rx="1" />
@@ -208,7 +208,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
         <circle cx="9" cy="7" r="4" />
         <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -230,7 +230,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <circle cx="12" cy="12" r="10" />
         <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
         <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -251,7 +251,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z" />
         <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z" />
       </svg>
@@ -271,7 +271,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <circle cx="12" cy="12" r="10" />
         <path d="M8 14s1.5 2 4 2 4-2 4-2" />
         <line x1="9" y1="9" x2="9.01" y2="9" />
@@ -293,7 +293,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <line x1="8" y1="6" x2="21" y2="6" />
         <line x1="8" y1="12" x2="21" y2="12" />
         <line x1="8" y1="18" x2="21" y2="18" />
@@ -317,7 +317,7 @@ const MODES: {
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
+       aria-hidden="true">
         <line x1="9" y1="6" x2="20" y2="6" />
         <line x1="9" y1="12" x2="20" y2="12" />
         <line x1="9" y1="18" x2="20" y2="18" />
@@ -634,24 +634,24 @@ export default function SummarizerPage() {
                         fontSize: ".78rem",
                         fontWeight: 500,
                         background: tab === t ? "hsl(var(--accent))" : "transparent",
-                        color: tab === t ? "#fff" : "var(--text3)",
+                        color: tab === t ? "var(--color-paper)" : "var(--text3)",
                         transition: "all .15s",
                         whiteSpace: "nowrap",
                       }}
                     >
                       {t === "text" ? (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                           <polyline points="14,2 14,8 20,8" />
                         </svg>
                       ) : t === "url" ? (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <circle cx="12" cy="12" r="10" />
                           <line x1="2" y1="12" x2="22" y2="12" />
                           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                         </svg>
                       ) : (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                           <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" />
                           <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" />
                         </svg>
@@ -702,7 +702,7 @@ export default function SummarizerPage() {
                           disabled={loading || !pasteText.trim()}
                           style={{
                             background: "hsl(var(--accent))",
-                            color: "#fff",
+                            color: "var(--color-paper)",
                             border: "none",
                             borderRadius: 9,
                             padding: "9px 20px",
@@ -751,7 +751,7 @@ export default function SummarizerPage() {
                           width: "100%",
                           height: 42,
                           background: "hsl(var(--accent))",
-                          color: "#fff",
+                          color: "var(--color-paper)",
                           border: "none",
                           borderRadius: 9,
                           fontFamily: "var(--sans)",
@@ -792,7 +792,7 @@ export default function SummarizerPage() {
                           width: "100%",
                           height: 42,
                           background: "hsl(var(--accent))",
-                          color: "#fff",
+                          color: "var(--color-paper)",
                           border: "none",
                           borderRadius: 9,
                           fontFamily: "var(--sans)",
@@ -904,7 +904,7 @@ export default function SummarizerPage() {
                         fontSize: ".7rem",
                         fontWeight: 700,
                         background: "hsl(var(--accent))",
-                        color: "#fff",
+                        color: "var(--color-paper)",
                         padding: "4px 12px",
                         borderRadius: 100,
                         textTransform: "uppercase",
@@ -1032,7 +1032,7 @@ export default function SummarizerPage() {
                         disabled={loading}
                         style={{
                           background: "hsl(var(--accent))",
-                          color: "#fff",
+                          color: "var(--color-paper)",
                           border: "none",
                           borderRadius: 8,
                           padding: "7px 14px",
@@ -1330,7 +1330,7 @@ export default function SummarizerPage() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {item.input_text?.slice(0, 60)}...
+                  {item.input_text?.slice(0, 60)}…
                 </div>
               </button>
             ))

@@ -104,9 +104,9 @@ function ToastContainer({
           className={cn(
             "flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-[12.5px] font-medium shadow-[var(--shadow-medium)]",
             toast.type === "success"
-              ? "border-[rgba(21,128,61,0.25)] bg-[rgba(21,128,61,0.06)] text-[var(--success)]"
+              ? "border-success-rule bg-success-wash text-[var(--success)]"
               : toast.type === "error"
-                ? "border-[rgba(180,35,24,0.25)] bg-[rgba(180,35,24,0.06)] text-[var(--error)]"
+                ? "border-danger-rule bg-danger-wash text-[var(--error)]"
                 : "border-[var(--line)] bg-[var(--surface)] text-[var(--ink-2)]"
           )}
         >
@@ -135,7 +135,6 @@ export default function SettingsPage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [preferences, setPreferences] = useState<PreferencesData>({
     notifications: true,
-    darkMode: false,
     autoSave: true,
     analytics: false,
   });

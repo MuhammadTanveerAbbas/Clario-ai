@@ -20,9 +20,9 @@ const STYLES = `
   .fp-field{display:flex;flex-direction:column;gap:5px}
   .fp-label{font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.02em}
   .fp-input{background:var(--bg2);border:1px solid hsl(var(--border));border-radius:9px;padding:11px 14px;font-size:.88rem;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .18s,box-shadow .18s;width:100%}
-  .fp-input:focus{outline:none;box-shadow:none}
+  .fp-input:focus,.fp-input:focus-visible{outline:none;outline-offset:0;box-shadow:none;border-color:rgba(23,20,18,.28)}
   .fp-input::placeholder{color:var(--text3)}
-  .fp-btn{background:hsl(var(--accent));color:#fff;border:none;border-radius:9px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--sans);width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s}
+  .fp-btn{background:hsl(var(--accent));color:var(--color-paper);border:none;border-radius:9px;padding:12px;font-size:.88rem;font-weight:600;cursor:pointer;font-family:var(--sans);width:100%;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .18s}
   .fp-btn:hover:not(:disabled){background:#ea6c0a}
   .fp-btn:disabled{opacity:.6;cursor:not-allowed}
   .fp-error{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:9px;padding:10px 13px;font-size:.8rem;color:var(--error);margin-bottom:4px}
@@ -31,7 +31,7 @@ const STYLES = `
   .fp-footer{text-align:center;margin-top:20px;font-size:.8rem;color:var(--text3)}
   .fp-footer a{color:hsl(var(--accent));text-decoration:none;font-weight:500}
   .fp-footer a:hover{text-decoration:underline}
-  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+  .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:var(--color-paper);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
 `;
 
 export default function ForgotPasswordPage() {
@@ -68,13 +68,13 @@ export default function ForgotPasswordPage() {
       <div className="fp-wrap">
         <div className="fp-card">
           <Link href="/" className="fp-logo">
-            <div className="fp-logo-mark">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
-            </div>
+            <img
+              src="/Clario.png"
+              alt=""
+              width={26}
+              height={26}
+              className="h-[26px] w-[26px] rounded-md object-cover"
+            />
             Clario
           </Link>
 
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
             <>
               <h1 className="fp-h1">
                 Reset your<br />
-                <em>password.</em>
+                <span>password.</span>
               </h1>
               <p className="fp-sub">Enter your email and we&apos;ll send a reset link.</p>
               {error && <div className="fp-error">{error}</div>}
@@ -109,17 +109,17 @@ export default function ForgotPasswordPage() {
           ) : (
             <div style={{ textAlign: "center" }}>
               <div className="fp-success-icon">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2" strokeLinecap="round">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-success)" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
               <h1 className="fp-h1" style={{ textAlign: "center" }}>
                 Check your<br />
-                <em>email.</em>
+                <span>email.</span>
               </h1>
               <p className="fp-sent-text">
                 We sent a reset link to{" "}
-                <strong style={{ color: "#d6d3d1" }}>{email}</strong>.
+                <strong style={{ color: "var(--color-rule)" }}>{email}</strong>.
                 {" "}Check your inbox &mdash; it should arrive within 2 minutes.
               </p>
             </div>

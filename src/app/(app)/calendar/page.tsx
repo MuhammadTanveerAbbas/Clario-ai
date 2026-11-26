@@ -22,7 +22,7 @@ interface CalEvent {
 }
 
 const PLATFORMS = ["Twitter", "LinkedIn", "Instagram", "YouTube", "Newsletter", "Podcast", "Blog", "TikTok", "Other"];
-const COLORS = ["var(--brand)", "#0ea5e9", "#8b5cf6", "#10b981", "#ec4899", "#f59e0b"];
+const COLORS = ["var(--brand)", "#0ea5e9", "#8b5cf6", "var(--color-success)", "#ec4899", "#f59e0b"];
 const STATUSES = ["Draft", "Scheduled", "Published", "Cancelled"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -51,7 +51,7 @@ function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: st
             className="flex items-center gap-3 rounded-xl border px-4 py-3 text-[12px] font-medium shadow-lg backdrop-blur-md max-w-[320px]"
             style={{
               background: "var(--surface)",
-              borderColor: t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "var(--brand)",
+              borderColor: t.type === "success" ? "var(--color-success)" : t.type === "error" ? "var(--color-danger)" : "var(--brand)",
               color: "var(--ink-2)",
             }}
           >
@@ -75,7 +75,7 @@ function EventPill({ event, onClick }: { event: CalEvent; onClick: (e: React.Mou
   return (
     <button
       onClick={onClick}
-      className="w-full truncate rounded-md px-2 py-0.5 text-left text-[11px] font-medium text-white transition-opacity hover:opacity-80"
+      className="w-full truncate rounded-md px-2 py-0.5 text-left text-[11px] font-medium text-accent-ink transition-opacity hover:opacity-80"
       style={{ background: event.color || "var(--brand)", border: "none", cursor: "pointer" }}
     >
       {event.title}
@@ -103,7 +103,7 @@ function DayCell({
     <div
       onClick={() => onAddClick(new Date(dateStr + "T12:00:00"))}
       className={cn(
-        "group relative min-h-[90px] cursor-pointer rounded-xl border p-2 transition-all duration-150 hover:border-[var(--brand-line)] hover:bg-[var(--surface)]",
+        "group relative min-h-[90px] cursor-pointer rounded-xl border p-2 transition-colors duration-150 hover:border-[var(--brand-line)] hover:bg-[var(--surface)]",
         isToday
           ? "border-[var(--brand)] bg-[var(--brand-soft)]"
           : "border-[var(--line)] bg-[var(--surface)]"
@@ -113,7 +113,7 @@ function DayCell({
       <div className={cn(
         "mb-1.5 flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-medium transition-colors",
         isToday
-          ? "bg-[var(--brand)] text-white"
+          ? "bg-brand-strong text-accent-ink"
           : "text-[var(--ink-3)] group-hover:text-[var(--ink-2)]"
       )}>
         {day}
@@ -181,7 +181,7 @@ function EventModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-scrim backdrop-blur-sm"
             onClick={onClose}
           />
           {/* Panel */}
@@ -257,7 +257,7 @@ function EventModal({
                     value={formData.content}
                     onChange={e => setFormData(p => ({ ...p, content: e.target.value }))}
                     className={cn(inputClass, "min-h-[90px] resize-y")}
-                    placeholder="Post content…"
+                    placeholder="Post content..."
                   />
                 </FormField>
 
@@ -303,8 +303,8 @@ function EventModal({
                 </button>
                 <button
                   onClick={onSave}
-                  className="rounded-xl px-5 py-2 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ background: "var(--brand)", border: "none", cursor: "pointer" }}
+                  className="rounded-xl px-5 py-2 text-[12px] font-semibold text-accent-ink transition-opacity hover:opacity-90"
+                  style={{ background: "var(--color-accent)", border: "none", cursor: "pointer" }}
                 >
                   {isEditing ? "Update" : "Add event"}
                 </button>
@@ -542,7 +542,7 @@ function CalendarPageInner() {
                 {DAYS.map(day => (
                   <div
                     key={day}
-                    className="py-1 text-center text-[11px] font-semibold uppercase tracking-wider text-[var(--ink-3)]"
+                    className="py-1 text-center text-[11px] font-medium text-[var(--ink-3)]"
                   >
                     {day}
                   </div>

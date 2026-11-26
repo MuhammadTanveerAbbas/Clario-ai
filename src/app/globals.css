@@ -1,3 +1,10 @@
+/* Hallmark · shape: kept · genre: editorial · theme: brand pinned by the project · redesign: full
+ * paper: #faf9f6 · accent: #F97316 · display: Fraunces · body: Cantarell · hero: Stage (/) Poster (/pricing) · nav: edge-aligned · footer: mast · signature: a real repurposed format stack
+ * axes: light/roman-serif/warm · posture: Stage · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S3 R4 V3 · weakest: S, the landing hero now shows an actual repurposed format stack instead of a generic panel */
+/* Hallmark · waive 65 · the project pins Fraunces, warm paper and its orange hue in its own tokens · this is an existing brand, not a chosen look */
+@import "./tokens.css";
+@import "./base.css" layer(base);
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,24 +13,24 @@
   --serif: var(--font-fraunces), Georgia, serif;
   --sans: var(--font-inter), system-ui, sans-serif;
   --geist: var(--font-inter), system-ui, sans-serif;
-  --bg: #faf9f6;
-  --bg2: #f4f1ec;
-  --bg3: #ece8e1;
+  --bg: #ffffff;
+  --bg2: #fafafa;
+  --bg3: #f5f5f5;
   --border2: #cfc7bb;
   --text: #171412;
   --text2: #4a443e;
   --text3: #6f675e;
   --accent-l: #fff7ed;
   --accent-m: #fdba74;
-  --sidebar: #f3f0ea;
-  --sidebar-b: #e2dcd2;
+  --sidebar: #ffffff;
+  --sidebar-b: #e6e0d6;
   --card-b: #e6e0d6;
   --input-b: #ded7cc;
   --success: #15803d;
   --error: #b42318;
   --surface: #ffffff;
-  --surface-2: #f7f4ef;
-  --surface-3: #efeae2;
+  --surface-2: #fafafa;
+  --surface-3: #f5f5f5;
   --ink: #171412;
   --ink-2: #4a443e;
   --ink-3: #6f675e;
@@ -33,8 +40,6 @@
   --brand-hover: #ea580c;
   --brand-soft: #fff7ed;
   --brand-line: #fdba74;
-  --gradient-1: linear-gradient(135deg, #f97316 0%, #fb923c 50%, #f59e0b 100%);
-  --gradient-2: linear-gradient(135deg, #0c0a09 0%, #292524 100%);
   --glass: rgba(250, 249, 246, 0.92);
   --glass-border: rgba(23, 20, 18, 0.08);
   --shadow-soft: 0 1px 2px rgba(23, 20, 18, 0.05);
@@ -45,7 +50,7 @@
 
 /* Prevent horizontal overflow on all screens */
 html, body {
-  overflow-x: hidden;
+  overflow-x: clip;
   width: 100%;
 }
 
@@ -78,17 +83,11 @@ img, video, svg {
     font-family: var(--font-inter), system-ui, sans-serif;
   }
 
-  input:focus,
-  textarea:focus,
-  select:focus {
-    outline: none;
-    border-color: hsl(var(--accent)) !important;
-    box-shadow: none !important;
-  }
-
-  button:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px color-mix(in srgb, hsl(var(--accent)) 35%, transparent) !important;
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 
   :root {
@@ -153,7 +152,7 @@ img, video, svg {
   }
 
   :focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 }
@@ -161,7 +160,7 @@ img, video, svg {
 /* Thin scrollbars for main scroll regions (chat, summarizer, etc.) */
 .scrollable {
   scrollbar-width: thin;
-  scrollbar-color: rgba(23, 20, 18, 0.22) transparent;
+  scrollbar-color: var(--color-scroll-thumb) transparent;
 }
 
 .scrollable::-webkit-scrollbar {
@@ -173,12 +172,12 @@ img, video, svg {
 }
 
 .scrollable::-webkit-scrollbar-thumb {
-  background: rgba(23, 20, 18, 0.22);
+  background: var(--color-scroll-thumb);
   border-radius: 999px;
 }
 
 .scrollable::-webkit-scrollbar-thumb:hover {
-  background: rgba(23, 20, 18, 0.35);
+  background: var(--color-scroll-thumb-hover);
 }
 
 .app-sidebar-nav {
@@ -193,9 +192,9 @@ img, video, svg {
 @layer components {
     .app-page {
         width: 100%;
-        max-width: 1240px;
+        max-width: var(--container);
         margin-inline: auto;
-        padding: 24px 16px 96px;
+        padding: var(--space-lg) var(--space-md) var(--space-3xl);
     }
 
     @media (min-width: 640px) {
@@ -234,7 +233,7 @@ img, video, svg {
 
     .field-label {
         display: block;
-        margin-bottom: 6px;
+        margin-bottom: var(--space-2xs);
         font-size: 13px;
         font-weight: 600;
         color: var(--ink-2);
@@ -246,7 +245,7 @@ img, video, svg {
         border-radius: 8px;
         border: 1px solid var(--input-b);
         background: var(--surface);
-        padding: 9px 12px;
+        padding: var(--space-xs) var(--space-sm);
         font-family: var(--sans);
         font-size: 14px;
         color: var(--ink);
@@ -278,11 +277,11 @@ img, video, svg {
     .app-chip {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: var(--space-2xs);
         border-radius: 999px;
         border: 1px solid var(--line);
         background: var(--surface-2);
-        padding: 3px 10px;
+        padding: var(--space-2xs) var(--space-sm);
         font-size: 12px;
         font-weight: 500;
         color: var(--ink-2);
@@ -292,11 +291,11 @@ img, video, svg {
     .app-chip-accent {
         border-color: var(--brand-line);
         background: var(--brand-soft);
-        color: var(--brand);
+        color: var(--color-accent);
     }
 
     .link-accent {
-        color: var(--brand);
+        color: var(--color-accent);
         font-weight: 600;
         text-decoration: none;
     }
@@ -361,14 +360,14 @@ img, video, svg {
     }
 
     .app-prose a {
-        color: var(--brand);
+        color: var(--color-accent);
         text-decoration: underline;
         text-underline-offset: 2px;
     }
 
     .app-prose blockquote {
-        border-left: 3px solid var(--brand-line);
-        padding: 0.25rem 0 0.25rem 1rem;
+        border-left: var(--rule-hair) solid var(--brand-line);
+        padding: var(--space-2xs) 0 var(--space-2xs) var(--space-md);
         color: var(--ink-2);
         font-style: italic;
     }
@@ -384,7 +383,7 @@ img, video, svg {
         background: var(--surface-2);
         border: 1px solid var(--line);
         border-radius: 10px;
-        padding: 1rem;
+        padding: var(--space-md);
         overflow-x: auto;
     }
 
@@ -397,7 +396,7 @@ img, video, svg {
         border: 0;
         height: 1px;
         background: var(--line);
-        margin: 1.5rem 0;
+        margin: var(--space-lg) 0;
     }
 
     .app-prose table {
@@ -409,19 +408,19 @@ img, video, svg {
     .app-prose th,
     .app-prose td {
         border-bottom: 1px solid var(--line);
-        padding: 0.5rem 0.6rem;
+        padding: var(--space-xs) var(--space-sm);
         text-align: left;
     }
 }
 
 @layer utilities {
     .card-hover {
-        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: border-color var(--dur-short) var(--ease-out), background-color var(--dur-short) var(--ease-out);
     }
 
     .card-hover:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-medium);
+        border-color: var(--color-rule);
+        background-color: var(--color-paper-2);
     }
 
     .fade-in {
@@ -490,17 +489,6 @@ img, video, svg {
         }
     }
     
-    @keyframes gradient {
-        0%, 100% {
-            background-size: 200% 200%;
-            background-position: left center;
-        }
-        50% {
-            background-size: 200% 200%;
-            background-position: right center;
-        }
-    }
-    
     .animate-fade-in {
         animation: fade-in 0.8s ease-out forwards;
     }
@@ -510,9 +498,6 @@ img, video, svg {
         opacity: 0;
     }
     
-    .animate-gradient {
-        animation: gradient 3s ease infinite;
-    }
 }
 
 /* Syntax Highlighting for Code Blocks */
@@ -520,8 +505,8 @@ img, video, svg {
   display: block;
   overflow-x: auto;
   padding: 1em;
-  background: #1e1e1e;
-  color: #d4d4d4;
+  background: var(--color-code-bg);
+  color: var(--color-code-surface);
 }
 
 .hljs-keyword,
@@ -529,45 +514,45 @@ img, video, svg {
 .hljs-literal,
 .hljs-section,
 .hljs-link {
-  color: #569cd6;
+  color: var(--color-code-blue);
 }
 
 .hljs-string {
-  color: #ce9178;
+  color: var(--color-code-string);
 }
 
 .hljs-number {
-  color: #b5cea8;
+  color: var(--color-code-number);
 }
 
 .hljs-comment {
-  color: #6a9955;
+  color: var(--color-code-comment);
   font-style: italic;
 }
 
 .hljs-function,
 .hljs-title {
-  color: #dcdcaa;
+  color: var(--color-code-fn);
 }
 
 .hljs-params {
-  color: #9cdcfe;
+  color: var(--color-code-prop);
 }
 
 .hljs-built_in,
 .hljs-class .hljs-title {
-  color: #4ec9b0;
+  color: var(--color-code-builtin);
 }
 
 .hljs-attr,
 .hljs-variable,
 .hljs-template-variable,
 .hljs-type {
-  color: #9cdcfe;
+  color: var(--color-code-prop);
 }
 
 .hljs-meta {
-  color: #d7ba7d;
+  color: var(--color-code-tag);
 }
 
 .hljs-emphasis {

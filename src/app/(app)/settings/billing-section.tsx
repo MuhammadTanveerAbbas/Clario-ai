@@ -161,7 +161,7 @@ export function BillingSection({ profile }: BillingSectionProps) {
               Upgrade to Pro
             </h3>
             <p className="mt-1 max-w-prose text-[12.5px] leading-relaxed text-[var(--ink-3)]">
-              Unlock more summaries, Remix Studio, AI chat, and brand voice
+              Get more summaries, Remix Studio, AI chat, and brand voice
               tools. The free plan includes {plan.requests} AI requests per
               month.
             </p>

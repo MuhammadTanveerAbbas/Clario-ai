@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,24 +12,21 @@ function ClarioLogo() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-2.5 shrink-0 no-underline group"
+      className="flex items-center gap-1.5 shrink-0 no-underline"
     >
-      <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-orange-500 via-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/25 transition-all duration-300 group-hover:shadow-orange-500/40 group-hover:scale-[1.03]">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" />
-          <path d="M2 17l10 5 10-5" />
-          <path d="M2 12l10 5 10-5" />
-        </svg>
-      </div>
-      <div className="flex flex-col leading-none">
-          <span
-            className="font-serif text-[1.35rem] font-light tracking-tight text-stone-900"
-            style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}
-          >
-            Clario
-          </span>
-
-      </div>
+      <Image
+        src="/Clario.png"
+        alt="Clario"
+        width={24}
+        height={24}
+        className="h-6 w-6 shrink-0 object-contain"
+      />
+      <span
+        className="font-serif text-[1.15rem] font-medium leading-none tracking-[-0.02em] text-ink"
+        style={{ fontFamily: "var(--font-fraunces), Georgia, serif" }}
+      >
+        Clario
+      </span>
     </Link>
   );
 }
@@ -55,10 +53,10 @@ export function MktNav() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 transition-all duration-300 ${
+        className={`sticky top-0 z-50 transition-colors duration-300 ${
           scrolled
-            ? "bg-white/92 backdrop-blur-xl border-b border-stone-200/90 shadow-[0_4px_24px_-4px_rgba(28,25,23,0.08)]"
-            : "bg-white/70 backdrop-blur-lg border-b border-transparent"
+            ? "bg-paper border-b border-rule "
+            : "bg-paper border-b border-transparent"
         }`}
       >
         <nav className="relative mx-auto flex h-[64px] max-w-7xl items-center justify-between gap-4 px-2 sm:px-4 lg:px-8">
@@ -73,12 +71,12 @@ export function MktNav() {
                   <li key={`${href}-${label}`} className="relative">
                     <Link
                       href={href}
-                      className={`group relative inline-flex items-center px-3 py-2 text-sm font-medium no-underline transition-colors duration-200 lg:px-4 ${
-                        isActive ? "text-stone-900" : "text-stone-600 hover:text-stone-900"
+                      className={`group relative inline-flex items-center px-3 py-2 text-sm font-normal no-underline transition-colors duration-200 lg:px-4 ${
+                        isActive ? "text-ink" : "text-body-muted hover:text-ink"
                       }`}
                     >
                       {label}
-                      <span className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-[2px] rounded-full bg-orange-500 transition-transform duration-200 origin-left lg:left-4 lg:right-4 ${
+                      <span className={`pointer-events-none absolute left-3 right-3 -bottom-0.5 h-[2px] rounded-full bg-brand-strong transition-transform duration-200 origin-left lg:left-4 lg:right-4 ${
                         isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                       }`} />
                     </Link>
@@ -92,13 +90,13 @@ export function MktNav() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="inline-flex items-center h-10 px-4 text-sm font-medium text-stone-600 hover:text-stone-900 rounded-lg hover:bg-stone-100 transition-colors no-underline"
+                    className="inline-flex items-center h-10 px-4 text-sm font-normal text-body-muted hover:text-ink rounded-lg hover:bg-paper-2 transition-colors no-underline"
                   >
                     Dashboard
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 h-10 px-4 rounded-lg transition-colors cursor-pointer border-0 shadow-sm shadow-orange-500/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                    className="text-sm font-semibold text-accent-ink bg-brand-strong hover:bg-accent-hover h-10 px-4 rounded-lg transition-colors cursor-pointer border-0 shadow-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-strong"
                   >
                     Sign out
                   </button>
@@ -106,7 +104,7 @@ export function MktNav() {
               ) : (
                 <Link
                   href="/sign-up"
-                  className="inline-flex items-center h-10 px-5 text-sm font-semibold text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors duration-200 no-underline shadow-sm shadow-orange-500/30 hover:shadow-orange-500/45 active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                  className="inline-flex items-center h-10 px-5 text-sm font-semibold text-accent-ink bg-brand-strong hover:bg-accent-hover rounded-lg transition-colors duration-200 no-underline shadow-soft active:scale-[.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-strong"
                 >
                   Get started
                 </Link>
@@ -119,7 +117,7 @@ export function MktNav() {
             {!user && (
               <Link
                 href="/sign-up"
-                className="inline-flex items-center whitespace-nowrap h-9 px-3.5 text-[13px] font-semibold text-white bg-orange-500 rounded-lg no-underline shadow-sm shadow-orange-500/30 active:scale-[.98] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                className="inline-flex items-center whitespace-nowrap h-9 px-3.5 text-[13px] font-semibold text-accent-ink bg-brand-strong rounded-lg no-underline shadow-soft active:scale-[.98] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-strong"
               >
                 Get started
               </Link>

@@ -204,7 +204,7 @@ function MiniStat({
 }) {
   return (
     <div className="flex min-h-[88px] flex-col justify-between rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--ink-3)]">
+      <p className="text-[11px] font-medium text-[var(--ink-3)]">
         {label}
       </p>
       {loading ? (
@@ -508,7 +508,7 @@ export default function Dashboard() {
       />
 
       {loadError && !loading ? (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[rgba(180,35,24,0.22)] bg-[rgba(180,35,24,0.04)] px-4 py-3">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-danger-rule bg-danger-wash-soft px-4 py-3">
           <p className="flex items-center gap-2 text-[12.5px] text-[var(--error)]">
             <AlertCircle className="h-4 w-4 shrink-0" />
             Some workspace data could not be loaded. Numbers may be incomplete.
@@ -674,9 +674,9 @@ export default function Dashboard() {
               className={cn(
                 "flex items-center gap-2.5 rounded-lg border px-4 py-2.5 text-[12.5px] font-medium shadow-[var(--shadow-medium)]",
                 toast.type === "success"
-                  ? "border-[rgba(21,128,61,0.25)] bg-[rgba(21,128,61,0.06)] text-[var(--success)]"
+                  ? "border-success-rule bg-success-wash text-[var(--success)]"
                   : toast.type === "error"
-                    ? "border-[rgba(180,35,24,0.25)] bg-[rgba(180,35,24,0.06)] text-[var(--error)]"
+                    ? "border-danger-rule bg-danger-wash text-[var(--error)]"
                     : "border-[var(--line)] bg-[var(--surface)] text-[var(--ink-2)]"
               )}
             >

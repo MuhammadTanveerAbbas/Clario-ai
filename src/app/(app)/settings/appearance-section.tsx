@@ -135,7 +135,7 @@ export function AppearanceSection() {
               >
                 <span
                   className={cn(
-                    "block text-[11px] font-semibold uppercase tracking-[0.08em]",
+                    "block text-[11px] font-medium",
                     active ? "text-[var(--brand)]" : "text-[var(--ink-3)]"
                   )}
                 >

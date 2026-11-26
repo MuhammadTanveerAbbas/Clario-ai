@@ -8,6 +8,7 @@
  */
 
 import { Innertube } from 'youtubei.js';
+import { formatTranscriptParts } from './transcript';
 
 export interface VideoMetadata {
   title: string;
@@ -47,15 +48,6 @@ export function extractVideoId(input: string): string | null {
     if (m?.[1]) return m[1];
   }
   return null;
-}
-
-function clean(text: string): string {
-  return text
-    .replace(/\[.*?\]/g, '')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&#39;/g, "'").replace(/&quot;/g, '"')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -112,7 +104,7 @@ async function viaTimedText(yt: Innertube, videoId: string): Promise<TranscriptR
         segs++;
         for (const s of ev.segs) { if (s.utf8) parts.push(s.utf8); }
       }
-      const text = clean(parts.join(' '));
+      const text = formatTranscriptParts(parts);
       if (text.length < 30) return null;
       return { text, method: isAuto(track) ? 'auto_captions' : 'captions', language: track.language_code ?? 'en', segmentCount: segs || parts.length };
     } catch { continue; }
@@ -143,7 +135,7 @@ async function viaEngagementPanel(yt: Innertube, videoId: string): Promise<Trans
       .filter(Boolean);
     if (!parts.length) return null;
 
-    const text = clean(parts.join(' '));
+    const text = formatTranscriptParts(parts);
     if (text.length < 30) return null;
 
     const lang = String(td.selectedLanguage ?? 'en');
@@ -212,7 +204,7 @@ async function viaPageScrape(videoId: string): Promise<TranscriptResult | null> 
       .slice(0, 60)
       .join(' ');
 
-    const text = clean(allText);
+    const text = formatTranscriptParts([allText]);
     if (text.length < 40) return null;
 
     return { text, method: 'description', language: 'en', segmentCount: 1 };

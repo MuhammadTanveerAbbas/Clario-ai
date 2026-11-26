@@ -4,9 +4,8 @@ import type { Components } from "react-markdown";
 
 /**
  * ReactMarkdown component map for generated content surfaces.
- * Kept under the original export name so existing callers keep working.
  */
-export function getMarkdownDarkComponents(): Partial<Components> {
+export function getMarkdownComponents(): Partial<Components> {
   return {
     script: () => null,
     p: ({ children, ...props }) => (

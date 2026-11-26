@@ -41,7 +41,7 @@ export function AutoExpandTextarea({
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       disabled={disabled}
-      className="bg-white/5 border-white/20 text-white resize-none rounded-xl focus:ring-2 focus:ring-[#4169E1]/50 focus:border-[#4169E1]/50 transition-all text-sm md:text-base min-h-[48px] overflow-y-auto"
+      className="bg-code-ink border-form-line text-code-surface resize-none rounded-xl focus:ring-2 focus:ring-[var(--color-code-blue)]/50 focus:border-[var(--color-code-blue)]/50 transition-colors text-sm md:text-base min-h-[48px] overflow-y-auto"
       rows={1}
     />
   )

@@ -130,8 +130,8 @@ export function PrivacySection() {
         </div>
       </section>
 
-      <section className="rounded-xl border border-[rgba(180,35,24,0.25)] bg-[var(--surface)]">
-        <div className="border-b border-[rgba(180,35,24,0.18)] px-5 py-4 sm:px-6">
+      <section className="rounded-xl border border-danger-rule bg-[var(--surface)]">
+        <div className="border-b border-danger-rule-soft px-5 py-4 sm:px-6">
           <h3 className="text-[14px] font-semibold text-[var(--error)]">
             Danger zone
           </h3>
@@ -141,7 +141,7 @@ export function PrivacySection() {
         </div>
 
         <div className="px-5 py-5 sm:px-6">
-          <div className="rounded-lg border border-[rgba(180,35,24,0.18)] bg-[rgba(180,35,24,0.04)] p-4">
+          <div className="rounded-lg border border-danger-rule-soft bg-danger-wash-soft p-4">
             <p className="text-[13px] font-medium text-[var(--ink)]">
               Delete account
             </p>
@@ -154,7 +154,7 @@ export function PrivacySection() {
               variant="outline"
               onClick={handleDeleteAccount}
               disabled={deleting}
-              className="mt-4 border-[rgba(180,35,24,0.35)] text-[var(--error)] hover:border-[rgba(180,35,24,0.55)] hover:bg-[rgba(180,35,24,0.08)] hover:text-[var(--error)]"
+              className="mt-4 border-danger text-[var(--error)] hover:border-danger hover:bg-danger-wash hover:text-[var(--error)]"
             >
               <Trash2 className="h-4 w-4" />
               {deleting ? "Deleting..." : "Delete my account"}

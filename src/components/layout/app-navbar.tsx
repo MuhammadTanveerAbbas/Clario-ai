@@ -74,11 +74,11 @@ export function AppNavbar() {
       <div className="flex min-w-0 flex-1 items-center gap-2.5">
         <span className="hidden items-center gap-1.5 text-[12px] font-medium text-[var(--ink-3)] sm:flex">
           <img
-            src="/favicon.svg"
+            src="/Clario.png"
             alt=""
             width={14}
             height={14}
-            className="h-3.5 w-3.5 shrink-0 rounded-[3px]"
+            className="h-3.5 w-3.5 shrink-0 rounded-[3px] object-cover"
           />
           Clario
           <span aria-hidden className="text-[var(--line-strong)]">

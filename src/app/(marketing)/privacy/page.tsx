@@ -5,7 +5,7 @@ export default function PrivacyPage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: `
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        :root{--o:#f97316;--ol:#fff7ed;--bk:#0c0a09;--g7:#44403c;--g5:#78716c;--g4:#a8a29e;--g2:#e7e5e4;--w:#fff;--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
+        :root{--o:var(--brand);--ol:var(--brand-soft);--bk:var(--color-ink);--g7:#44403c;--g5:var(--color-muted);--g4:#a8a29e;--g2:#e7e5e4;--w:var(--color-paper);--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
         body{font-family:var(--sans);background:var(--w);color:var(--bk);-webkit-font-smoothing:antialiased}
         .legal-wrap{max-width:740px;margin:0 auto;padding:64px 5% 80px}
         @media(max-width:480px){.legal-wrap{padding:40px 5% 60px}}
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
         .legal-a:hover{text-decoration:underline}
       ` }} />
       <div className="legal-wrap">
-        <h1 className="legal-h1">Privacy <em>Policy.</em></h1>
+        <h1 className="legal-h1">Privacy <span>Policy.</span></h1>
         <p className="legal-meta">Last updated: March 23, 2025 · Clario is operated by Clario AI Ltd.</p>
 
         <div className="legal-section">
@@ -85,7 +85,7 @@ export default function PrivacyPage() {
 
         <div className="legal-section">
           <h2 className="legal-h2">7. Cookies</h2>
-          <p className="legal-p">We use only essential cookies: a Supabase session cookie and a theme preference cookie. We do not use advertising cookies.</p>
+          <p className="legal-p">We use only essential cookies: a Supabase session cookie. We do not use advertising cookies.</p>
         </div>
 
         <div className="legal-section">

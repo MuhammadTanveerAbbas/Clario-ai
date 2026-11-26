@@ -2,7 +2,7 @@
 
 const LEGAL_STYLES = `
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  :root{--o:#f97316;--ol:#fff7ed;--bk:#0c0a09;--g7:#44403c;--g5:#78716c;--g4:#a8a29e;--g2:#e7e5e4;--w:#fff;--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
+  :root{--o:var(--brand);--ol:var(--brand-soft);--bk:var(--color-ink);--g7:#44403c;--g5:var(--color-muted);--g4:#a8a29e;--g2:#e7e5e4;--w:var(--color-paper);--serif:var(--font-fraunces),Georgia,serif;--sans:var(--font-inter),system-ui,sans-serif}
   body{font-family:var(--sans);background:var(--w);color:var(--bk);-webkit-font-smoothing:antialiased}
   .legal-wrap{max-width:740px;margin:0 auto;padding:64px 5% 80px}
   @media(max-width:480px){.legal-wrap{padding:40px 5% 60px}}
@@ -21,7 +21,7 @@ export default function RefundPage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: LEGAL_STYLES }} />
       <div className="legal-wrap">
-        <h1 className="legal-h1">Refund <em>Policy.</em></h1>
+        <h1 className="legal-h1">Refund <span>Policy.</span></h1>
         <p className="legal-meta">Last updated: October 8, 2025 · Applies to all Pro plan purchases.</p>
 
         <div className="legal-section">
@@ -43,7 +43,7 @@ export default function RefundPage() {
           <h2 className="legal-h2">3. How to Request a Refund</h2>
           <p className="legal-p"><strong>3.1 Contact Support:</strong> Email <a href="mailto:support@clario.ai" className="legal-a">support@clario.ai</a> with your request and reason for refund.</p>
           <p className="legal-p"><strong>3.2 Provide Details:</strong> Include your account email and order/transaction ID.</p>
-          <p className="legal-p"><strong>3.3 Processing Time:</strong> Refunds are processed within 5–10 business days after approval.</p>
+          <p className="legal-p"><strong>3.3 Processing Time:</strong> Refunds are processed within 5 to 10 business days after approval.</p>
           <p className="legal-p"><strong>3.4 Refund Method:</strong> Refunds are issued to the original payment method used for purchase via Stripe.</p>
         </div>
 

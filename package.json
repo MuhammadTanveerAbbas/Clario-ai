@@ -14,6 +14,7 @@
     "test": "node --test \"tests/**/*.test.mjs\""
   },
   "dependencies": {
+    "@mozilla/readability": "0.6.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.1.1",
@@ -49,11 +50,11 @@
     "groq-sdk": "^0.37.0",
     "isomorphic-dompurify": "^3.3.0",
     "js-tiktoken": "^1.0.12",
+    "jsdom": "31.0.1",
     "jspdf": "^4.2.0",
     "lucide-react": "^0.475.0",
     "marked": "^17.0.1",
     "next": "16.3.8",
-    "next-themes": "^0.4.6",
     "react": "^18.3.1",
     "react-day-picker": "^9.14.0",
     "react-dom": "^18.3.1",
@@ -66,11 +67,13 @@
     "stripe": "^20.4.1",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "undici": "8.13.1",
     "youtubei.js": "^17.0.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@types/jsdom": "30.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -365,7 +365,7 @@ export default function BrandVoicePage() {
                   ).map(([label, value]) =>
                     value ? (
                       <div key={label}>
-                        <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--ink-3)]">
+                        <dt className="text-[11px] font-medium text-[var(--ink-3)]">
                           {label}
                         </dt>
                         <dd className="mt-0.5 text-[13px] leading-relaxed text-[var(--ink-2)]">
@@ -403,7 +403,7 @@ export default function BrandVoicePage() {
                     }}
                   >
                     <span
-                      className="absolute top-[3px] h-[16px] w-[16px] rounded-full bg-white transition-[left]"
+                      className="absolute top-[3px] h-[16px] w-[16px] rounded-full bg-paper transition-transform"
                       style={{ left: voice.is_active ? 22 : 3 }}
                     />
                   </button>
@@ -440,7 +440,7 @@ export default function BrandVoicePage() {
 
       {modalOpen ? (
         <div
-          className="fixed inset-0 z-[500] flex items-center justify-center overflow-y-auto bg-[rgba(23,20,18,0.45)] p-5"
+          className="fixed inset-0 z-[500] flex items-center justify-center overflow-y-auto bg-overlay p-5"
           onClick={(event) => {
             if (event.target === event.currentTarget) setModalOpen(false);
           }}

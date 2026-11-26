@@ -2,7 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { getMarkdownDarkComponents } from "@/lib/markdown-dark-components";
+import { getMarkdownComponents } from "@/lib/markdown-components";
 
 interface MarkdownRendererProps {
   content: string;
@@ -19,7 +19,7 @@ export function MarkdownRenderer({
     <div className={`markdown-content ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        components={getMarkdownDarkComponents()}
+        components={getMarkdownComponents()}
       >
         {content}
       </ReactMarkdown>

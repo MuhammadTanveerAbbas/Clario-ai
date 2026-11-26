@@ -1,0 +1,65 @@
+:root {
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem; --text-xl: 1.5625rem; --text-2xl: 1.953rem; --text-3xl: 2.441rem;
+  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem); --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.5rem); --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.625rem); --text-lead: clamp(1.125rem, 0.35vw + 1rem, 1.375rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --color-error: #b42318; --color-success: #15803d;
+  --container: 1440px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+
+  /* Brand, read from the project's own palette in globals.css. */
+  --brand: #f97316;
+  --brand-hover: #ea580c;
+  --brand-soft: #fff7ed;
+  --brand-2: #fb923c;
+  --form-line: #3d3935;
+  --color-white: #ffffff;
+  --color-paper: #faf9f6;
+  --color-paper-2: #f4f1ec;
+  --color-paper-3: #ece8e1;
+  --color-ink: #171412;
+  --color-ink-2: #4a443e;
+  --color-muted: #6f675e;
+  --color-rule: #cfc7bb;
+  --color-accent: #F97316;
+  --color-accent-hover: #9a3412;
+  --color-accent-ink: var(--color-paper);
+  --color-focus: #F97316;
+
+  /* Tonal rules and overlays used by the app screens. */
+  --color-danger: #b42318;
+  --color-danger-hover: #912018;
+  --color-danger-ink: #fca5a5;
+  --color-danger-rule: rgba(180, 35, 24, 0.22);
+  --color-danger-rule-soft: rgba(180, 35, 24, 0.12);
+  --color-danger-wash: rgba(180, 35, 24, 0.06);
+  --color-danger-wash-soft: rgba(180, 35, 24, 0.04);
+  --color-success-wash: rgba(21, 128, 61, 0.06);
+  --color-scroll-thumb: rgba(23, 20, 18, 0.22);
+  --color-scroll-thumb-hover: rgba(23, 20, 18, 0.35);
+  --color-ink-wash: rgba(23, 20, 18, 0.04);
+  --color-success-rule: rgba(21, 128, 61, 0.25);
+  --color-overlay: rgba(23, 20, 18, 0.45);
+  --color-scrim: rgba(23, 20, 18, 0.6);
+  --color-code-ink: #1c1917;
+  --color-code-surface: #fafaf9;
+  --color-code-panel: #fafaf9;
+  --color-code-muted: #a8a29e;
+  --color-code-blue: #569cd6;
+  --color-code-string: #ce9178;
+  --color-code-comment: #6a9955;
+  --color-code-prop: #9cdcfe;
+  --color-code-number: #b5cea8;
+  --color-code-tag: #d7ba7d;
+  --color-code-fn: #dcdcaa;
+  --color-code-bg: #1e1e1e;
+  --color-code-builtin: #4ec9b0;
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+  --font-outlier: var(--font-fraunces), Georgia, serif;
+  --radius-card: 12px; --radius-control: 8px; --radius-pill: 999px; --rule-hair: 1px; --shadow-card: none;
+  --tracking-display: -0.015em;
+}

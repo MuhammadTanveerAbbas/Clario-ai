@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="public/favicon.svg" alt="Clario logo" width="80" height="80" />
+  <img src="public/Clario.png" alt="Clario logo" width="80" height="80" />
 
 # Clario
 
@@ -20,7 +20,7 @@
 ---
 
 <div align="center">
-  <img src="public/Clario-Hub.png" alt="Clario workspace preview" width="100%" />
+  <img src="public/dashboard-preview.svg" alt="Clario workspace preview" width="100%" />
 </div>
 
 ---

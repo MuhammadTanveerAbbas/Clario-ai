@@ -86,8 +86,6 @@ CREATE TABLE profiles (
   onboarding_completed   BOOLEAN     NOT NULL DEFAULT FALSE,
   onboarding_steps       JSONB       NOT NULL DEFAULT
                            '{"summarize":false,"remix":false,"brandVoice":false,"chat":false}'::JSONB,
-  theme                  TEXT        NOT NULL DEFAULT 'dark'
-                           CHECK (theme IN ('dark','light')),
   created_at             TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at             TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

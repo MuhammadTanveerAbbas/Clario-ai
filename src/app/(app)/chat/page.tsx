@@ -65,7 +65,7 @@ function ToastContainer({
             gap: 10,
             background: "hsl(var(--card))",
             border: "1px solid hsl(var(--border))",
-            borderLeft: `3px solid ${t.type === "success" ? "#10b981" : t.type === "error" ? "#ef4444" : "hsl(var(--accent))"}`,
+            borderLeft: `3px solid ${t.type === "success" ? "var(--color-success)" : t.type === "error" ? "var(--color-danger)" : "hsl(var(--accent))"}`,
             borderRadius: 10,
             padding: "11px 14px",
             boxShadow: "0 8px 24px rgba(0,0,0,.2)",
@@ -327,14 +327,14 @@ export default function ChatPage() {
         .messages-area::-webkit-scrollbar-thumb{background:rgba(23,20,18,.22);border-radius:999px}
         .messages-area::-webkit-scrollbar-thumb:hover{background:rgba(23,20,18,.35)}
         @media(max-width:480px){.messages-area{padding:12px;gap:8px}}
-        .msg-user{align-self:flex-end;background:var(--brand);color:#fff;border-radius:14px 14px 4px 14px;padding:10px 14px;max-width:85%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+        .msg-user{align-self:flex-end;background:var(--brand);color:var(--color-paper);border-radius:14px 14px 4px 14px;padding:10px 14px;max-width:85%;font-size:.88rem;line-height:1.5;white-space:pre-wrap;word-break:break-word}
         .msg-assistant{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:12px 16px;max-width:88%;font-size:.88rem;line-height:1.7;white-space:normal;word-break:break-word;font-family:var(--sans);-webkit-font-smoothing:antialiased;color:var(--ink)}
         .input-area{border-top:1px solid var(--line);padding:16px;flex-shrink:0;background:var(--bg)}
         @media(max-width:480px){.input-area{padding:10px}}
         .input-row{display:flex;gap:10px;align-items:flex-end}
         .chat-textarea{flex:1;background:var(--surface);border:1px solid var(--input-b);border-radius:12px;padding:10px 14px;font-family:var(--sans);font-size:.88rem;color:var(--ink);resize:none;min-height:44px;max-height:144px;outline:none;transition:border-color .15s;line-height:1.5}
         .chat-textarea:focus{border-color:var(--brand)}
-        .send-btn{width:40px;height:40px;border-radius:50%;background:var(--brand);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+        .send-btn{width:40px;height:40px;border-radius:50%;background:var(--brand);border:none;color:var(--color-paper);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
         .send-btn:disabled{opacity:.4;cursor:not-allowed}
         .send-btn:not(:disabled):hover{background:var(--brand-hover)}
         .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3);display:inline-block;animation:pulse-dot 1.2s ease-in-out infinite}
@@ -389,7 +389,7 @@ export default function ChatPage() {
                     }}
                     style={{
                       background: "hsl(var(--accent))",
-                      color: "#fff",
+                      color: "var(--color-paper)",
                       border: "none",
                       borderRadius: 7,
                       padding: "4px 10px",
@@ -417,7 +417,7 @@ export default function ChatPage() {
                     }}
                     aria-label="Close sidebar"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                       <line x1="18" y1="6" x2="6" y2="18" />
                       <line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
@@ -473,7 +473,7 @@ export default function ChatPage() {
                       stroke="currentColor"
                       strokeWidth="1.5"
                       strokeLinecap="round"
-                    >
+                     aria-hidden="true">
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                     <span
@@ -544,7 +544,7 @@ export default function ChatPage() {
                             style={{
                               background: "none",
                               border: "none",
-                              color: "#ef4444",
+                              color: "var(--color-danger)",
                               cursor: "pointer",
                               fontSize: ".68rem",
                             }}
@@ -574,7 +574,7 @@ export default function ChatPage() {
                     stroke="currentColor"
                     strokeWidth="1.8"
                     strokeLinecap="round"
-                  >
+                   aria-hidden="true">
                     <line x1="3" y1="12" x2="21" y2="12" />
                     <line x1="3" y1="6" x2="21" y2="6" />
                     <line x1="3" y1="18" x2="21" y2="18" />
@@ -623,7 +623,7 @@ export default function ChatPage() {
                     </span>
                     <button
                       type="button"
-                      className="opacity-0 transition-opacity group-hover:opacity-100 p-1 rounded-md hover:bg-white/10 text-[var(--text3)]"
+                      className="opacity-0 transition-opacity group-hover:opacity-100 p-1 rounded-md hover:bg-form-line text-[var(--text3)]"
                       aria-label="Edit title"
                       onClick={() => setEditingTitle(true)}
                     >
@@ -647,7 +647,7 @@ export default function ChatPage() {
                     stroke="currentColor"
                     strokeWidth="1.8"
                     strokeLinecap="round"
-                  >
+                   aria-hidden="true">
                     <polyline points="3 6 5 6 21 6" />
                     <path d="M19 6l-1 14H6L5 6" />
                     <path d="M10 11v6" />
@@ -671,7 +671,7 @@ export default function ChatPage() {
                     }}
                   >
                     <div style={{ width: 48, height: 48, borderRadius: 14, background: "var(--accent-l)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.6" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
                     <h2
                       style={{
@@ -737,7 +737,7 @@ export default function ChatPage() {
                               marginRight: 4,
                             }}
                           >
-                            Clario is writing...
+                            Clario is writing…
                           </span>
                           {[0, 1, 2].map((i) => (
                             <span
@@ -800,7 +800,7 @@ export default function ChatPage() {
                           gap: 5,
                         }}
                       >
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22A10 10 0 0 1 2 12c0-3.5 2-6.5 5-8"/></svg>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="10.5" r="2.5"/><circle cx="8.5" cy="7.5" r="2.5"/><circle cx="6.5" cy="12.5" r="2.5"/><path d="M12 22A10 10 0 0 1 2 12c0-3.5 2-6.5 5-8"/></svg>
                         {activeBrandVoice.name} active
                       <button
                         onClick={deactivateVoice}
@@ -823,7 +823,7 @@ export default function ChatPage() {
                   <div
                     style={{
                       fontSize: ".72rem",
-                      color: input.length > 1950 ? "#ef4444" : "var(--text3)",
+                      color: input.length > 1950 ? "var(--color-danger)" : "var(--text3)",
                       textAlign: "right",
                       marginBottom: 4,
                     }}
@@ -863,7 +863,7 @@ export default function ChatPage() {
                       stroke="currentColor"
                       strokeWidth="2"
                       strokeLinecap="round"
-                    >
+                     aria-hidden="true">
                       <line x1="22" y1="2" x2="11" y2="13" />
                       <polygon points="22 2 15 22 11 13 2 9 22 2" />
                     </svg>
@@ -884,7 +884,7 @@ export default function ChatPage() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-600"
+              className="bg-danger text-accent-ink hover:bg-danger-hover focus:ring-danger"
               onClick={() => {
                 setMessages([]);
                 setClearDialogOpen(false);

@@ -170,7 +170,7 @@ export function SecuritySection({ userEmail, onSignOut }: SecuritySectionProps) 
               type="button"
               variant="outline"
               onClick={onSignOut}
-              className="w-full border-[rgba(180,35,24,0.28)] text-[var(--error)] hover:border-[rgba(180,35,24,0.45)] hover:bg-[rgba(180,35,24,0.05)] hover:text-[var(--error)]"
+              className="w-full border-danger-rule text-[var(--error)] hover:border-danger-rule hover:bg-danger-wash-soft hover:text-[var(--error)]"
             >
               Sign out of all devices
             </Button>

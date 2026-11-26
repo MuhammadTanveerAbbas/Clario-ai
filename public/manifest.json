@@ -8,9 +8,9 @@
   "theme_color": "#f97316",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/Clario.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]

@@ -18,7 +18,6 @@ export interface Database {
           requests_reset_at: string
           onboarding_completed: boolean
           onboarding_steps: Json
-          theme: 'dark' | 'light'
           created_at: string
           updated_at: string
         }
@@ -36,7 +35,6 @@ export interface Database {
           requests_reset_at?: string
           onboarding_completed?: boolean
           onboarding_steps?: Json
-          theme?: 'dark' | 'light'
           created_at?: string
           updated_at?: string
         }
@@ -54,7 +52,6 @@ export interface Database {
           requests_reset_at?: string
           onboarding_completed?: boolean
           onboarding_steps?: Json
-          theme?: 'dark' | 'light'
           created_at?: string
           updated_at?: string
         }

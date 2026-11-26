@@ -64,7 +64,7 @@ export function ProfileSection({
   return (
     <div className="space-y-4">
       <div className="surface flex items-center gap-4 p-5">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[var(--brand)] font-serif text-[22px] font-medium text-white">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-brand-strong font-serif text-[22px] font-medium text-accent-ink">
           {initials}
         </div>
         <div className="min-w-0">

@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { ClientProviders } from "@/components/providers/client-providers";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
 const cantarell = Cantarell({
   subsets: ["latin"],
@@ -61,8 +60,8 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    icon: [{ url: "/Clario.png", type: "image/png" }],
+    apple: [{ url: "/Clario.png", type: "image/png" }],
   },
   openGraph: {
     type: "website",
@@ -102,7 +101,7 @@ const jsonLd = {
       "@id": "https://clario-hub.vercel.app/#organization",
       name: "Clario",
       url: "https://clario-hub.vercel.app/",
-      logo: "https://clario-hub.vercel.app/favicon.svg",
+      logo: "https://clario-hub.vercel.app/Clario.png",
       email: "muhammadtanveerabbas.contact@gmail.com",
       sameAs: ["https://x.com/m_tanveerabbas"],
     },
@@ -149,10 +148,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      suppressHydrationWarning
       className={`${cantarell.variable} ${fraunces.variable}`}
     >
-      <body className="font-sans antialiased" suppressHydrationWarning>
+      <body className="font-sans antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -160,10 +158,8 @@ export default function RootLayout({
         <ClientProviders>
           <AuthProvider>
             <SidebarProvider>
-              <ThemeProvider>
-                {children}
-                <Toaster />
-              </ThemeProvider>
+              {children}
+              <Toaster />
             </SidebarProvider>
           </AuthProvider>
         </ClientProviders>

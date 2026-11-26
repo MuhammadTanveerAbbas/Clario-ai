@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 
 export interface PreferencesData {
   notifications: boolean;
-  darkMode: boolean;
   autoSave: boolean;
   analytics: boolean;
 }
@@ -66,7 +65,7 @@ function Toggle({
     >
       <span
         className={cn(
-          "absolute h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
+          "absolute h-4 w-4 rounded-full bg-paper shadow-soft transition-transform",
           checked ? "translate-x-[20px]" : "translate-x-[3px]"
         )}
         aria-hidden
