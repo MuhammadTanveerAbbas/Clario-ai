@@ -73,7 +73,7 @@ export const metadata: Metadata = {
       "Turn 1 video into 10 pieces of content with AI. Summarize, remix, and write in your brand voice.",
     images: [
       {
-        url: "https://clario-hub.vercel.app/opengraph-image",
+        url: "https://clario-hub.vercel.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Clario - AI Content Repurposing Tool for Creators",
@@ -87,6 +87,14 @@ export const metadata: Metadata = {
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
       "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice.",
+    images: [
+      {
+        url: "https://clario-hub.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Clario - AI Content Repurposing Tool for Creators",
+      },
+    ],
   },
   alternates: {
     canonical: "https://clario-hub.vercel.app",
@@ -150,6 +158,12 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       className={`${cantarell.variable} ${fraunces.variable}`}
     >
+      <head>
+        <meta
+          property="og:logo"
+          content="https://clario-hub.vercel.app/Clario.png"
+        />
+      </head>
       <body className="font-sans antialiased">
         <script
           type="application/ld+json"
