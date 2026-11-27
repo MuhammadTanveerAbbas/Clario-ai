@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Clario",
   },
   description:
-    "Turn 1 YouTube video into 10 pieces of content. AI-powered summarizer, chat, remix studio, and brand voice library. Built for YouTubers, podcasters, and content creators.",
+    "Turn 1 YouTube video into 10 pieces of content with AI summarizer, remix studio, chat, and brand voice tools. Built for creators.",
   keywords: [
     "content repurposing",
     "AI content creator",
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     siteName: "Clario",
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
-      "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice. Built for YouTubers and podcasters.",
+      "Turn 1 video into 10 pieces of content with AI. Summarize, remix, and write in your brand voice.",
     images: [
       {
         url: "https://clario-hub.vercel.app/opengraph-image",
