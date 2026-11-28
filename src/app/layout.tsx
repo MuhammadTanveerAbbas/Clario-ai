@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cantarell, Fraunces } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: "%s | Clario",
   },
   description:
-    "Turn 1 YouTube video into 10 pieces of content with AI summarizer, remix studio, chat, and brand voice tools. Built for creators.",
+    "Turn 1 video into 10 ready to publish posts with AI. Summarize, remix for any platform, chat, and write in your brand voice. Built for creators and teams.",
   keywords: [
     "content repurposing",
     "AI content creator",
@@ -60,7 +60,10 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   icons: {
-    icon: [{ url: "/Clario.png", type: "image/png" }],
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
     apple: [{ url: "/Clario.png", type: "image/png" }],
   },
   openGraph: {
@@ -70,7 +73,7 @@ export const metadata: Metadata = {
     siteName: "Clario",
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
-      "Turn 1 video into 10 pieces of content with AI. Summarize, remix, and write in your brand voice.",
+      "Turn 1 video into 10 ready to publish posts with AI. Summarize, remix for any platform, chat, and write in your brand voice. Built for creators and teams.",
     images: [
       {
         url: "https://clario-hub.vercel.app/og-image.png",
@@ -86,7 +89,7 @@ export const metadata: Metadata = {
     creator: "@m_tanveerabbas",
     title: "Clario - Turn 1 Video into 10 Pieces of Content",
     description:
-      "AI-powered content repurposing for creators. Summarize videos, remix into 10 formats, and write in your brand voice.",
+      "Turn 1 video into 10 ready to publish posts with AI. Summarize, remix for any platform, chat, and write in your brand voice. Built for creators and teams.",
     images: [
       {
         url: "https://clario-hub.vercel.app/og-image.png",
@@ -99,6 +102,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://clario-hub.vercel.app",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f97316",
 };
 
 const jsonLd = {
